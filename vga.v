@@ -51,6 +51,9 @@ module vga(
     localparam V_WHOLE      = V_VISIBLE + V_FRONT + V_SYNC + V_BACK;
 
     localparam COUNTER_WIDTH    = `GET_WIDTH(H_WHOLE);
+    localparam DISP_AREA        = H_VISIBLE * V_VISIBLE;
+    localparam DISP_ADDR        = DISP_AREA / 4;
+    localparam ADDR_COUNT_WIDTH = `GET_WIDTH(DISP_ADDR);
 
     reg    [47:0] disp_reg;
     reg    [47:0] disp_reg_next;
@@ -62,11 +65,15 @@ module vga(
     wire   [COUNTER_WIDTH:0] v_counter_next;
     wire   [COUNTER_WIDTH:0] line_offset_next;
 
+    reg    [ADDR_COUNT_WIDTH:0] addr_count;
+    wire   [ADDR_COUNT_WIDTH:0] addr_count_next;
+
     wire   [11:0] pixel_data;
 
     wire   [19:0] vga_addr_next;
 
     reg    vga_should_read_r;
+    reg    vga_should_read_b;
     wire   vga_should_read  = h_counter >= (H_SYNC+H_BACK-4) && h_counter < (H_SYNC+H_BACK+H_VISIBLE-4) && 
                               v_counter >= (V_SYNC+V_BACK) && v_counter < (V_SYNC+V_BACK+V_VISIBLE) &&
                               line_offset[1:0] == 3;
@@ -83,9 +90,9 @@ module vga(
                                                                  disp_reg[47:36]
                                 )
                                 : 12'b0;
-    assign vga_addr_next            = (h_counter == (H_SYNC+H_BACK-1) && v_counter == (V_SYNC+V_BACK+V_VISIBLE-1)) 
-                                            ? vga_offset_in : vga_addr + 20'b1;
-    assign vga_offset_sel           = (h_counter == (H_SYNC+H_BACK+H_VISIBLE-4) && v_counter == (V_SYNC+V_BACK+V_VISIBLE-1));
+    assign addr_count_next          = (addr_count == DISP_ADDR-1) ? 0 : addr_count + 1;
+    assign vga_addr_next            = (addr_count == DISP_ADDR-1) ? vga_offset_in : vga_addr + 20'b1;
+    assign vga_offset_sel           = (addr_count == DISP_ADDR-1) && vga_should_read_r && ~vga_sel;
 
     task init_vga;
     begin
@@ -96,15 +103,17 @@ module vga(
         {vga_r, vga_g, vga_b}   <= 12'b0;
         vga_hs                  <= 1'b0;
         vga_vs                  <= 1'b0;
+        vga_should_read_b       <= 0;
     end
     endtask
 
     task init;
     begin
-        disp_reg_next   <= 48'b0;
-        vga_sel         <= 1'b0;
-        vga_addr        <= 20'b0;
+        disp_reg_next       <= 48'b0;
+        vga_sel             <= 1'b0;
+        vga_addr            <= 20'b0;
         vga_should_read_r   <= 1'b0;
+        addr_count          <= 0;
     end
     endtask
 
@@ -122,6 +131,7 @@ module vga(
             h_counter               <= h_counter_next;
             v_counter               <= v_counter_next;
             line_offset             <= line_offset_next;
+            vga_should_read_b       <= vga_should_read;
             if (line_offset[1:0] == 3) begin
                 disp_reg <= disp_reg_next;
             end
@@ -131,7 +141,7 @@ module vga(
     always @(posedge clk) begin
         if (rst) init();
         else begin
-            vga_should_read_r   <= vga_should_read;
+            vga_should_read_r   <= vga_should_read_b;
             if (vga_sel) begin
                 if (vga_valid) begin
                     disp_reg_next <= vga_data;
@@ -139,6 +149,7 @@ module vga(
                 end
             end
             else if (vga_should_read_r) begin
+                addr_count  <= addr_count_next;
                 vga_addr    <= vga_addr_next;
                 vga_sel     <= 1'b1;
             end
