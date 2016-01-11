@@ -39,8 +39,8 @@ module vga_test;
     wire vga_sel;
 
     wire [47:0] vga_data;
-    wire vga_valid;
     wire vga_offset_sel;
+    wire vga_valid;
 
     // Instantiate the Unit Under Test (UUT)
     vga uut (
@@ -61,7 +61,6 @@ module vga_test;
     );
 
     assign vga_data = {vga_addr[7:0], vga_addr, vga_addr};
-    assign vga_valid = vga_sel;
 
     initial begin
         // Initialize Inputs
@@ -73,8 +72,17 @@ module vga_test;
         #100;
 
         // Add stimulus here
-
     end
+
+    reg state = 0;
+    reg last_state = 0;
+
+    always @(posedge clk) begin
+        last_state  <= state;
+        state       <= state ? 0 : (vga_sel & ~vga_valid);
+    end
+
+    assign vga_valid = last_state;
 
     initial forever #5 clk = ~clk;
     initial forever #7.692307 clk_vga = ~clk_vga;
