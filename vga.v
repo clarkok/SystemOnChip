@@ -55,15 +55,23 @@ module vga(
     localparam LINE_ADDR_WIDTH  = `GET_WIDTH(LINE_ADDR_COUNT);
 
     // cross area
-    reg  [47:0]             line_buffer[0:H_VISIBLE-1];
-    wire                    new_line_clk_vga;
-    wire                    new_line_clk;
+    wire                    line_buffer_full;
+    wire [47:0]             line_buffer_din;
+    wire [47:0]             line_buffer_dout;
+    wire                    line_buffer_we;
+    wire                    line_buffer_rd;
 
-    async_flag async_flag(
-        .clk_src(clk_vga),
-        .flag_src(new_line_clk_vga),
-        .clk_dst(clk),
-        .flag_dst(new_line_clk)
+    vga_line_buffer vga_line_buffer(
+        .rst(rst),
+        .wr_clk(clk),
+        .rd_clk(clk_vga),
+
+        .full(line_buffer_full),
+        .empty(),
+        .din(line_buffer_din),
+        .dout(line_buffer_dout),
+        .wr_en(line_buffer_we),
+        .rd_en(line_buffer_rd)
     );
 
     // clk_vga domain
@@ -73,7 +81,7 @@ module vga(
     wire [COUNTER_WIDTH:0]  h_counter_next;
     wire [COUNTER_WIDTH:0]  v_counter_next;
     wire [COUNTER_WIDTH:0]  line_offset;
-    wire [47:0]             pixel_block;
+    reg  [47:0]             pixel_block;
     reg  [11:0]             pixel_data;
     wire                    inside_display;
     wire                    vga_hs_next;
@@ -82,13 +90,11 @@ module vga(
     assign h_counter_next   = (h_counter == H_WHOLE - 1) ? 0 : h_counter + 1;
     assign v_counter_next   = (h_counter == H_WHOLE - 1) ? (v_counter == V_WHOLE - 1 ? 0 : v_counter + 1) : v_counter;
     assign line_offset      = h_counter - (H_SYNC + H_BACK);
-    assign pixel_block      = line_buffer[line_offset[COUNTER_WIDTH:2]];
     assign inside_display   = h_counter >= (H_SYNC + H_BACK) && h_counter < (H_SYNC + H_BACK + H_VISIBLE) &&
                               v_counter >= (V_SYNC + V_BACK) && v_counter < (V_SYNC + V_BACK + V_VISIBLE);
     assign vga_hs_next      = h_counter >= H_SYNC;
     assign vga_vs_next      = v_counter >= V_SYNC;
-    assign new_line_clk_vga = h_counter == (H_SYNC + H_BACK + H_VISIBLE) &&
-                              v_counter >= (V_SYNC + V_BACK - 1) && v_counter < (V_SYNC + V_BACK + V_VISIBLE - 1);
+    assign line_buffer_rd   = inside_display && (line_offset[1:0] == 2'b01);
 
     always @(*) begin
         if (inside_display) begin
@@ -110,6 +116,7 @@ module vga(
         vga_vs                  <= 0;
         h_counter               <= 0;
         v_counter               <= 0;
+        pixel_block             <= 0;
     end
     endtask
 
@@ -123,34 +130,35 @@ module vga(
             vga_vs                  <= vga_vs_next;
             h_counter               <= h_counter_next;
             v_counter               <= v_counter_next;
+            if (inside_display && line_offset[1:0] == 2'b11) begin
+                pixel_block     <= line_buffer_dout;
+            end
         end
     end
 
     // clk domain
-    localparam S_WAITING    = H_VISIBLE / 4;
 
-    reg  [COUNTER_WIDTH:0]  line_counter;
-    reg  [COUNTER_WIDTH:0]  state;
+    localparam DISP_ADDR_COUNT  = (H_VISIBLE * V_VISIBLE) / 4;
+    localparam DISP_ADDR_WIDTH  = `GET_WIDTH(DISP_ADDR_COUNT);
 
-    wire [COUNTER_WIDTH:0]  line_counter_next;
-    wire [COUNTER_WIDTH:0]  state_next;
-    wire [19:0]             vga_addr_next;
-    wire                    vga_sel_next;
+    reg  [DISP_ADDR_WIDTH:0]    addr_counter;
+    wire [DISP_ADDR_WIDTH:0]    addr_counter_next;
+    wire                        vga_sel_next;
+    wire [19:0]                 vga_addr_next;
 
-    assign line_counter_next    = new_line_clk ? (line_counter == V_VISIBLE - 1 ? 0 : line_counter + 1) : line_counter;
-    assign state_next           = state == S_WAITING
-                                    ? (new_line_clk ? 0 : S_WAITING)
-                                    : (vga_valid ? state + 1 : state);
-    assign vga_offset_sel       = new_line_clk && (line_counter == 0);
-    assign vga_addr_next        = vga_offset_sel ? vga_offset_in : (vga_valid ? vga_addr + 1 : vga_addr);
-    assign vga_sel_next         = state_next != S_WAITING;
+    assign vga_offset_sel       = vga_sel_next && (addr_counter == DISP_ADDR_COUNT-1);
+    assign vga_sel_next         = ~line_buffer_full;
+    assign vga_addr_next        = vga_sel_next ? (vga_offset_sel ? vga_offset_in : vga_addr + 1) : vga_addr;
+    assign addr_counter_next    = vga_sel_next ? (addr_counter == DISP_ADDR_COUNT-1 ? 0 : addr_counter + 1) : addr_counter;
+
+    assign line_buffer_din  = vga_data;
+    assign line_buffer_we   = vga_valid;
 
     task init;
     begin
-        vga_addr        <= 0;
-        vga_sel         <= 0;
-        line_counter    <= 0;
-        state           <= S_WAITING;
+        vga_addr            <= 0;
+        vga_sel             <= 0;
+        addr_counter        <= 0;
     end
     endtask
 
@@ -159,14 +167,15 @@ module vga(
     always @(posedge clk) begin
         if (rst) init();
         else begin
-            vga_addr        <= vga_addr_next;
-            vga_sel         <= vga_sel_next;
-            line_counter    <= line_counter_next;
-            state           <= state_next;
-
-            if (vga_valid) begin
-                line_buffer[state]  <= vga_data;
+            if (!vga_sel) begin
+                vga_sel         <= vga_sel_next;
+                vga_addr        <= vga_addr_next;
+                addr_counter    <= addr_counter_next;
+            end
+            else if (vga_valid) begin
+                vga_sel     <= 0;
             end
         end
     end
+
 endmodule
