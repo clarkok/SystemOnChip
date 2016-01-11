@@ -28,7 +28,6 @@ module vga_test;
     reg clk;
     reg clk_vga;
     reg rst;
-    reg vga_valid;
 
     // Outputs
     wire [3:0] vga_b;
@@ -40,6 +39,7 @@ module vga_test;
     wire vga_sel;
 
     wire [47:0] vga_data;
+    wire vga_valid;
     wire vga_offset_sel;
 
     // Instantiate the Unit Under Test (UUT)
@@ -61,13 +61,13 @@ module vga_test;
     );
 
     assign vga_data = {vga_addr[7:0], vga_addr, vga_addr};
+    assign vga_valid = vga_sel;
 
     initial begin
         // Initialize Inputs
         clk = 0;
         clk_vga = 0;
         rst = 0;
-        vga_valid = 1;
 
         // Wait 100 ns for global reset to finish
         #100;
