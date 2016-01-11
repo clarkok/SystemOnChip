@@ -77,7 +77,7 @@ module vga_test;
     end
 
     initial forever #5 clk = ~clk;
-    initial forever #7.7 clk_vga = ~clk_vga;
+    initial forever #7.692307 clk_vga = ~clk_vga;
 
 endmodule
 

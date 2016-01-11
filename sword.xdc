@@ -1782,3 +1782,6 @@ set_input_delay -clock [get_clocks [list [get_clocks -of_objects [get_pins dsp/i
 
 
 
+
+
+set_false_path -from [get_pins gpu/vga/async_flag/flag_toggle_src_reg/C] -to [get_pins {gpu/vga/async_flag/sync_dst_reg[0]/D}]
