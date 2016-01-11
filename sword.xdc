@@ -20,46 +20,46 @@
 
 #   NET "clk"                                      TNM_NET = TM_CLK ;
 #   TIMESPEC TS_CLKIN                               = PERIOD "TM_CLK"       10 ns HIGH 50%;
-#   
+#
 #   NET "*s_SYS_CLK"                               TNM_NET = TM_SYS_CLK;
 #   TIMESPEC TS_SYS_CLK                             = PERIOD "TM_SYS_CLK"   10 ns HIGH 50%;
-#   
+#
 #   NET "*s_SYS_CLK100M"                           TNM_NET = TM_CLK_100M;
 #   TIMESPEC TS_SYS_CLK                             = PERIOD "TM_CLK_100M"  10 ns HIGH 50%;
-#   
+#
 #   NET "*s_SYS_CLK50M"                            TNM_NET = TM_CLK_50M ;
 #   TIMESPEC TS_CLK_50M                             = PERIOD "TM_CLK_50M"   20 ns HIGH 50%;
-#   
+#
 #   NET "*s_SYS_CLK375M"                           TNM_NET = TM_CLK_250M ;
 #   TIMESPEC TS_CLK_375M                            = PERIOD "TM_CLK_250M"   4 ns HIGH 50%;
-#   
+#
 #   NET "*s_TMDS_RXC"                              TNM_NET = TM_TMDS_RXC ;
 #   TIMESPEC TS_TMDS_RXC                            = PERIOD "TM_TMDS_RXC"  20 ns HIGH 50%;
-#   
+#
 #   NET "*s_UI_CLK"                                TNM_NET = TM_UI_CLK ;
 #   TIMESPEC TS_UI_CLK                              = PERIOD "TM_UI_CLK"     5 ns HIGH 50%;
-#   
+#
 #   TIMESPEC "TS_100M_CLK_to_RXC_CLK"             = FROM "TM_SYS_CLK"  TO "TM_TMDS_RXC"   10 ns DATAPATHONLY ;
 #   TIMESPEC "TS_RXC_CLK_to_100M_CLK"             = FROM "TM_TMDS_RXC" TO "TM_SYS_CLK"    10 ns DATAPATHONLY ;
-#   
+#
 #   TIMESPEC "TS_100M_CLK_to_50M_CLK"             = FROM "TM_SYS_CLK"  TO "TM_CLK_50M"    10 ns DATAPATHONLY ;
 #   TIMESPEC "TS_50M_CLK_to_100M_CLK"             = FROM "TM_CLK_50M"  TO "TM_SYS_CLK"    10 ns DATAPATHONLY ;
-#   
+#
 #   TIMESPEC "TS_SYS_CLK_to_UI_CLK"               = FROM "TM_SYS_CLK"  TO "TM_UI_CLK"      5 ns DATAPATHONLY ;
 #   TIMESPEC "TS_UI_CLK_to_SYS_CLK"               = FROM "TM_UI_CLK" TO "TM_SYS_CLK"      10 ns DATAPATHONLY ;
-#   
+#
 #   TIMESPEC "TS_UI_CLK_to_MIG_CLK"               = FROM "TM_UI_CLK"  TO "TM_MIG_CLK"      5 ns DATAPATHONLY ;
 #   TIMESPEC "TS_MIG_CLK_to_UI_CLK"               = FROM "TM_MIG_CLK" TO "TM_UI_CLK"       5 ns DATAPATHONLY ;
-#   
+#
 #   NET "*XRST*"                                  TIG ;
 #   NET "*RST*"                                   TIG ;
-#   
+#
 #   TIMESPEC "TS_PADS_to_FFS"                     = FROM PADS("TMDS*") TO FFS  10 ns ;
 #   TIMESPEC "TS_FFS_to_PADS"                     = FROM FFS TO PADS("TMDS*")  10 ns ;
-#   
+#
 #   INST "U_HDMI_CTRL/U_LVDS_RX/U_MMCME2_ADV3/clkin1_buf"         LOC = BUFGCTRL_X0Y11 ;
 #   INST "U_HDMI_CTRL/U_LVDS_RX/U_MMCME2_ADV3/mmcm_adv_inst"     LOC = MMCME2_ADV_X1Y2 ;
-#   
+#
 ############################################################################
 # Location Constraints                                                     #
 ############################################################################
@@ -167,7 +167,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports {tri_led1[2]}]
 #   NET "SD_RESET"                                 LOC = AE23      | IOSTANDARD = LVCMOS33 ;
 #   NET "SD_SCK"                                   LOC = AF23      | IOSTANDARD = LVCMOS33 ;
 
-#   
+#
 #   NET "AUD_PWM"                                  LOC = P26       | IOSTANDARD = LVCMOS33 ;
 #   NET "AUD_SD"                                   LOC = M25       | IOSTANDARD = LVCMOS33 ;
 #   NET "MIC_CLK"                                  LOC = Y16       | IOSTANDARD = LVCMOS18 ;
@@ -1148,775 +1148,495 @@ set_property SLEW FAST [get_ports vga_vs]
 ############## NET - IOSTANDARD ##################
 
 # Pad function: IO_L2P_T0_34
-set_property PACKAGE_PIN U2 [get_ports {ddr3_dq[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:360
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[0]' has been applied to the port object 'ddr3_dq[0]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:360
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[0]' has been applied to the port object 'ddr3_dq[0]'.
-set_property SLEW FAST [get_ports {ddr3_dq[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:360
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[0]' has been applied to the port object 'ddr3_dq[0]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[0]}]
 # Pad function: IO_L5P_T0_34
-set_property PACKAGE_PIN U7 [get_ports {ddr3_dq[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:361
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[1]' has been applied to the port object 'ddr3_dq[1]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:361
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[1]' has been applied to the port object 'ddr3_dq[1]'.
-set_property SLEW FAST [get_ports {ddr3_dq[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:361
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[1]' has been applied to the port object 'ddr3_dq[1]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[1]}]
 # Pad function: IO_L1P_T0_34
-set_property PACKAGE_PIN U6 [get_ports {ddr3_dq[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:362
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[2]' has been applied to the port object 'ddr3_dq[2]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:362
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[2]' has been applied to the port object 'ddr3_dq[2]'.
-set_property SLEW FAST [get_ports {ddr3_dq[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:362
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[2]' has been applied to the port object 'ddr3_dq[2]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[2]}]
 # Pad function: IO_L6P_T0_34
-set_property PACKAGE_PIN V4 [get_ports {ddr3_dq[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:363
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[3]' has been applied to the port object 'ddr3_dq[3]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:363
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[3]' has been applied to the port object 'ddr3_dq[3]'.
-set_property SLEW FAST [get_ports {ddr3_dq[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:363
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[3]' has been applied to the port object 'ddr3_dq[3]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[3]}]
 # Pad function: IO_L5N_T0_34
-set_property PACKAGE_PIN V6 [get_ports {ddr3_dq[4]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:364
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[4]' has been applied to the port object 'ddr3_dq[4]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[4]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:364
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[4]' has been applied to the port object 'ddr3_dq[4]'.
-set_property SLEW FAST [get_ports {ddr3_dq[4]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:364
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[4]' has been applied to the port object 'ddr3_dq[4]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[4]}]
 # Pad function: IO_L4N_T0_34
-set_property PACKAGE_PIN W3 [get_ports {ddr3_dq[5]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:365
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[5]' has been applied to the port object 'ddr3_dq[5]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[5]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:365
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[5]' has been applied to the port object 'ddr3_dq[5]'.
-set_property SLEW FAST [get_ports {ddr3_dq[5]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:365
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[5]' has been applied to the port object 'ddr3_dq[5]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[5]}]
 # Pad function: IO_L1N_T0_34
-set_property PACKAGE_PIN U5 [get_ports {ddr3_dq[6]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:366
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[6]' has been applied to the port object 'ddr3_dq[6]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[6]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:366
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[6]' has been applied to the port object 'ddr3_dq[6]'.
-set_property SLEW FAST [get_ports {ddr3_dq[6]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:366
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[6]' has been applied to the port object 'ddr3_dq[6]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[6]}]
 # Pad function: IO_L2N_T0_34
-set_property PACKAGE_PIN U1 [get_ports {ddr3_dq[7]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:367
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[7]' has been applied to the port object 'ddr3_dq[7]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[7]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:367
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[7]' has been applied to the port object 'ddr3_dq[7]'.
-set_property SLEW FAST [get_ports {ddr3_dq[7]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:367
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[7]' has been applied to the port object 'ddr3_dq[7]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[7]}]
 # Pad function: IO_L12N_T1_MRCC_34
-set_property PACKAGE_PIN AA2 [get_ports {ddr3_dq[8]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:368
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[8]' has been applied to the port object 'ddr3_dq[8]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[8]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:368
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[8]' has been applied to the port object 'ddr3_dq[8]'.
-set_property SLEW FAST [get_ports {ddr3_dq[8]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:368
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[8]' has been applied to the port object 'ddr3_dq[8]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[8]}]
 # Pad function: IO_L7N_T1_34
-set_property PACKAGE_PIN Y2 [get_ports {ddr3_dq[9]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:369
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[9]' has been applied to the port object 'ddr3_dq[9]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[9]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:369
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[9]' has been applied to the port object 'ddr3_dq[9]'.
-set_property SLEW FAST [get_ports {ddr3_dq[9]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:369
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[9]' has been applied to the port object 'ddr3_dq[9]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[9]}]
 # Pad function: IO_L11N_T1_SRCC_34
-set_property PACKAGE_PIN AC2 [get_ports {ddr3_dq[10]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:370
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[10]' has been applied to the port object 'ddr3_dq[10]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[10]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:370
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[10]' has been applied to the port object 'ddr3_dq[10]'.
-set_property SLEW FAST [get_ports {ddr3_dq[10]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:370
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[10]' has been applied to the port object 'ddr3_dq[10]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[10]}]
 # Pad function: IO_L10N_T1_34
-set_property PACKAGE_PIN Y1 [get_ports {ddr3_dq[11]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:371
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[11]' has been applied to the port object 'ddr3_dq[11]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[11]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:371
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[11]' has been applied to the port object 'ddr3_dq[11]'.
-set_property SLEW FAST [get_ports {ddr3_dq[11]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:371
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[11]' has been applied to the port object 'ddr3_dq[11]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[11]}]
 # Pad function: IO_L12P_T1_MRCC_34
-set_property PACKAGE_PIN AA3 [get_ports {ddr3_dq[12]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:372
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[12]' has been applied to the port object 'ddr3_dq[12]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[12]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:372
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[12]' has been applied to the port object 'ddr3_dq[12]'.
-set_property SLEW FAST [get_ports {ddr3_dq[12]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:372
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[12]' has been applied to the port object 'ddr3_dq[12]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[12]}]
 # Pad function: IO_L8N_T1_34
-set_property PACKAGE_PIN V1 [get_ports {ddr3_dq[13]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:373
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[13]' has been applied to the port object 'ddr3_dq[13]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[13]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:373
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[13]' has been applied to the port object 'ddr3_dq[13]'.
-set_property SLEW FAST [get_ports {ddr3_dq[13]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:373
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[13]' has been applied to the port object 'ddr3_dq[13]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[13]}]
 # Pad function: IO_L11P_T1_SRCC_34
-set_property PACKAGE_PIN AB2 [get_ports {ddr3_dq[14]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:374
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[14]' has been applied to the port object 'ddr3_dq[14]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[14]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:374
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[14]' has been applied to the port object 'ddr3_dq[14]'.
-set_property SLEW FAST [get_ports {ddr3_dq[14]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:374
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[14]' has been applied to the port object 'ddr3_dq[14]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[14]}]
 # Pad function: IO_L10P_T1_34
-set_property PACKAGE_PIN W1 [get_ports {ddr3_dq[15]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:375
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[15]' has been applied to the port object 'ddr3_dq[15]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[15]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:375
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[15]' has been applied to the port object 'ddr3_dq[15]'.
-set_property SLEW FAST [get_ports {ddr3_dq[15]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:375
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[15]' has been applied to the port object 'ddr3_dq[15]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[15]}]
 # Pad function: IO_L13P_T2_MRCC_34
-set_property PACKAGE_PIN AA4 [get_ports {ddr3_dq[16]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:376
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[16]' has been applied to the port object 'ddr3_dq[16]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[16]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:376
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[16]' has been applied to the port object 'ddr3_dq[16]'.
-set_property SLEW FAST [get_ports {ddr3_dq[16]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:376
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[16]' has been applied to the port object 'ddr3_dq[16]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[16]}]
 # Pad function: IO_L14N_T2_SRCC_34
-set_property PACKAGE_PIN AC3 [get_ports {ddr3_dq[17]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:377
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[17]' has been applied to the port object 'ddr3_dq[17]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[17]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:377
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[17]' has been applied to the port object 'ddr3_dq[17]'.
-set_property SLEW FAST [get_ports {ddr3_dq[17]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:377
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[17]' has been applied to the port object 'ddr3_dq[17]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[17]}]
 # Pad function: IO_L17N_T2_34
-set_property PACKAGE_PIN Y5 [get_ports {ddr3_dq[18]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:378
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[18]' has been applied to the port object 'ddr3_dq[18]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[18]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:378
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[18]' has been applied to the port object 'ddr3_dq[18]'.
-set_property SLEW FAST [get_ports {ddr3_dq[18]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:378
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[18]' has been applied to the port object 'ddr3_dq[18]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[18]}]
 # Pad function: IO_L16N_T2_34
-set_property PACKAGE_PIN AC6 [get_ports {ddr3_dq[19]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:379
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[19]' has been applied to the port object 'ddr3_dq[19]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[19]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:379
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[19]' has been applied to the port object 'ddr3_dq[19]'.
-set_property SLEW FAST [get_ports {ddr3_dq[19]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:379
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[19]' has been applied to the port object 'ddr3_dq[19]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[19]}]
 # Pad function: IO_L17P_T2_34
-set_property PACKAGE_PIN Y6 [get_ports {ddr3_dq[20]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:380
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[20]' has been applied to the port object 'ddr3_dq[20]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[20]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:380
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[20]' has been applied to the port object 'ddr3_dq[20]'.
-set_property SLEW FAST [get_ports {ddr3_dq[20]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:380
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[20]' has been applied to the port object 'ddr3_dq[20]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[20]}]
 # Pad function: IO_L18P_T2_34
-set_property PACKAGE_PIN AD6 [get_ports {ddr3_dq[21]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:381
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[21]' has been applied to the port object 'ddr3_dq[21]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[21]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:381
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[21]' has been applied to the port object 'ddr3_dq[21]'.
-set_property SLEW FAST [get_ports {ddr3_dq[21]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:381
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[21]' has been applied to the port object 'ddr3_dq[21]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[21]}]
 # Pad function: IO_L13N_T2_MRCC_34
-set_property PACKAGE_PIN AB4 [get_ports {ddr3_dq[22]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:382
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[22]' has been applied to the port object 'ddr3_dq[22]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[22]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:382
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[22]' has been applied to the port object 'ddr3_dq[22]'.
-set_property SLEW FAST [get_ports {ddr3_dq[22]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:382
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[22]' has been applied to the port object 'ddr3_dq[22]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[22]}]
 # Pad function: IO_L14P_T2_SRCC_34
-set_property PACKAGE_PIN AC4 [get_ports {ddr3_dq[23]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:383
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[23]' has been applied to the port object 'ddr3_dq[23]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[23]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:383
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[23]' has been applied to the port object 'ddr3_dq[23]'.
-set_property SLEW FAST [get_ports {ddr3_dq[23]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:383
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[23]' has been applied to the port object 'ddr3_dq[23]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[23]}]
 # Pad function: IO_L24N_T3_34
-set_property PACKAGE_PIN AF2 [get_ports {ddr3_dq[24]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:384
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[24]' has been applied to the port object 'ddr3_dq[24]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[24]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:384
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[24]' has been applied to the port object 'ddr3_dq[24]'.
-set_property SLEW FAST [get_ports {ddr3_dq[24]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:384
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[24]' has been applied to the port object 'ddr3_dq[24]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[24]}]
 # Pad function: IO_L22N_T3_34
-set_property PACKAGE_PIN AE2 [get_ports {ddr3_dq[25]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:385
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[25]' has been applied to the port object 'ddr3_dq[25]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[25]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:385
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[25]' has been applied to the port object 'ddr3_dq[25]'.
-set_property SLEW FAST [get_ports {ddr3_dq[25]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:385
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[25]' has been applied to the port object 'ddr3_dq[25]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[25]}]
 # Pad function: IO_L22P_T3_34
-set_property PACKAGE_PIN AE3 [get_ports {ddr3_dq[26]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:386
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[26]' has been applied to the port object 'ddr3_dq[26]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[26]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:386
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[26]' has been applied to the port object 'ddr3_dq[26]'.
-set_property SLEW FAST [get_ports {ddr3_dq[26]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:386
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[26]' has been applied to the port object 'ddr3_dq[26]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[26]}]
 # Pad function: IO_L19P_T3_34
-set_property PACKAGE_PIN AD4 [get_ports {ddr3_dq[27]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:387
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[27]' has been applied to the port object 'ddr3_dq[27]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[27]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:387
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[27]' has been applied to the port object 'ddr3_dq[27]'.
-set_property SLEW FAST [get_ports {ddr3_dq[27]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:387
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[27]' has been applied to the port object 'ddr3_dq[27]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[27]}]
 # Pad function: IO_L23P_T3_34
-set_property PACKAGE_PIN AE6 [get_ports {ddr3_dq[28]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:388
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[28]' has been applied to the port object 'ddr3_dq[28]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[28]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:388
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[28]' has been applied to the port object 'ddr3_dq[28]'.
-set_property SLEW FAST [get_ports {ddr3_dq[28]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:388
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[28]' has been applied to the port object 'ddr3_dq[28]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[28]}]
 # Pad function: IO_L20N_T3_34
-set_property PACKAGE_PIN AE1 [get_ports {ddr3_dq[29]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:389
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[29]' has been applied to the port object 'ddr3_dq[29]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[29]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:389
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[29]' has been applied to the port object 'ddr3_dq[29]'.
-set_property SLEW FAST [get_ports {ddr3_dq[29]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:389
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[29]' has been applied to the port object 'ddr3_dq[29]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[29]}]
 # Pad function: IO_L24P_T3_34
-set_property PACKAGE_PIN AF3 [get_ports {ddr3_dq[30]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:390
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[30]' has been applied to the port object 'ddr3_dq[30]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[30]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:390
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[30]' has been applied to the port object 'ddr3_dq[30]'.
-set_property SLEW FAST [get_ports {ddr3_dq[30]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:390
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[30]' has been applied to the port object 'ddr3_dq[30]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[30]}]
 # Pad function: IO_L23N_T3_34
-set_property PACKAGE_PIN AE5 [get_ports {ddr3_dq[31]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:391
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dq[31]' has been applied to the port object 'ddr3_dq[31]'.
-set_property IOSTANDARD SSTL15_T_DCI [get_ports {ddr3_dq[31]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:391
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dq[31]' has been applied to the port object 'ddr3_dq[31]'.
-set_property SLEW FAST [get_ports {ddr3_dq[31]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:391
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dq[31]' has been applied to the port object 'ddr3_dq[31]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dq[31]}]
 # Pad function: IO_L17P_T2_33
-set_property PACKAGE_PIN AC13 [get_ports {ddr3_addr[13]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:392
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[13]' has been applied to the port object 'ddr3_addr[13]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[13]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:392
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[13]' has been applied to the port object 'ddr3_addr[13]'.
-set_property SLEW FAST [get_ports {ddr3_addr[13]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:392
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[13]' has been applied to the port object 'ddr3_addr[13]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[13]}]
 # Pad function: IO_L11N_T1_SRCC_33
-set_property PACKAGE_PIN AB9 [get_ports {ddr3_addr[12]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:393
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[12]' has been applied to the port object 'ddr3_addr[12]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[12]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:393
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[12]' has been applied to the port object 'ddr3_addr[12]'.
-set_property SLEW FAST [get_ports {ddr3_addr[12]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:393
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[12]' has been applied to the port object 'ddr3_addr[12]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[12]}]
 # Pad function: IO_L1N_T0_33
-set_property PACKAGE_PIN W11 [get_ports {ddr3_addr[11]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:394
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[11]' has been applied to the port object 'ddr3_addr[11]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[11]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:394
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[11]' has been applied to the port object 'ddr3_addr[11]'.
-set_property SLEW FAST [get_ports {ddr3_addr[11]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:394
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[11]' has been applied to the port object 'ddr3_addr[11]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[11]}]
 # Pad function: IO_L10P_T1_33
-set_property PACKAGE_PIN AB7 [get_ports {ddr3_addr[10]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:395
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[10]' has been applied to the port object 'ddr3_addr[10]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[10]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:395
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[10]' has been applied to the port object 'ddr3_addr[10]'.
-set_property SLEW FAST [get_ports {ddr3_addr[10]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:395
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[10]' has been applied to the port object 'ddr3_addr[10]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[10]}]
 # Pad function: IO_L17N_T2_33
-set_property PACKAGE_PIN AD13 [get_ports {ddr3_addr[9]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:396
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[9]' has been applied to the port object 'ddr3_addr[9]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[9]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:396
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[9]' has been applied to the port object 'ddr3_addr[9]'.
-set_property SLEW FAST [get_ports {ddr3_addr[9]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:396
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[9]' has been applied to the port object 'ddr3_addr[9]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[9]}]
 # Pad function: IO_L5P_T0_33
-set_property PACKAGE_PIN Y11 [get_ports {ddr3_addr[8]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:397
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[8]' has been applied to the port object 'ddr3_addr[8]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[8]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:397
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[8]' has been applied to the port object 'ddr3_addr[8]'.
-set_property SLEW FAST [get_ports {ddr3_addr[8]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:397
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[8]' has been applied to the port object 'ddr3_addr[8]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[8]}]
 # Pad function: IO_L1P_T0_33
-set_property PACKAGE_PIN V11 [get_ports {ddr3_addr[7]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:398
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[7]' has been applied to the port object 'ddr3_addr[7]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[7]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:398
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[7]' has been applied to the port object 'ddr3_addr[7]'.
-set_property SLEW FAST [get_ports {ddr3_addr[7]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:398
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[7]' has been applied to the port object 'ddr3_addr[7]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[7]}]
 # Pad function: IO_L15P_T2_DQS_33
-set_property PACKAGE_PIN AB12 [get_ports {ddr3_addr[6]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:399
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[6]' has been applied to the port object 'ddr3_addr[6]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[6]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:399
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[6]' has been applied to the port object 'ddr3_addr[6]'.
-set_property SLEW FAST [get_ports {ddr3_addr[6]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:399
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[6]' has been applied to the port object 'ddr3_addr[6]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[6]}]
 # Pad function: IO_L15N_T2_DQS_33
-set_property PACKAGE_PIN AC12 [get_ports {ddr3_addr[5]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:400
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[5]' has been applied to the port object 'ddr3_addr[5]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[5]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:400
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[5]' has been applied to the port object 'ddr3_addr[5]'.
-set_property SLEW FAST [get_ports {ddr3_addr[5]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:400
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[5]' has been applied to the port object 'ddr3_addr[5]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[5]}]
 # Pad function: IO_L6P_T0_33
-set_property PACKAGE_PIN V9 [get_ports {ddr3_addr[4]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:401
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[4]' has been applied to the port object 'ddr3_addr[4]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[4]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:401
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[4]' has been applied to the port object 'ddr3_addr[4]'.
-set_property SLEW FAST [get_ports {ddr3_addr[4]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:401
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[4]' has been applied to the port object 'ddr3_addr[4]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[4]}]
 # Pad function: IO_L5N_T0_33
-set_property PACKAGE_PIN Y10 [get_ports {ddr3_addr[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:402
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[3]' has been applied to the port object 'ddr3_addr[3]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:402
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[3]' has been applied to the port object 'ddr3_addr[3]'.
-set_property SLEW FAST [get_ports {ddr3_addr[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:402
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[3]' has been applied to the port object 'ddr3_addr[3]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[3]}]
 # Pad function: IO_L3N_T0_DQS_33
-set_property PACKAGE_PIN W9 [get_ports {ddr3_addr[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:403
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[2]' has been applied to the port object 'ddr3_addr[2]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:403
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[2]' has been applied to the port object 'ddr3_addr[2]'.
-set_property SLEW FAST [get_ports {ddr3_addr[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:403
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[2]' has been applied to the port object 'ddr3_addr[2]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[2]}]
 # Pad function: IO_L8N_T1_33
-set_property PACKAGE_PIN AA7 [get_ports {ddr3_addr[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:404
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[1]' has been applied to the port object 'ddr3_addr[1]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:404
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[1]' has been applied to the port object 'ddr3_addr[1]'.
-set_property SLEW FAST [get_ports {ddr3_addr[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:404
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[1]' has been applied to the port object 'ddr3_addr[1]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[1]}]
 # Pad function: IO_L11P_T1_SRCC_33
-set_property PACKAGE_PIN AA9 [get_ports {ddr3_addr[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:405
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_addr[0]' has been applied to the port object 'ddr3_addr[0]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_addr[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:405
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_addr[0]' has been applied to the port object 'ddr3_addr[0]'.
-set_property SLEW FAST [get_ports {ddr3_addr[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:405
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_addr[0]' has been applied to the port object 'ddr3_addr[0]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_addr[0]}]
 # Pad function: IO_L8P_T1_33
-set_property PACKAGE_PIN AA8 [get_ports {ddr3_ba[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:406
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_ba[2]' has been applied to the port object 'ddr3_ba[2]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_ba[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:406
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_ba[2]' has been applied to the port object 'ddr3_ba[2]'.
-set_property SLEW FAST [get_ports {ddr3_ba[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:406
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_ba[2]' has been applied to the port object 'ddr3_ba[2]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_ba[2]}]
 # Pad function: IO_L4P_T0_33
-set_property PACKAGE_PIN Y8 [get_ports {ddr3_ba[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:407
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_ba[1]' has been applied to the port object 'ddr3_ba[1]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_ba[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:407
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_ba[1]' has been applied to the port object 'ddr3_ba[1]'.
-set_property SLEW FAST [get_ports {ddr3_ba[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:407
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_ba[1]' has been applied to the port object 'ddr3_ba[1]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_ba[1]}]
 # Pad function: IO_L2P_T0_33
-set_property PACKAGE_PIN V8 [get_ports {ddr3_ba[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:408
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_ba[0]' has been applied to the port object 'ddr3_ba[0]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_ba[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:408
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_ba[0]' has been applied to the port object 'ddr3_ba[0]'.
-set_property SLEW FAST [get_ports {ddr3_ba[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:408
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_ba[0]' has been applied to the port object 'ddr3_ba[0]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_ba[0]}]
 # Pad function: IO_L4N_T0_33
-set_property PACKAGE_PIN Y7 [get_ports ddr3_ras_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:409
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_ras_n' has been applied to the port object 'ddr3_ras_n'.
-set_property IOSTANDARD SSTL15 [get_ports ddr3_ras_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:409
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_ras_n' has been applied to the port object 'ddr3_ras_n'.
-set_property SLEW FAST [get_ports ddr3_ras_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:409
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_ras_n' has been applied to the port object 'ddr3_ras_n'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_ras_n]
 # Pad function: IO_L10N_T1_33
-set_property PACKAGE_PIN AC7 [get_ports ddr3_cas_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:410
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_cas_n' has been applied to the port object 'ddr3_cas_n'.
-set_property IOSTANDARD SSTL15 [get_ports ddr3_cas_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:410
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_cas_n' has been applied to the port object 'ddr3_cas_n'.
-set_property SLEW FAST [get_ports ddr3_cas_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:410
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_cas_n' has been applied to the port object 'ddr3_cas_n'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_cas_n]
 # Pad function: IO_L12N_T1_MRCC_33
-set_property PACKAGE_PIN AD9 [get_ports ddr3_we_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:411
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_we_n' has been applied to the port object 'ddr3_we_n'.
-set_property IOSTANDARD SSTL15 [get_ports ddr3_we_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:411
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_we_n' has been applied to the port object 'ddr3_we_n'.
-set_property SLEW FAST [get_ports ddr3_we_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:411
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_we_n' has been applied to the port object 'ddr3_we_n'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_we_n]
 # Pad function: IO_L8P_T1_34
-set_property PACKAGE_PIN V2 [get_ports ddr3_reset_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:412
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_reset_n' has been applied to the port object 'ddr3_reset_n'.
-set_property IOSTANDARD LVCMOS15 [get_ports ddr3_reset_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:412
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_reset_n' has been applied to the port object 'ddr3_reset_n'.
-set_property SLEW FAST [get_ports ddr3_reset_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:412
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_reset_n' has been applied to the port object 'ddr3_reset_n'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_reset_n]
 # Pad function: IO_L2N_T0_33
-set_property PACKAGE_PIN V7 [get_ports ddr3_cke]
 # C:/Users/c/SoC-old/Sword_Original.ucf:413
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_cke' has been applied to the port object 'ddr3_cke'.
-set_property IOSTANDARD SSTL15 [get_ports ddr3_cke]
 # C:/Users/c/SoC-old/Sword_Original.ucf:413
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_cke' has been applied to the port object 'ddr3_cke'.
-set_property SLEW FAST [get_ports ddr3_cke]
 # C:/Users/c/SoC-old/Sword_Original.ucf:413
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_cke' has been applied to the port object 'ddr3_cke'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_cke]
 # Pad function: IO_L12P_T1_MRCC_33
-set_property PACKAGE_PIN AC9 [get_ports ddr3_odt]
 # C:/Users/c/SoC-old/Sword_Original.ucf:414
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_odt' has been applied to the port object 'ddr3_odt'.
-set_property IOSTANDARD SSTL15 [get_ports ddr3_odt]
 # C:/Users/c/SoC-old/Sword_Original.ucf:414
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_odt' has been applied to the port object 'ddr3_odt'.
-set_property SLEW FAST [get_ports ddr3_odt]
 # C:/Users/c/SoC-old/Sword_Original.ucf:414
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_odt' has been applied to the port object 'ddr3_odt'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_odt]
 # Pad function: IO_L9N_T1_DQS_33
-set_property PACKAGE_PIN AD8 [get_ports ddr3_cs_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:415
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_cs_n' has been applied to the port object 'ddr3_cs_n'.
-set_property IOSTANDARD SSTL15 [get_ports ddr3_cs_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:415
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_cs_n' has been applied to the port object 'ddr3_cs_n'.
-set_property SLEW FAST [get_ports ddr3_cs_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:415
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_cs_n' has been applied to the port object 'ddr3_cs_n'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_cs_n]
 # Pad function: IO_L4P_T0_34
-set_property PACKAGE_PIN V3 [get_ports {ddr3_dm[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:416
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dm[0]' has been applied to the port object 'ddr3_dm[0]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_dm[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:416
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dm[0]' has been applied to the port object 'ddr3_dm[0]'.
-set_property SLEW FAST [get_ports {ddr3_dm[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:416
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dm[0]' has been applied to the port object 'ddr3_dm[0]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dm[0]}]
 # Pad function: IO_L7P_T1_34
-set_property PACKAGE_PIN Y3 [get_ports {ddr3_dm[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:417
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dm[1]' has been applied to the port object 'ddr3_dm[1]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_dm[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:417
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dm[1]' has been applied to the port object 'ddr3_dm[1]'.
-set_property SLEW FAST [get_ports {ddr3_dm[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:417
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dm[1]' has been applied to the port object 'ddr3_dm[1]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dm[1]}]
 # Pad function: IO_L16P_T2_34
-set_property PACKAGE_PIN AB6 [get_ports {ddr3_dm[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:418
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dm[2]' has been applied to the port object 'ddr3_dm[2]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_dm[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:418
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dm[2]' has been applied to the port object 'ddr3_dm[2]'.
-set_property SLEW FAST [get_ports {ddr3_dm[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:418
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dm[2]' has been applied to the port object 'ddr3_dm[2]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dm[2]}]
 # Pad function: IO_L20P_T3_34
-set_property PACKAGE_PIN AD1 [get_ports {ddr3_dm[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:419
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dm[3]' has been applied to the port object 'ddr3_dm[3]'.
-set_property IOSTANDARD SSTL15 [get_ports {ddr3_dm[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:419
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dm[3]' has been applied to the port object 'ddr3_dm[3]'.
-set_property SLEW FAST [get_ports {ddr3_dm[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:419
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dm[3]' has been applied to the port object 'ddr3_dm[3]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dm[3]}]
 # Pad function: IO_L3P_T0_DQS_34
-set_property PACKAGE_PIN W6 [get_ports {ddr3_dqs_p[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:420
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_p[0]' has been applied to the port object 'ddr3_dqs_p[0]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_p[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:420
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_p[0]' has been applied to the port object 'ddr3_dqs_p[0]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_p[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:420
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_p[0]' has been applied to the port object 'ddr3_dqs_p[0]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_p[0]}]
 # Pad function: IO_L3N_T0_DQS_34
-set_property PACKAGE_PIN W5 [get_ports {ddr3_dqs_n[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:421
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_n[0]' has been applied to the port object 'ddr3_dqs_n[0]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_n[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:421
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_n[0]' has been applied to the port object 'ddr3_dqs_n[0]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_n[0]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:421
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_n[0]' has been applied to the port object 'ddr3_dqs_n[0]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_n[0]}]
 # Pad function: IO_L9P_T1_DQS_34
-set_property PACKAGE_PIN AB1 [get_ports {ddr3_dqs_p[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:422
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_p[1]' has been applied to the port object 'ddr3_dqs_p[1]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_p[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:422
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_p[1]' has been applied to the port object 'ddr3_dqs_p[1]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_p[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:422
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_p[1]' has been applied to the port object 'ddr3_dqs_p[1]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_p[1]}]
 # Pad function: IO_L9N_T1_DQS_34
-set_property PACKAGE_PIN AC1 [get_ports {ddr3_dqs_n[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:423
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_n[1]' has been applied to the port object 'ddr3_dqs_n[1]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_n[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:423
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_n[1]' has been applied to the port object 'ddr3_dqs_n[1]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_n[1]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:423
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_n[1]' has been applied to the port object 'ddr3_dqs_n[1]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_n[1]}]
 # Pad function: IO_L15P_T2_DQS_34
-set_property PACKAGE_PIN AA5 [get_ports {ddr3_dqs_p[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:424
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_p[2]' has been applied to the port object 'ddr3_dqs_p[2]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_p[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:424
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_p[2]' has been applied to the port object 'ddr3_dqs_p[2]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_p[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:424
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_p[2]' has been applied to the port object 'ddr3_dqs_p[2]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_p[2]}]
 # Pad function: IO_L15N_T2_DQS_34
-set_property PACKAGE_PIN AB5 [get_ports {ddr3_dqs_n[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:425
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_n[2]' has been applied to the port object 'ddr3_dqs_n[2]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_n[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:425
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_n[2]' has been applied to the port object 'ddr3_dqs_n[2]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_n[2]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:425
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_n[2]' has been applied to the port object 'ddr3_dqs_n[2]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_n[2]}]
 # Pad function: IO_L21P_T3_DQS_34
-set_property PACKAGE_PIN AF5 [get_ports {ddr3_dqs_p[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:426
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_p[3]' has been applied to the port object 'ddr3_dqs_p[3]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_p[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:426
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_p[3]' has been applied to the port object 'ddr3_dqs_p[3]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_p[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:426
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_p[3]' has been applied to the port object 'ddr3_dqs_p[3]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_p[3]}]
 # Pad function: IO_L21N_T3_DQS_34
-set_property PACKAGE_PIN AF4 [get_ports {ddr3_dqs_n[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:427
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_dqs_n[3]' has been applied to the port object 'ddr3_dqs_n[3]'.
-set_property IOSTANDARD DIFF_SSTL15_T_DCI [get_ports {ddr3_dqs_n[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:427
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_dqs_n[3]' has been applied to the port object 'ddr3_dqs_n[3]'.
-set_property SLEW FAST [get_ports {ddr3_dqs_n[3]}]
 # C:/Users/c/SoC-old/Sword_Original.ucf:427
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_dqs_n[3]' has been applied to the port object 'ddr3_dqs_n[3]'.
-set_property VCCAUX_IO HIGH [get_ports {ddr3_dqs_n[3]}]
 # Pad function: IO_L7P_T1_33
-set_property PACKAGE_PIN AE7 [get_ports ddr3_ck_p]
 # C:/Users/c/SoC-old/Sword_Original.ucf:428
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_ck_p' has been applied to the port object 'ddr3_ck_p'.
-set_property IOSTANDARD DIFF_SSTL15 [get_ports ddr3_ck_p]
 # C:/Users/c/SoC-old/Sword_Original.ucf:428
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_ck_p' has been applied to the port object 'ddr3_ck_p'.
-set_property SLEW FAST [get_ports ddr3_ck_p]
 # C:/Users/c/SoC-old/Sword_Original.ucf:428
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_ck_p' has been applied to the port object 'ddr3_ck_p'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_ck_p]
 # Pad function: IO_L7N_T1_33
-set_property PACKAGE_PIN AF7 [get_ports ddr3_ck_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:429
 # The conversion of 'IOSTANDARD' constraint on 'net' object 'ddr3_ck_n' has been applied to the port object 'ddr3_ck_n'.
-set_property IOSTANDARD DIFF_SSTL15 [get_ports ddr3_ck_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:429
 # The conversion of 'SLEW' constraint on 'net' object 'ddr3_ck_n' has been applied to the port object 'ddr3_ck_n'.
-set_property SLEW FAST [get_ports ddr3_ck_n]
 # C:/Users/c/SoC-old/Sword_Original.ucf:429
 # The conversion of 'VCCAUX_IO' constraint on 'net' object 'ddr3_ck_n' has been applied to the port object 'ddr3_ck_n'.
-set_property VCCAUX_IO HIGH [get_ports ddr3_ck_n]
 
 #   NST "*/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/phaser_out" LOC=PHASER_OUT_PHY_X1Y7;
 #   NST "*/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/phaser_out" LOC=PHASER_OUT_PHY_X1Y6;
@@ -1968,7 +1688,7 @@ set_property VCCAUX_IO HIGH [get_ports ddr3_ck_n]
 #   IMESPEC "TS_MULTICYCLEPATH_DEVICE_TEMP_SYNC" = TO "TNM_MULTICYCLEPATH_DEVICE_TEMP_SYNC" 20 ns DATAPATHONLY;
 ##################################################################################################
 #-------------------------------------------------------------------------------------
-# JTAG interface Constraints 
+# JTAG interface Constraints
 #-------------------------------------------------------------------------------------
 #   IMESPEC TS_J_CLK = PERIOD J_CLK 30 ns ;
 #   IMESPEC TS_J_TO_D = FROM J_CLK TO D_CLK TIG ;
@@ -1976,7 +1696,7 @@ set_property VCCAUX_IO HIGH [get_ports ddr3_ck_n]
 #   ET "U_CHIPSCOPE_IBERT/U0/U_IBERT_CORE/U_GTCPX_X0Y0/gt_txoutclk" TNM_NET = D_CLK ;
 
 #-------------------------------------------------------------------------------------
-# GT Clock Constraints 
+# GT Clock Constraints
 #-------------------------------------------------------------------------------------
 # Input REFCLK constratins
 # QUAD 0
@@ -2006,7 +1726,7 @@ set_property VCCAUX_IO HIGH [get_ports ddr3_ck_n]
 #   IMESPEC "TS_X0Y3_TXOUTCLK" = PERIOD "TNM_X0Y3_TXOUTCLK" 12.8 ns;
 
 #-------------------------------------------------------------------------------------
-# GT LOC constraint 
+# GT LOC constraint
 #-------------------------------------------------------------------------------------
 #   NST U_CHIPSCOPE_IBERT/U0/U_IBERT_CORE/U_GTCPX_X0Y0/U_GT_CHANNEL_X0Y0/gtxe2_i_x0y0 LOC=GTXE2_CHANNEL_X0Y0;
 #   NST U_CHIPSCOPE_IBERT/U0/U_IBERT_CORE/U_GTCPX_X0Y1/U_GT_CHANNEL_X0Y1/gtxe2_i_x0y1 LOC=GTXE2_CHANNEL_X0Y1;
@@ -2014,507 +1734,51 @@ set_property VCCAUX_IO HIGH [get_ports ddr3_ck_n]
 #   NST U_CHIPSCOPE_IBERT/U0/U_IBERT_CORE/U_GTCPX_X0Y3/U_GT_CHANNEL_X0Y3/gtxe2_i_x0y3 LOC=GTXE2_CHANNEL_X0Y3;
 #   NST U_CHIPSCOPE_IBERT/U0/U_IBERT_CORE/U_GTCCPX_QUAD0/U_GTXE2_COMN_QUAD0/gtxe2_comm LOC=GTXE2_COMMON_X0Y0;
 #-------------------------------------------------------------------------------------
-# GT REFCLK PIN LOCs 
+# GT REFCLK PIN LOCs
 #-------------------------------------------------------------------------------------
 #   ET Q0_CLK0_MGTREFCLK_P_IPAD LOC=H6;
 #   ET Q0_CLK0_MGTREFCLK_N_IPAD LOC=H5;
 #-------------------------------------------------------------------------------------
-# RXOUTCLK OUTPUT PIN LOCs (if enabled) 
+# RXOUTCLK OUTPUT PIN LOCs (if enabled)
 #-------------------------------------------------------------------------------------
 #   ET "SFP1_TX_DISABLE"        LOC = "T19"       | IOSTANDARD = "LVCMOS33"    ;
 #   ET "SFP2_TX_DISABLE"        LOC = "R17"       | IOSTANDARD = "LVCMOS33"    ;
 
 ##################################################################################################
-#   NET "ETH_PHY_MDC"        LOC = AC14        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;  
-#   NET "ETH_PHY_MDIO"       LOC = AD14        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;  
-#   NET "ETH_PHY_RST_N"      LOC = N23         | IOSTANDARD = LVCMOS33 | DRIVE = 8 ;  
-#   NET "ETH_RXC"            LOC = AB17        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;   
-#   NET "ETH_RX_EN"          LOC = AC17        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;  
-#   NET "ETH_RXD[0]"         LOC = AD20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;   
-#   NET "ETH_RXD[1]"         LOC = AE20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;   
-#   NET "ETH_RXD[2]"         LOC = AA19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;   
-#   NET "ETH_RXD[3]"         LOC = AA20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;   
-#   NET "ETH_TXD[0]"         LOC = AB19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;   
-#   NET "ETH_TXD[1]"         LOC = AB20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;       
-#   NET "ETH_TXD[2]"         LOC = Y17         | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;       
-#   NET "ETH_TXD[3]"         LOC = Y18         | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;       
-#   NET "ETH_TX_EN"          LOC = AD19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;         
-#   NET "ETH_TXC"            LOC = AC19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;  
+#   NET "ETH_PHY_MDC"        LOC = AC14        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
+#   NET "ETH_PHY_MDIO"       LOC = AD14        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
+#   NET "ETH_PHY_RST_N"      LOC = N23         | IOSTANDARD = LVCMOS33 | DRIVE = 8 ;
+#   NET "ETH_RXC"            LOC = AB17        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;
+#   NET "ETH_RX_EN"          LOC = AC17        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;
+#   NET "ETH_RXD[0]"         LOC = AD20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;
+#   NET "ETH_RXD[1]"         LOC = AE20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;
+#   NET "ETH_RXD[2]"         LOC = AA19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;
+#   NET "ETH_RXD[3]"         LOC = AA20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 ;
+#   NET "ETH_TXD[0]"         LOC = AB19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
+#   NET "ETH_TXD[1]"         LOC = AB20        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
+#   NET "ETH_TXD[2]"         LOC = Y17         | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
+#   NET "ETH_TXD[3]"         LOC = Y18         | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
+#   NET "ETH_TX_EN"          LOC = AD19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
+#   NET "ETH_TXC"            LOC = AC19        | IOSTANDARD = LVCMOS18 | DRIVE = 8 | SLEW = FAST;
 
 ############################################################################
 # End Constraints                                                          #
 ############################################################################
 
-# PlanAhead Generated miscellaneous constraints 
 
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[13]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[12]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[11]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[10]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[9]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_iodelay_ctrl/rst_ref_sync_r[14]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_ddr3_clk_ibuf/sys_clk_ibufg]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/pll_locked_i]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[11]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[10]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[9]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rst_phaser_ref_sync_r[12]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_ddr3_infrastructure/rstdiv0_sync_r1]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/mc0/wr_data_addr[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/mc0/wr_data_addr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/mc0/wr_data_addr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/mc0/wr_data_addr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/mc0/wr_data_addr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/mc0/wr_data_offset[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/mc0/col_mach0/rd_data_en]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_0/my_full[4]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_wr_of]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_1/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/phy_ctl_pre_fifo_2/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/if_empty]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/phy_ctl_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/phy_ctl_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/phy_ctl_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/phy_ctl_full[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/ififo_rd_en_in]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_en]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/if_empty_r[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/if_empty_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/if_empty_r[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/if_empty_r[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[4]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/A_po_fine_inc]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/ififo_rd_en_in]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_en]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/if_empty_r[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/if_empty_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/if_empty_r[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/if_empty_r[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/B_po_fine_inc]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/ififo_rd_en_in]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_en]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/if_empty_r[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/if_empty_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/if_empty_r[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/if_empty_r[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/C_po_fine_inc]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/ififo_rd_en_in]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_en]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/if_empty_r[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/if_empty_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/if_empty_r[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/if_empty_r[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/D_po_fine_inc]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/B_po_fine_inc]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/C_po_fine_inc]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[6]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[7]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_empty[8]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/my_full[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/wr_ptr[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/rd_ptr_timing[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/D_po_fine_inc]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/A_po_fine_inc]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/if_empty]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/calib_in_common]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_sel[5]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_sel[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_sel[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_sel[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_sel[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_sel[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_in_common]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_zero_inputs[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/calib_zero_inputs[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_sel_stg2stg3[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_sel_stg2stg3[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_sel_stg2stg3[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_stg2_c_incdec[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_stg2_c_incdec[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_stg2_c_incdec[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_en_stg2_c[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_en_stg2_c[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_en_stg2_c[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_stg2_f_incdec[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_stg2_f_incdec[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_stg2_f_incdec[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_en_stg2_f[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_en_stg2_f[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/po_en_stg2_f[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/init_calib_complete]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/idelay_inc_r2]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/u_ddr_phy_init/init_complete_r_timing]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/u_ddr_phy_init/init_complete_r1_timing]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/u_ddr_phy_wrcal/wrcal_dqs_cnt_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/u_ddr_phy_wrcal/wrcal_dqs_cnt_r[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/u_ddr_phy_wrcal/wrcal_dqs_cnt_r[2]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/mb_wrlvl_inst.u_ddr_phy_wrlvl/dqs_po_dec_done]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/mb_wrlvl_inst.u_ddr_phy_wrlvl/wr_level_done]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/mb_wrlvl_inst.u_ddr_phy_ck_addr_cmd_delay/delay_done_r4]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/oclk_calib.u_ddr_phy_oclkdelay_cal/ocal_done_r]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_calib_top/u_ddr_phy_rdlvl/rdlvl_stg1_done]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/reset]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_cmd0/app_rdy_r]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/app_rd_data_valid]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/ram_init_done_r_lcl]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/not_strict_mode.rd_buf.rd_buf_indx_copy_r[4]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/not_strict_mode.rd_buf.rd_buf_indx_copy_r[3]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/not_strict_mode.rd_buf.rd_buf_indx_copy_r[2]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/not_strict_mode.rd_buf.rd_buf_indx_copy_r[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/not_strict_mode.rd_buf.rd_buf_indx_copy_r[0]}]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/not_strict_mode.rd_buf_we]
-set_property MARK_DEBUG true [get_nets ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_ui_top/ui_rd_data0/not_strict_mode.bypass]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_axi_mc/axi_register_slice_d3/aw_pipe/state[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_axi_mc/axi_register_slice_d3/aw_pipe/state[0]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_axi_mc/axi_register_slice_d3/ar_pipe/state[1]}]
-set_property MARK_DEBUG true [get_nets {ddr3_ctrl/u_ddr3/u_memc_ui_top_axi/u_axi_mc/axi_register_slice_d3/ar_pipe/state[0]}]
+
+
+
+
+set_output_delay -clock [get_clocks [list [get_clocks -of_objects [get_pins dsp/inst/mmcm_adv_inst/CLKOUT0]]]] -max -7.000 [get_ports {{sram_addr[0]} {sram_addr[1]} {sram_addr[2]} {sram_addr[3]} {sram_addr[4]} {sram_addr[5]} {sram_addr[6]} {sram_addr[7]} {sram_addr[8]} {sram_addr[9]} {sram_addr[10]} {sram_addr[11]} {sram_addr[12]} {sram_addr[13]} {sram_addr[14]} {sram_addr[15]} {sram_addr[16]} {sram_addr[17]} {sram_addr[18]} {sram_addr[19]} {sram_dq[0]} {sram_dq[1]} {sram_dq[2]} {sram_dq[3]} {sram_dq[4]} {sram_dq[5]} {sram_dq[6]} {sram_dq[7]} {sram_dq[8]} {sram_dq[9]} {sram_dq[10]} {sram_dq[11]} {sram_dq[12]} {sram_dq[13]} {sram_dq[14]} {sram_dq[15]} {sram_dq[16]} {sram_dq[17]} {sram_dq[18]} {sram_dq[19]} {sram_dq[20]} {sram_dq[21]} {sram_dq[22]} {sram_dq[23]} {sram_dq[24]} {sram_dq[25]} {sram_dq[26]} {sram_dq[27]} {sram_dq[28]} {sram_dq[29]} {sram_dq[30]} {sram_dq[31]} {sram_dq[32]} {sram_dq[33]} {sram_dq[34]} {sram_dq[35]} {sram_dq[36]} {sram_dq[37]} {sram_dq[38]} {sram_dq[39]} {sram_dq[40]} {sram_dq[41]} {sram_dq[42]} {sram_dq[43]} {sram_dq[44]} {sram_dq[45]} {sram_dq[46]} {sram_dq[47]} sram_oen sram_wen}]
+
+
+
+
+
+
+set_input_delay -clock [get_clocks [list [get_clocks -of_objects [get_pins dsp/inst/mmcm_adv_inst/CLKOUT0]]]] -max 7.000 [get_ports -regexp -filter { NAME =~  ".*sram.*" && DIRECTION == "INOUT" }]
+
+
+
+
