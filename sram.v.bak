@@ -1,0 +1,82 @@
+module sram(
+    input  clk,
+    input  rst,
+
+    // sram IO
+    output [19:0] sram_addr,
+    inout  [47:0] sram_dq,
+    output        sram_ce,
+    output        sram_oen,
+    output        sram_wen,
+
+    // VGA IO
+    input  [19:0] vga_addr,
+    output [47:0] vga_data,
+    input         vga_sel,
+    output        vga_valid,
+
+    // GPU master IO
+    input  [19:0] gpu_master_addr,
+    output [47:0] gpu_master_data_o,
+    input  [47:0] gpu_master_data_i,
+    input         gpu_master_sel,
+    input         gpu_master_we,
+    output        gpu_master_valid,
+
+    // GPU slave IO
+    input  [19:0] gpu_slave_addr,
+    output [47:0] gpu_slave_data_o,
+    input  [47:0] gpu_slave_data_i,
+    input         gpu_slave_sel,
+    input         gpu_slave_we,
+    output        gpu_slave_valid
+
+    // BUS IO
+    );
+
+    reg [19:0] rd_addr;
+    reg done;
+
+    wire   sram_wea       =  vga_sel        ? 1'b0              :
+                             gpu_master_sel ? gpu_master_we     :
+                             gpu_slave_sel  ? gpu_slave_we      :
+                                              1'b0;
+    assign sram_addr      =  vga_sel        ? vga_addr          :
+                             gpu_master_sel ? gpu_master_addr   :
+                             gpu_slave_sel  ? gpu_slave_addr    :
+                                              20'h0;
+    assign sram_dq   =  vga_sel         ? {48{1'bz}} :
+                        gpu_master_sel  ? ( gpu_master_we ? gpu_master_data_i : {48{1'bz}} ) :
+                        gpu_slave_sel   ? ( gpu_slave_we  ? gpu_slave_data_i  : {48{1'bz}} ) :
+                                          {48{1'bz}};
+    assign sram_ce   =  1'b0;
+    assign sram_oen  =  sram_wea;
+    assign sram_wen  = ~sram_wea;
+
+    assign vga_data  =  sram_dq;
+    assign vga_valid =  vga_sel & done & (rd_addr == vga_addr);
+
+    assign gpu_master_data_o=  sram_dq;
+    assign gpu_master_valid =  ~gpu_master_sel || (done & (rd_addr == gpu_master_addr));
+
+    assign gpu_slave_data_o =  sram_dq;
+    assign gpu_slave_valid  =  ~gpu_slave_sel  || (done & (rd_addr == gpu_slave_addr));
+
+    task init;
+    begin
+        rd_addr <= 20'b0;
+        done    <= 1'b0;
+    end
+    endtask
+
+    initial init();
+
+    always @(posedge clk) begin
+        if (rst) init();
+        else begin
+            rd_addr <= sram_addr;
+            done    <= done ? 1'b0 : (vga_sel || gpu_master_sel || gpu_slave_sel);
+        end
+    end
+
+endmodule
