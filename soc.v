@@ -25,7 +25,10 @@ module soc(
     output [3:0] vga_g,
     output [3:0] vga_r,
     output vga_hs,
-    output vga_vs
+    output vga_vs,
+
+    input  uart_rxd,
+    output uart_txd
     );
 
     wire clk_sys;
@@ -33,7 +36,40 @@ module soc(
     wire clk_ddr;
     wire rst = ~rstn;
 
-    wire [31:0] disp_value;
+    reg [31:0] disp_value;
+
+    initial begin
+        disp_value  <= 0;
+    end
+
+    wire data_send;
+    wire data_sent;
+    wire [7:0] data_in;
+    wire [7:0] data_out;
+    wire data_received;
+
+    assign data_send = data_received;
+    assign data_in = data_out;
+
+    always @(posedge clk) begin
+        if (data_received) begin
+            disp_value <= {disp_value[23:0], data_out};
+        end
+    end
+
+    uart uart(
+        .clk(clk_sys),
+        .rst(rst),
+
+        .uart_rxd(uart_rxd),
+        .uart_txd(uart_txd),
+
+        .data_in(data_in),
+        .data_send(data_send),
+        .data_sent(data_sent),
+        .data_out(data_out),
+        .data_received(data_received)
+    );
 
     dsp dsp(
         .clk_in1(clk),
@@ -58,7 +94,7 @@ module soc(
         .vga_hs(vga_hs),
         .vga_vs(vga_vs),
 
-        .disp_value(disp_value)
+        .disp_value()
     );
 
     assign tri_led0 = 3'b111;
