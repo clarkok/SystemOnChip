@@ -14,7 +14,7 @@ module uart(
     output          data_received
     );
 
-    parameter BAUD_RATE = 128000;
+    parameter BAUD_RATE = 460800;
     parameter CLK_FREQ  = 100_000_000;   // 100MHz
     parameter OVER_SAMP = 32;
 
