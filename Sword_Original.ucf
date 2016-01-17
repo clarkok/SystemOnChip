@@ -410,9 +410,9 @@
     NET   "ddr3_cas_n"                                 LOC = "AC7"     |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L10N_T1_33
     NET   "ddr3_we_n"                                  LOC = "AD9"     |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L12N_T1_MRCC_33
     NET   "ddr3_reset_n"                               LOC = "V2"      |   IOSTANDARD = LVCMOS15             |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L8P_T1_34
-    NET   "ddr3_cke"                                   LOC = "V7"      |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L2N_T0_33
-    NET   "ddr3_odt"                                   LOC = "AC9"     |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L12P_T1_MRCC_33
-    NET   "ddr3_cs_n"                                  LOC = "AD8"     |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L9N_T1_DQS_33
+    NET   "ddr3_cke[0]"                                   LOC = "V7"      |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L2N_T0_33
+    NET   "ddr3_odt[0]"                                   LOC = "AC9"     |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L12P_T1_MRCC_33
+    NET   "ddr3_cs_n[0]"                                  LOC = "AD8"     |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L9N_T1_DQS_33
     NET   "ddr3_dm[0]"                                 LOC = "V3"      |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L4P_T0_34
     NET   "ddr3_dm[1]"                                 LOC = "Y3"      |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L7P_T1_34
     NET   "ddr3_dm[2]"                                 LOC = "AB6"     |   IOSTANDARD = SSTL15               |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L16P_T2_34
@@ -425,8 +425,8 @@
     NET   "ddr3_dqs_n[2]"                              LOC = "AB5"     |   IOSTANDARD = DIFF_SSTL15_T_DCI    |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L15N_T2_DQS_34
     NET   "ddr3_dqs_p[3]"                              LOC = "AF5"     |   IOSTANDARD = DIFF_SSTL15_T_DCI    |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L21P_T3_DQS_34
     NET   "ddr3_dqs_n[3]"                              LOC = "AF4"     |   IOSTANDARD = DIFF_SSTL15_T_DCI    |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L21N_T3_DQS_34
-    NET   "ddr3_ck_p"                                  LOC = "AE7"     |   IOSTANDARD = DIFF_SSTL15          |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L7P_T1_33
-    NET   "ddr3_ck_n"                                  LOC = "AF7"     |   IOSTANDARD = DIFF_SSTL15          |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L7N_T1_33
+    NET   "ddr3_ck_p[0]"                                  LOC = "AE7"     |   IOSTANDARD = DIFF_SSTL15          |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L7P_T1_33
+    NET   "ddr3_ck_n[0]"                                  LOC = "AF7"     |   IOSTANDARD = DIFF_SSTL15          |     VCCAUX_IO = HIGH      |     SLEW = FAST        ; # Pad function: IO_L7N_T1_33
 
 #   NST "*/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/phaser_out" LOC=PHASER_OUT_PHY_X1Y7;
 #   NST "*/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/phaser_out" LOC=PHASER_OUT_PHY_X1Y6;
