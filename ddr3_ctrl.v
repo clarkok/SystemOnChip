@@ -1,5 +1,6 @@
 module ddr3_ctrl(
     input  clk,
+    input  clk_ref,
     input  rst,
 
     inout  [31:0] ddr3_dq,
@@ -22,70 +23,100 @@ module ddr3_ctrl(
     output [ 2:0] state_value
     );
 
-    wire interrupt;
     wire init_calib_complete;
-    wire [28:0] s_axi_awaddr;
-    wire        s_axi_awvalid;
-    wire        s_axi_awready;
-    wire [31:0] s_axi_wdata;
-    wire [ 3:0] s_axi_wstrb;
-    wire        s_axi_wvalid;
-    wire        s_axi_wready;
-    wire [ 1:0] s_axi_bresp;
-    wire        s_axi_bvalid;
-    wire [28:0] s_axi_araddr;
-    wire        s_axi_arvalid;
-    wire        s_axi_arready;
-    wire        s_axi_rready;
-    wire [31:0] s_axi_rdata;
-    wire [ 1:0] s_axi_rresp;
-    wire        s_axi_rlast;
-    wire        s_axi_rvalid;
+    wire [ 28:0] s_axi_awaddr;
+    wire         s_axi_awvalid;
+    wire         s_axi_awready;
+    wire [255:0] s_axi_wdata;
+    wire [ 31:0] s_axi_wstrb;
+    wire         s_axi_wvalid;
+    wire         s_axi_wready;
+    wire [  1:0] s_axi_bresp;
+    wire         s_axi_bvalid;
+    wire [ 28:0] s_axi_araddr;
+    wire         s_axi_arvalid;
+    wire         s_axi_arready;
+    wire         s_axi_rready;
+    wire [255:0] s_axi_rdata;
+    wire [  1:0] s_axi_rresp;
+    wire         s_axi_rlast;
+    wire         s_axi_rvalid;
 
     localparam  S_WAIT = 0,
                 S_WRITE = 1,
                 S_WRITE_END = 2,
                 S_READ = 3,
                 S_READ_END = 4,
-                S_IDLE = 5;
+                S_SECOND_READ = 5,
+                S_SECOND_WRITE = 6;
 
     wire ui_clk;
+    wire ui_clk_sync_rst;
 
     reg [2:0] state;
     reg [31:0] data_src;
     reg [31:0] data_dst;
+    reg [31:0] timer;
+    reg        inited;
 
     assign disp_value = data_dst;
     assign state_value = state;
-    assign s_axi_awaddr = 0;
+    assign s_axi_awaddr = {data_src[15:0], 16'b00};
     assign s_axi_awvalid = (state == S_WRITE);
     assign s_axi_wdata = data_src;
-    assign s_axi_wstrb = 4'b1111;
+    assign s_axi_wstrb = 32'hFFFFFFFF;
     assign s_axi_wvalid = (state == S_WRITE_END);
-    assign s_axi_araddr = 0;
-    assign s_axi_arvalid = (state == S_READ);
-    assign s_axi_rvalid = (state == S_READ_END);
 
-    initial begin 
+    assign s_axi_araddr = {data_src[15:0] - 1'b1, 16'b00};
+    assign s_axi_arvalid = (state == S_READ);
+    assign s_axi_rready = (state == S_READ_END);
+
+    task init();
+    begin
         state <= 0;
+        inited <= 0;
         data_src <= 0;
         data_dst <= 0;
+        timer <= 0;
     end
+    endtask
+
+    initial init(); 
 
     always @(posedge ui_clk) begin
-        if (init_calib_complete) begin
-            state <= S_WRITE;
-        end
+        if (ui_clk_sync_rst) init();
+        else begin
+            if (init_calib_complete && ~inited) begin
+                inited <= 1;
+                state <= S_WRITE;
+            end
 
-        case (state)
-            S_WRITE:        if (s_axi_awready)  state <= S_WRITE_END;
-            S_WRITE_END:    if (s_axi_wready)   state <= S_READ;
-            S_READ:         if (s_axi_arready)  state <= S_READ_END;
-            S_READ_END:     if (s_axi_rready)   begin data_dst <= s_axi_rdata; state <= S_WRITE; data_src <= data_src + 1; end
-        endcase
+            case (state)
+                S_WRITE:        if (s_axi_awready)  state <= S_WRITE_END;
+                S_WRITE_END:    if (s_axi_wready)   begin
+                    state <= S_SECOND_READ;
+                    timer <= 100_000_000;
+                end
+                S_SECOND_READ:  begin
+                    if (timer)  timer <= timer - 1;
+                    else        state <= S_READ;
+                end
+                S_READ:         if (s_axi_arready)  state <= S_READ_END;
+                S_READ_END:     if (s_axi_rvalid)   begin
+                    data_dst <= s_axi_rdata;
+                    state <= S_SECOND_WRITE;
+                    data_src <= data_src + 1;
+                    timer <= 100_000_000;
+                end
+                S_SECOND_WRITE: begin
+                    if (timer)  timer <= timer - 1;
+                    else        state <= S_WRITE;
+                end
+            endcase
+        end
     end
 
-    ddr3 u_ddr3 (
+    ddr3_mig ddr3_mig (
     // Memory interface ports
          .ddr3_dq                        (ddr3_dq),
          .ddr3_dqs_n                     (ddr3_dqs_n),
@@ -103,10 +134,12 @@ module ddr3_ctrl(
          .ddr3_dm                        (ddr3_dm),
          .ddr3_odt                       (ddr3_odt),
          .sys_clk_i                      (clk),
+         .clk_ref_i                      (clk_ref),
     // Application interface ports
          .ui_clk                         (ui_clk),
-         .ui_clk_sync_rst                (),
-         .aresetn                        (rst),
+         .ui_clk_sync_rst                (ui_clk_sync_rst),
+         .mmcm_locked                    (),
+         .aresetn                        (~rst),
          .app_sr_req                     (0),
          .app_sr_active                  (),
          .app_ref_req                    (0),

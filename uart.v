@@ -86,49 +86,49 @@ module uart(
                         end
                     end
                     4'h1 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h2;
                         uart_txd    <= tx_buf[0];
                     end
                     4'h2 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h3;
                         uart_txd    <= tx_buf[0];
                     end
                     4'h3 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h4;
                         uart_txd    <= tx_buf[0];
                     end
                     4'h4 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h5;
                         uart_txd    <= tx_buf[0];
                     end
                     4'h5 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h6;
                         uart_txd    <= tx_buf[0];
                     end
                     4'h6 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h7;
                         uart_txd    <= tx_buf[0];
                     end
                     4'h7 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h8;
                         uart_txd    <= tx_buf[0];
                     end
                     4'h8 : begin
-                        tx_buf      <= {0, tx_buf[7:1]};
+                        tx_buf      <= {1'b0, tx_buf[7:1]};
                         tx_count    <= CLK_DIV-1;
                         tx_state    <= 4'h9;
                         uart_txd    <= tx_buf[0];

@@ -28,7 +28,7 @@ module soc(
     output vga_vs,
 
     input  uart_rxd,
-    output uart_txd /*,
+    output uart_txd,
 
     inout  [31:0] ddr3_dq,
     inout  [ 3:0] ddr3_dqs_n,
@@ -39,18 +39,18 @@ module soc(
     output        ddr3_cas_n,
     output        ddr3_we_n,
     output        ddr3_reset_n,
-    output        ddr3_ck_p,
-    output        ddr3_ck_n,
-    output        ddr3_cke,
-    output        ddr3_cs_n,
+    output [ 0:0] ddr3_ck_p,
+    output [ 0:0] ddr3_ck_n,
+    output [ 0:0] ddr3_cke,
+    output [ 0:0] ddr3_cs_n,
     output [ 3:0] ddr3_dm,
-    output        ddr3_odt
-    */
+    output [ 0:0] ddr3_odt
     );
 
     wire clk_sys;
     wire clk_vga;
     wire clk_ddr;
+    wire clk_ddr_ref;
     wire rst = ~rstn;
 
     reg [31:0] disp_value;
@@ -91,9 +91,9 @@ module soc(
     wire [31:0] ddr3_disp_value;
     wire [2:0] ddr3_state_value;
 
-    /*
     ddr3_ctrl ddr3_ctrl(
         .clk(clk_ddr),
+        .clk_ref(clk_ddr_ref),
         .rst(rst),
 
         .ddr3_dq(ddr3_dq),
@@ -115,13 +115,13 @@ module soc(
         .disp_value(ddr3_disp_value),
         .state_value(ddr3_state_value)
     );
-    */
 
     dsp dsp(
         .clk_in1(clk),
         .clk_out1(clk_sys),
         .clk_out2(clk_vga),
-        .clk_out3(clk_ddr)
+        .clk_out3(clk_ddr),
+        .clk_out4(clk_ddr_ref)
     );
 
     gpu gpu(
