@@ -20,7 +20,7 @@ module ddr3_ctrl(
     output [ 3:0] ddr3_dm,
     output        ddr3_odt,
 
-    input  [ 31:0]  addr_i,
+    input  [ 28:0]  addr_i,
     input  [255:0]  data_i,
     output [255:0]  data_o,
     input           we_i,
