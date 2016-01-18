@@ -89,10 +89,11 @@ module soc(
     );
 
     wire [31:0] ddr3_disp_value;
-    wire [2:0] ddr3_state_value;
+    wire [1:0] ddr3_state_value;
 
-    ddr3_ctrl ddr3_ctrl(
-        .clk(clk_ddr),
+    ddr3_dev ddr3_dev(
+        .clk(clk_sys),
+        .clk_ddr(clk_ddr),
         .clk_ref(clk_ddr_ref),
         .rst(rst),
 
