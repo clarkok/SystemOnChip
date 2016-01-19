@@ -20,7 +20,7 @@ module ddr3_ctrl(
     output [ 3:0] ddr3_dm,
     output        ddr3_odt,
 
-    input  [ 31:0]  addr_i,
+    input  [ 28:0]  addr_i,
     input  [255:0]  data_i,
     output [255:0]  data_o,
     input           we_i,
@@ -137,7 +137,7 @@ module ddr3_ctrl(
             if (ui_rd_flag)     ui_rd <= 1'b1;
 
             case (state)
-                S_INIT: if (init_calib_complete)    state <= S_IDLE;
+                S_INIT: if (init_calib_complete)    state <= S_END;         // assert an ACK to upper level module
                 S_IDLE: begin
                     s_axi_awaddr    <= addr_i;
                     s_axi_araddr    <= addr_i;

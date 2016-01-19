@@ -88,14 +88,25 @@ module soc(
         .data_received(data_received)
     );
 
-    wire [31:0] ddr3_disp_value;
-    wire [15:0] ddr3_state_value;
+    wire [31:0] ddr3_addr_i;
+    wire [31:0] ddr3_data_i;
+    wire [31:0] ddr3_data_o;
+    reg         ddr3_we_i;
+    reg         ddr3_rd_i;
+    wire        ddr3_ack_o;
 
     ddr3_dev ddr3_dev(
         .clk(clk_sys),
         .clk_ddr(clk_ddr),
         .clk_ref(clk_ddr_ref),
         .rst(rst),
+
+        .addr_i(ddr3_addr_i),
+        .data_i(ddr3_data_i),
+        .data_o(ddr3_data_o),
+        .we_i(ddr3_we_i),
+        .rd_i(ddr3_rd_i),
+        .ack_o(ddr3_ack_o),
 
         .ddr3_dq(ddr3_dq),
         .ddr3_dqs_n(ddr3_dqs_n),
@@ -111,11 +122,39 @@ module soc(
         .ddr3_cke(ddr3_cke),
         .ddr3_cs_n(ddr3_cs_n),
         .ddr3_dm(ddr3_dm),
-        .ddr3_odt(ddr3_odt),
-
-        .disp_value(ddr3_disp_value),
-        .state_value(ddr3_state_value)
+        .ddr3_odt(ddr3_odt)
     );
+
+    reg [31:0] counter;
+    reg [31:0] read_data;
+
+    initial begin
+        counter     <= 0;
+        ddr3_we_i   <= 1'b0;
+        ddr3_rd_i   <= 1'b0;
+        read_data   <= 0;
+    end
+
+    assign ddr3_addr_i  = counter;
+    assign ddr3_data_i  = counter;
+
+    always @(posedge clk) begin
+        if (rst) begin
+            counter     <= 0;
+            ddr3_we_i   <= 1'b0;
+            ddr3_rd_i   <= 1'b0;
+            read_data   <= 0;
+        end
+        else begin
+            case ({ddr3_we_i, ddr3_rd_i})
+                2'b00:                  {ddr3_we_i, ddr3_rd_i}  <= 2'b10;
+                2'b10:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b01;
+                2'b01:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b00;
+            endcase
+
+            if (ddr3_rd_i && ddr3_ack_o) read_data <= ddr3_data_o;
+        end
+    end
 
     dsp dsp(
         .clk_in1(clk),
@@ -153,9 +192,9 @@ module soc(
         .rst(rst),
 
         .en({8{1'b1}}),
-        .data(ddr3_disp_value),
+        .data(read_data),
         .dot(sram_dq[39:32]),
-        .led(ddr3_state_value),
+        .led(sram_addr[15:0]),
 
         .led_clk(led_clk),
         .led_en(led_pen),
