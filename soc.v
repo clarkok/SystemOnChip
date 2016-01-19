@@ -98,6 +98,7 @@ module soc(
     wire        ddr3_ack_o;
 
     wire [15:0] cache_state_value;
+    wire [15:0] last_cache_state_value;
     wire [15:0] ctrl_state_value;
 
     ddr3_dev ddr3_dev(
@@ -130,6 +131,7 @@ module soc(
         .ddr3_odt(ddr3_odt),
 
         .cache_state_value(cache_state_value),
+        .last_cache_state_value(last_cache_state_value),
         .ctrl_state_value(ctrl_state_value)
     );
 
@@ -205,11 +207,12 @@ module soc(
     reg [15:0] led;
 
     always @* begin
-        case (sw[1:0])
+        case (sw[2:0])
             0: led  = cache_state_value;
             1: led  = ctrl_state_value;
             2: led  = {ddr3_we_i, ddr3_rd_i};
             3: led  = counter[15:0];
+            4: led  = last_cache_state_value;
         endcase
     end
 

@@ -89,13 +89,13 @@ module ddr3_ctrl(
         .flag_dst(ui_rd_flag)
     );
 
-    localparam  S_INIT = 0,
-                S_IDLE = 1,
-                S_READ_A = 2,
-                S_READ_D = 3,
-                S_WRITE_A = 4,
-                S_WRITE_D = 5,
-                S_END = 6;
+    localparam  S_INIT          = 3'h0,
+                S_IDLE          = 3'h1,
+                S_READ_A        = 3'h2,
+                S_READ_D        = 3'h3,
+                S_WRITE_A       = 3'h4,
+                S_WRITE_D       = 3'h5,
+                S_END           = 3'h6;
 
     wire        ui_ack  = (state == S_END);
 

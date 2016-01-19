@@ -18,7 +18,8 @@ module ddr3_cache_ctrl(
     output                ctrl_rd_i,
     input                 ctrl_ack_o,
 
-    output [15:0] state_value
+    output     [15:0] state_value,
+    output reg [15:0] last_state_value
     );
 
     localparam TOTAL_ADDR_BITS  = 29;                               // 512MByte
@@ -39,20 +40,17 @@ module ddr3_cache_ctrl(
         .wea(cache_we_i)
     );
 
-    assign disp_value   = ctrl_data_o[31:0];
-    assign state_value  = state;
-
     reg [TAG_BITS-1:0]  tags[0:511];
     reg [511:0]         valid;
     reg [511:0]         dirties;
 
-    localparam S_INIT = 0;
-    localparam S_IDLE = 1;
-    localparam S_WRITE_CACHE = 2;
-    localparam S_READ_CACHE = 3;
-    localparam S_READ_BEFORE_WRITE = 4;
-    localparam S_WRITE_AFTER_READ = 5;
-    localparam S_END = 6;
+    localparam S_INIT                   = 3'h0;
+    localparam S_IDLE                   = 3'h1;
+    localparam S_WRITE_CACHE            = 3'h2;
+    localparam S_READ_CACHE             = 3'h3;
+    localparam S_READ_BEFORE_WRITE      = 3'h4;
+    localparam S_WRITE_AFTER_READ       = 3'h5;
+    localparam S_END                    = 3'h6;
 
     wire [HASH_BITS-1:0]    hash    =  addr_i[HASH_BITS+UNIT_BITS-1:UNIT_BITS];
     wire [TAG_BITS-1:0]     tag     =  addr_i[28:HASH_BITS+UNIT_BITS];
@@ -151,5 +149,8 @@ module ddr3_cache_ctrl(
             endcase
         end
     end
+
+    assign state_value  = state;
+    always @(posedge clk)   if (state_value)    last_state_value    <= state_value;
 
 endmodule

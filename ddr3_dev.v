@@ -30,6 +30,7 @@ module ddr3_dev(
     output        ddr3_odt,
 
     output [15:0] cache_state_value,
+    output [15:0] last_cache_state_value,
     output [15:0] ctrl_state_value
     );
 
@@ -90,7 +91,8 @@ module ddr3_dev(
         .ctrl_rd_i(ctrl_rd_i),
         .ctrl_ack_o(ctrl_ack_o),
 
-        .state_value(cache_state_value)
+        .state_value(cache_state_value),
+        .last_state_value(last_cache_state_value)
     );
 
 endmodule
