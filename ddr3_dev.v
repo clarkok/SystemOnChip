@@ -30,7 +30,7 @@ module ddr3_dev(
     */
 
     output [31:0] disp_value,
-    output [ 1:0] state_value
+    output [15:0] state_value
     );
 
     reg  [31:0]     ctrl_addr_i;
@@ -67,7 +67,9 @@ module ddr3_dev(
         .data_o(ctrl_data_o),
         .we_i(ctrl_we_i),
         .rd_i(ctrl_rd_i),
-        .ack_o(ctrl_ack_o)
+        .ack_o(ctrl_ack_o),
+
+        .state_value(state_value)
     );
 
     reg  [31:0]     counter;
@@ -78,7 +80,7 @@ module ddr3_dev(
     assign ctrl_rd_i    = state == 2'h2;
 
     assign disp_value   = ctrl_data_o[31:0];
-    assign state_value  = state;
+    // assign state_value  = state;
 
     initial begin
         counter     <= 0;
@@ -96,7 +98,15 @@ module ddr3_dev(
         end
         else begin
             case (state)
-                2'h0:                   state   <= 2'h1;
+                2'h0: begin
+                    if (timer == 100_000_000) begin
+                        state   <= 2'h1;
+                        timer   <= 32'b0;
+                    end
+                    else begin
+                        timer   <= timer + 32'b1;
+                    end
+                end
                 2'h1: if (ctrl_ack_o)   state   <= 2'h2;
                 2'h2: if (ctrl_ack_o)   state   <= 2'h3;
                 2'h3: begin

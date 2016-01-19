@@ -25,7 +25,9 @@ module ddr3_ctrl(
     output [255:0]  data_o,
     input           we_i,
     input           rd_i,
-    output          ack_o
+    output          ack_o,
+
+    output [15:0]    state_value
     );
 
     wire            init_calib_complete;
@@ -235,5 +237,7 @@ module ddr3_ctrl(
          .init_calib_complete            (init_calib_complete),
          .sys_rst                        (rst)
         );
+
+    assign state_value  = state;
 
 endmodule
