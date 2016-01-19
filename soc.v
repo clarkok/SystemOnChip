@@ -2,6 +2,8 @@ module soc(
     input clk,
     input rstn,
 
+    input  [15:0] sw,
+
     output [2:0] tri_led0,
     output [2:0] tri_led1,
 
@@ -95,6 +97,9 @@ module soc(
     reg         ddr3_rd_i;
     wire        ddr3_ack_o;
 
+    wire [15:0] cache_state_value;
+    wire [15:0] ctrl_state_value;
+
     ddr3_dev ddr3_dev(
         .clk(clk_sys),
         .clk_ddr(clk_ddr),
@@ -122,11 +127,15 @@ module soc(
         .ddr3_cke(ddr3_cke),
         .ddr3_cs_n(ddr3_cs_n),
         .ddr3_dm(ddr3_dm),
-        .ddr3_odt(ddr3_odt)
+        .ddr3_odt(ddr3_odt),
+
+        .cache_state_value(cache_state_value),
+        .ctrl_state_value(ctrl_state_value)
     );
 
     reg [31:0] counter;
     reg [31:0] read_data;
+    reg        init;
 
     initial begin
         counter     <= 0;
@@ -144,15 +153,21 @@ module soc(
             ddr3_we_i   <= 1'b0;
             ddr3_rd_i   <= 1'b0;
             read_data   <= 0;
+            init        <= 1'b0;
         end
         else begin
-            case ({ddr3_we_i, ddr3_rd_i})
-                2'b00:                  {ddr3_we_i, ddr3_rd_i}  <= 2'b10;
-                2'b10:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b01;
-                2'b01:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b00;
-            endcase
+            if (init) begin
+                case ({ddr3_we_i, ddr3_rd_i})
+                    2'b00:            begin {ddr3_we_i, ddr3_rd_i}  <= 2'b10;   counter <= counter + 1'b1; end
+                    2'b10:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b01;
+                    2'b01:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b00;
+                endcase
 
-            if (ddr3_rd_i && ddr3_ack_o) read_data <= ddr3_data_o;
+                if (ddr3_rd_i && ddr3_ack_o) read_data <= ddr3_data_o;
+            end
+            else begin
+                if (ddr3_ack_o)     init <= 1'b1;
+            end
         end
     end
 
@@ -187,6 +202,17 @@ module soc(
     assign tri_led0 = 3'b111;
     assign tri_led1 = 3'b111;
 
+    reg [15:0] led;
+
+    always @* begin
+        case (sw[1:0])
+            0: led  = cache_state_value;
+            1: led  = ctrl_state_value;
+            2: led  = {ddr3_we_i, ddr3_rd_i};
+            3: led  = counter[15:0];
+        endcase
+    end
+
     board_disp_sword board_disp_sword(
         .clk(clk_sys),
         .rst(rst),
@@ -194,7 +220,7 @@ module soc(
         .en({8{1'b1}}),
         .data(read_data),
         .dot(sram_dq[39:32]),
-        .led(sram_addr[15:0]),
+        .led(led),
 
         .led_clk(led_clk),
         .led_en(led_pen),
