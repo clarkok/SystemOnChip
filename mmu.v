@@ -80,19 +80,20 @@ module mmu(
         page_fault_addr     <= 32'b0;
 
         for (i = 0; i < 64; i = i + 1) begin
-            page_dir_caches     <= 32'b0;
-            page_dir_tags       <= 4'b0;
-            page_dir_valids     <= 1'b0;
+            page_dir_caches[i]  <= 32'b0;
+            page_dir_tags[i]    <= 4'b0;
+            page_dir_valids[i]  <= 1'b0;
 
-            page_ent_caches     <= 32'b0;
-            page_ent_tags       <= 13'b0;
-            page_ent_valids     <= 1'b0;
+            page_ent_caches[i]  <= 32'b0;
+            page_ent_tags[i]    <= 13'b0;
+            page_ent_valids[i]  <= 1'b0;
         end
     end
     endtask
 
     initial init();
 
+    integer i;
     always @(posedge clk) begin
         if (rst) init();
         else begin
@@ -101,16 +102,34 @@ module mmu(
                 S_IDLE:     if (v_lookup)       state <= S_QUERY;
                 S_QUERY: begin
                     case (1)
-                        ~v_dir_cached:          state <= S_LOAD_DIR;
-                        ~v_ent_cached:          state <= S_LOAD_ENT;
-                        ~v_ent_cached[0]:       state <= S_END;             // page fault
-                        default:                state <= S_END;
+                        ~v_dir_cached:    begin state <= S_LOAD_DIR;    addr_r      <= v_dir_addr;  end
+                        ~v_ent_cached:    begin state <= S_LOAD_ENT;    addr_r      <= v_ent_addr;  end
+                        default:          begin state <= S_END;         page_fault  <= ~v_ent_value[0]; if (~v_ent_value[0]) page_fault_addr <= v_addr_i;   end
                     endcase
                 end
-                S_LOAD_DIR: if (ack_i)          state <= S_LOAD_ENT;        // FIXME deal with page fault
-                S_LOAD_ENT: if (ack_i)          state <= S_END;
+                S_LOAD_DIR: begin
+                    if (ack_i) begin
+                        state <= S_LOAD_ENT;
+                        if (~data_i[0]) begin
+                            page_fault      <= 1'b1;
+                            page_fault_addr <= v_addr_i;
+                            state           <= S_END;
+                        end
+                    end
+                end
+                S_LOAD_ENT: if (ack_i)    begin state <= S_END;         page_fault  <= ~v_ent_value[0]; if (~v_ent_value[0]) page_fault_addr <= v_addr_i;   end
                 S_END:                          state <= S_IDLE;
             endcase
+
+            if (mmu_we) begin
+                mmu_base            <= mmu_base_i;
+                page_fault          <= 1'b0;
+
+                for (i = 0; i < 64; i = i + 1) begin
+                    page_dir_valids[i]  <= 64'b0;
+                    page_ent_valids[i]  <= 64'b0;
+                end
+            end
         end
     end
 
