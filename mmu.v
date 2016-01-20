@@ -111,8 +111,6 @@ module mmu(
                 S_LOAD_ENT: if (ack_i)          state <= S_END;
                 S_END:                          state <= S_IDLE;
             endcase
-
-            if (mmu_we)
         end
     end
 
