@@ -146,7 +146,7 @@ module soc(
         read_data   <= 0;
     end
 
-    assign ddr3_addr_i  = counter;
+    assign ddr3_addr_i  = {counter[15:0], counter[31:16]};
     assign ddr3_data_i  = counter;
 
     always @(posedge clk) begin
