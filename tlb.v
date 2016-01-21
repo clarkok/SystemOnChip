@@ -9,7 +9,6 @@ module tlb(
     input  [31:0] v_addr_i,
     input         v_lookup,
     output [31:0] v_ent_o,
-    output [19:0] v_page_o,
     output        v_ack_o,
 
     output [31:0] addr_o,
@@ -66,7 +65,6 @@ module tlb(
     wire [31:0] v_ent_addr_in   = {data_i[31:12],       v_page_ent, 2'b00};
 
     assign      v_ent_o         = page_ent_caches[v_ent_hash];
-    assign      v_page_o        = {v_ent_tag, v_ent_hash};
     assign      v_ack_o         = (state == S_END);
 
     assign      addr_o          = addr_r;

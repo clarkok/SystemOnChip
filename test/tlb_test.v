@@ -10,7 +10,6 @@ module tlb_test;
 
     wire [31:0] mmu_base_o;
     wire [31:0] v_ent_o;
-    wire [19:0] v_page_o;
     wire v_ack_o;
     wire [31:0] addr_o;
     wire [31:0] data_o;
@@ -28,7 +27,6 @@ module tlb_test;
         .v_addr_i(v_addr_i),
         .v_lookup(v_lookup),
         .v_ent_o(v_ent_o),
-        .v_page_o(v_page_o),
         .v_ack_o(v_ack_o),
         .addr_o(addr_o),
         .data_i(data_i),
