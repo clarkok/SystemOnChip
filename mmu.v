@@ -24,9 +24,9 @@ module mmu(
     output [31:0] page_fault_addr
     );
 
-    wire        v_lookup,
-    wire [31:0] v_ent_o,
-    wire        v_ack_o,
+    wire        v_lookup;
+    wire [31:0] v_ent_o;
+    wire        v_ack_o;
 
     wire [31:0] tlb_addr_o;
     wire [31:0] tlb_data_o;
