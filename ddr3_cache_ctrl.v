@@ -99,7 +99,7 @@ module ddr3_cache_ctrl(
             4: write_buf = {cache_data_o[255:160], data_i, cache_data_o[127:  0]};
             5: write_buf = {cache_data_o[255:192], data_i, cache_data_o[159:  0]};
             6: write_buf = {cache_data_o[255:224], data_i, cache_data_o[191:  0]};
-            7: write_buf = {                       data_i, cache_data_i[223:  0]};
+            7: write_buf = {                       data_i, cache_data_o[223:  0]};
         endcase
     end
 

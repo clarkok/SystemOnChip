@@ -65,6 +65,8 @@ module ddr3_cache_ctrl_test;
     end
     endtask
 
+    integer i;
+
     initial begin
         clk         = 0;
         rst         = 0;
@@ -81,26 +83,15 @@ module ddr3_cache_ctrl_test;
         ctrl_ack_o  = 0;
 
         #10;
-        write(32'h00000000, 32'h01234567);
+        for (i = 0; i < 4096; i = i + 1) write({i[29:0], 2'b00}, i);
 
-        #10;
-        read(32'h00000000);
-
-        #10;
-        write(32'h00000004, 32'h01020304);
-
-        #10;
-        read(32'h00000004);
-
-        #10;
-        read(32'h00100000);
+        for (i = 0; i < 4096; i = i + 1) read({i[29:0], 2'b00});
     end
 
     initial forever #5 clk = ~clk;
 
     reg [255:0] _ddr3_sim [0:255];
 
-    integer i;
     initial begin
         for (i = 0; i < 256; i = i + 1) _ddr3_sim[i] = 256'b0;
     end
