@@ -107,9 +107,10 @@ module tlb(
                     case (1)
                         v_ent_cached: begin
                             state <= S_END;
-                            page_fault  <= ~v_ent_value[0];
-                            if (~v_ent_value[0])
+                            if (~v_ent_value[0]) begin
+                                page_fault      <= 1'b1;
                                 page_fault_addr <= v_addr_i;
+                            end
                         end
                         v_dir_cached: begin
                             if (v_dir_value[0]) begin
