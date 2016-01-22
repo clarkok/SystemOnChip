@@ -69,6 +69,9 @@ module ddr3_cache_ctrl(
     assign          cache_we_i      = (state == S_READ_CACHE && ctrl_ack_o) ||
                                       (state == S_WRITE_AFTER_READ);
 
+    wire [28:0]             write_addr  = {tags[hash], hash, {UNIT_BITS{1'b0}}};
+    wire [28:0]             read_addr   = {tag,        hash, {UNIT_BITS{1'b0}}};
+
     wire                    read    =  rd_i;
     wire                    write   =  we_i;
     wire                    cached  =  valid[hash] &&
@@ -129,18 +132,18 @@ module ddr3_cache_ctrl(
                 S_IDLE: begin
                     case (1)
                         read && cached:                 state <= S_END;
-                        read && missed && dirty:  begin state <= S_WRITE_CACHE;         ctrl_addr_i <= {tags[hash], hash, {UNIT_BITS{1'b0}}}; end
-                        read && missed && clear:  begin state <= S_READ_CACHE;          ctrl_addr_i <=  addr_i; end
+                        read && missed && dirty:  begin state <= S_WRITE_CACHE;         ctrl_addr_i <=  write_addr; end
+                        read && missed && clear:  begin state <= S_READ_CACHE;          ctrl_addr_i <=  read_addr;  end
                         write && cached:                state <= S_READ_BEFORE_WRITE;
-                        write && missed && dirty: begin state <= S_WRITE_CACHE;         ctrl_addr_i <= {tags[hash], hash, {UNIT_BITS{1'b0}}}; end
-                        write && missed && clear: begin state <= S_READ_CACHE;          ctrl_addr_i <=  addr_i; end
+                        write && missed && dirty: begin state <= S_WRITE_CACHE;         ctrl_addr_i <=  write_addr; end
+                        write && missed && clear: begin state <= S_READ_CACHE;          ctrl_addr_i <=  read_addr;  end
                     endcase
                 end
-                S_WRITE_CACHE:  if (ctrl_ack_o)   begin state <= S_READ_CACHE;          ctrl_addr_i <=  addr_i; dirties[hash] <= 1'b0; end
+                S_WRITE_CACHE:  if (ctrl_ack_o)   begin state <= S_READ_CACHE;          ctrl_addr_i <=  read_addr; dirties[hash] <= 1'b0; end
                 S_READ_CACHE: begin
                     case (1)
-                        ctrl_ack_o && read:       begin state <= S_END;                 tags[hash]  <= tag; valid[hash] <= 1'b1; end
-                        ctrl_ack_o && write:      begin state <= S_READ_BEFORE_WRITE;   tags[hash]  <= tag; valid[hash] <= 1'b1; end
+                        ctrl_ack_o && read:       begin state <= S_END;                 tags[hash]  <= tag; valid[hash] <= 1'b1; dirties[hash] <= 1'b0; end
+                        ctrl_ack_o && write:      begin state <= S_READ_BEFORE_WRITE;   tags[hash]  <= tag; valid[hash] <= 1'b1; dirties[hash] <= 1'b0; end
                     endcase
                 end
                 S_READ_BEFORE_WRITE:                    state <= S_WRITE_AFTER_READ;

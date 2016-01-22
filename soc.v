@@ -93,8 +93,8 @@ module soc(
     wire [31:0] ddr3_addr_i;
     wire [31:0] ddr3_data_i;
     wire [31:0] ddr3_data_o;
-    reg         ddr3_we_i;
-    reg         ddr3_rd_i;
+    wire        ddr3_we_i;
+    wire        ddr3_rd_i;
     wire        ddr3_ack_o;
 
     wire [15:0] cache_state_value;
@@ -138,38 +138,63 @@ module soc(
     reg [31:0] counter;
     reg [31:0] read_data;
     reg        init;
+    reg [31:0] state;
 
     initial begin
         counter     <= 0;
-        ddr3_we_i   <= 1'b0;
-        ddr3_rd_i   <= 1'b0;
         read_data   <= 0;
+        state       <= 0;
     end
 
-    assign ddr3_addr_i  = {counter[15:0], counter[31:16]};
+    assign ddr3_addr_i  = {counter[29:0], 2'b00};
     assign ddr3_data_i  = counter;
+    assign ddr3_we_i    = (state == 1);
+    assign ddr3_rd_i    = (state == 3);
 
     always @(posedge clk) begin
         if (rst) begin
+            state       <= 0;
             counter     <= 0;
-            ddr3_we_i   <= 1'b0;
-            ddr3_rd_i   <= 1'b0;
             read_data   <= 0;
             init        <= 1'b0;
         end
         else begin
-            if (init) begin
-                case ({ddr3_we_i, ddr3_rd_i})
-                    2'b00:            begin {ddr3_we_i, ddr3_rd_i}  <= 2'b10;   counter <= counter + 1'b1; end
-                    2'b10:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b01;
-                    2'b01:  if (ddr3_ack_o) {ddr3_we_i, ddr3_rd_i}  <= 2'b00;
-                endcase
+            case (state)
+                0: if (ddr3_ack_o)  state <= 1;
+                1: if (ddr3_ack_o)  state <= 2;
+                2: begin
+                    if (counter == 134217727) begin
+                        counter <= 0;
+                        state   <= 3;
+                    end
+                    else begin
+                        counter <= counter + 1;
+                        state   <= 1;
+                    end
+                end
+                3: begin
+                    if (ddr3_ack_o) begin
+                        if (ddr3_data_o == counter) begin
+                            state       <= 4;
+                        end
+                        else begin
+                            state       <= 5;
+                        end
+                    end
+                end
+                4: begin
+                    if (counter == 134217727) begin
+                        counter <= 0;
+                        state   <= 1;
+                    end
+                    else begin
+                        counter <= counter + 1;
+                        state   <= 3;
+                    end
+                end
+            endcase
 
-                if (ddr3_rd_i && ddr3_ack_o) read_data <= ddr3_data_o;
-            end
-            else begin
-                if (ddr3_ack_o)     init <= 1'b1;
-            end
+            if (ddr3_rd_i && ddr3_ack_o)    read_data   <= ddr3_data_o;
         end
     end
 
