@@ -246,7 +246,7 @@ module soc(
         .rst(rst),
 
         .en({8{1'b1}}),
-        .data(read_data),
+        .data(counter),
         .dot(sram_dq[39:32]),
         .led(led),
 

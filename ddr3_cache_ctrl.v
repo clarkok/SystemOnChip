@@ -22,15 +22,17 @@ module ddr3_cache_ctrl(
     output reg [15:0] last_state_value
     );
 
+    parameter CACHE_LINES       = 1024;
+
     localparam TOTAL_ADDR_BITS  = 29;                               // 512MByte
     localparam UNIT_BITS        = `GET_WIDTH(256 / 8 - 1);
-    localparam HASH_BITS        = 9;                                // 512 cache lines
+    localparam HASH_BITS        = `GET_WIDTH(CACHE_LINES - 1);
     localparam TAG_BITS         = TOTAL_ADDR_BITS - UNIT_BITS - HASH_BITS;
 
-    wire [8:0]      cache_addr_i;
-    wire [255:0]    cache_data_i;
-    wire [255:0]    cache_data_o;
-    wire            cache_we_i;
+    wire [HASH_BITS-1:0]    cache_addr_i;
+    wire [255:0]            cache_data_i;
+    wire [255:0]            cache_data_o;
+    wire                    cache_we_i;
 
     ddr3_cache ddr3_cache(
         .clka(clk),
@@ -40,9 +42,9 @@ module ddr3_cache_ctrl(
         .wea(cache_we_i)
     );
 
-    reg [TAG_BITS-1:0]  tags[0:511];
-    reg [511:0]         valid;
-    reg [511:0]         dirties;
+    reg [TAG_BITS-1:0]      tags[0:CACHE_LINES-1];
+    reg [CACHE_LINES-1:0]   valid;
+    reg [CACHE_LINES-1:0]   dirties;
 
     localparam S_INIT                   = 3'h0;
     localparam S_IDLE                   = 3'h1;
@@ -110,12 +112,12 @@ module ddr3_cache_ctrl(
     integer i;
     begin
         state       <= S_INIT;
-        valid       <= 512'b0;
-        dirties     <= 512'b0;
+        valid       <= {CACHE_LINES{1'b0}};
+        dirties     <= {CACHE_LINES{1'b0}};
         ctrl_addr_i <= 29'b0;
         ctrl_data_i <= 256'b0;
 
-        for (i = 0; i < 512; i = i + 1)
+        for (i = 0; i < CACHE_LINES; i = i + 1)
             tags[i] <= 0;
     end
     endtask
@@ -132,11 +134,9 @@ module ddr3_cache_ctrl(
                 S_IDLE: begin
                     case (1)
                         read && cached:                 state <= S_END;
-                        read && missed && dirty:  begin state <= S_WRITE_CACHE;         ctrl_addr_i <=  write_addr; end
-                        read && missed && clear:  begin state <= S_READ_CACHE;          ctrl_addr_i <=  read_addr;  end
                         write && cached:                state <= S_READ_BEFORE_WRITE;
-                        write && missed && dirty: begin state <= S_WRITE_CACHE;         ctrl_addr_i <=  write_addr; end
-                        write && missed && clear: begin state <= S_READ_CACHE;          ctrl_addr_i <=  read_addr;  end
+                        missed && dirty:          begin state <= S_WRITE_CACHE;         ctrl_addr_i <=  write_addr; end
+                        missed && clear:          begin state <= S_READ_CACHE;          ctrl_addr_i <=  read_addr;  end
                     endcase
                 end
                 S_WRITE_CACHE:  if (ctrl_ack_o)   begin state <= S_READ_CACHE;          ctrl_addr_i <=  read_addr; dirties[hash] <= 1'b0; end
