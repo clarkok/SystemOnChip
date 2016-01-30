@@ -1,15 +1,9 @@
 init:
-    lb      $1,     1($0)
-    lh      $5,     3($4)
-    lw      $9,     5($8)
-    dd      0xC14B0006          #    ll      $11,    6($10)
-    sb      $13,    7($12)
-    sh      $15,    8($14)
-    sw      $17,    9($16)
-    dd      0xE253000A          #    sc      $19,    10($18)
-    beq     $zero, $zero, fault
+    addi    $1,     $zero,  10
+    addiu   $2,     $1,     10
+    slti    $3,     $1,     11
+    sltiu   $4,     $1,     -9
+    andi    $5,     $1,     0xFFFF
+    ori     $6,     $5,     0xF0F0
+    xori    $7,     $5,     0x0F0F
     j       init
-fault:
-    lb      $1,     5($0)
-forever:
-    j       forever

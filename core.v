@@ -551,7 +551,7 @@ module core(
         endcase
     end
 
-    wire exec_overflow_err  = exec_overflow | dec_overflow_o;
+    wire exec_overflow_err  = exec_overflow & dec_overflow_o;
     wire exec_no_exception  = ~( exec_exception_o ||
                                 (exec_pc_we_o == 2'b0) ||                             // JR
                                 (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0));   // predict missed
