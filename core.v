@@ -1,12 +1,12 @@
 `include "exceptions.vh"
 
-module Core(
+module core(
     input  clk,
     input  rst,
 
     output [INST_ADDR_WIDTH-1:0]    inst_addr_o,
     input  [31:0]                   inst_data_i,
-    input                           inst_valid,
+    input                           inst_valid_i,
 
     output [DATA_ADDR_WIDTH-1:0]    data_addr_o,
     input  [DATA_DATA_WIDTH-1:0]    data_data_i,
@@ -16,8 +16,24 @@ module Core(
     output                          data_rd_o,
     input                           data_valid_i,
 
+    output                          mem_fc,
+    output                          mem_sc,
+    input                           hw_page_fault,
+
     input                           hw_interrupt,
-    input  [31:0]                   hw_cause
+    input  [31:0]                   hw_cause,
+
+    output                          exception,
+    output [31:0]                   cause,
+    output [INST_ADDR_WIDTH-1:0]    epc,
+    output                          eret,
+
+    output [4:0]                    cp0_addr_o,
+    input  [31:0]                   cp0_data_i,
+    output [31:0]                   cp0_data_o,
+    output                          cp0_we_o,
+
+    input  [INST_ADDR_WIDTH-1:0]    cp0_exception_base
     );
 
     parameter INST_ADDR_WIDTH = 32;
@@ -84,8 +100,8 @@ module Core(
                 I_BGEZ  = 49,
 
                 I_SCALL = 50,
-                I_ERET  = 51,
-                I_BREAK = 52,
+                I_BREAK = 51,
+                I_ERET  = 52,
 
                 I_MFC0  = 53,
                 I_MTC0  = 54,
@@ -160,7 +176,7 @@ module Core(
     end
     endfunction
 
-    wire pipeline_flush;
+    wire dec_pipeline_flush_i;
 
     reg                         dec_exception_o;
     reg  [31:0]                 dec_cause_o;
@@ -168,24 +184,27 @@ module Core(
     reg  [4:0]                  dec_rs_o;
     reg  [4:0]                  dec_rt_o;
     reg  [4:0]                  dec_rd_o;
-    reg  [4:0]                  dec_imm_o;
+    reg  [DATA_DATA_WIDTH-1:0]  dec_imm_o;
     reg  [4:0]                  dec_shamt_o;
     reg  [1:0]                  dec_pc_we_o;        // 0: always flush, 1: conditional flush, 2: Non
     reg  [1:0]                  dec_pc_we_sel_o;    // 0: branch, 1: mem_result, 2: syscall, 3: eret
     reg                         dec_reg_we_o;
     reg  [2:0]                  dec_reg_we_sel_o;   // 0: alu_out, 1: bus_data, 2: pc + 4, 3: c0
-    reg  [2:0]                  dec_reg_we_dst_o;   // 0: rd, 1: rt, 2: $ra, 3: hi, 4: lohi
+    reg  [2:0]                  dec_reg_we_dst_o;   // 0: rd, 1: rt, 2: $ra, 3: hi, 4: lo, 5:lohi
     reg  [3:0]                  dec_alu_op_o;       //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
                                                     //  add sub and slt or  xor nor sll srl sra sltueq  ne  lui mul mulu
     reg  [2:0]                  dec_alu_a_sel_o;    //  0: rs, 1: rt, 2: exec_result, 3: mem_result, 4: hi, 5: lo, 6: 0, 7: imm
     reg  [2:0]                  dec_alu_b_sel_o;    //  0: rt, 1: imm, 2: shamt, 3: exec_result, 4: mem_result, 5: 0
-    reg                         dec_sign_ext_o;
     reg                         dec_load_unsigned_o;
+    reg                         dec_overflow_o;
     reg                         dec_mem_rd_o;
     reg                         dec_mem_we_o;
     reg                         dec_mem_fc_o;
     reg                         dec_mem_sc_o;
     reg  [1:0]                  dec_mem_sel_o;
+    reg                         dec_cp0_we;
+
+    reg  [INST_ADDR_WIDTH-1:0]  the_pc;
 
     reg  [5:0]                  dec_dst_in_exec;
     reg  [5:0]                  dec_dst_in_mem;
@@ -195,20 +214,20 @@ module Core(
     wire [31:0]                 dec_inst;
     wire [NR_INST-1:0]          dec_decoded;
 
-    assign dec_inst     = inst_valid ? inst_data_i : NOP;
+    assign dec_inst     = inst_valid_i ? inst_data_i : NOP;
     assign dec_decoded  = decode(dec_inst);
 
     task dec_init;
     begin
         dec_exception_o     <= 0;
         dec_cause_o         <= 0;
-        dec_pc_o            <= pipeline_flush ? dec_pc_i : 0;
+        dec_pc_o            <= 0;
         dec_rs_o            <= 0;
         dec_rt_o            <= 0;
         dec_rd_o            <= 0;
         dec_imm_o           <= 0;
         dec_shamt_o         <= 0;
-        dec_pc_we_o         <= 0;
+        dec_pc_we_o         <= 2;
         dec_pc_we_sel_o     <= 0;
         dec_reg_we_o        <= 0;
         dec_reg_we_sel_o    <= 0;
@@ -216,8 +235,8 @@ module Core(
         dec_alu_op_o        <= 0;
         dec_alu_a_sel_o     <= 0;
         dec_alu_b_sel_o     <= 0;
-        dec_sign_ext_o      <= 0;
         dec_load_unsigned_o <= 0;
+        dec_overflow_o      <= 0;
         dec_mem_rd_o        <= 0;
         dec_mem_we_o        <= 0;
         dec_mem_fc_o        <= 0;
@@ -226,39 +245,58 @@ module Core(
 
         dec_dst_in_exec     <= 6'b10_0000;
         dec_dst_in_mem      <= 6'b10_0000;
+        the_pc              <= 1;
     end
     endtask
 
     initial dec_init();
 
-    wire [INST_ADDR_WIDTH-1:0]  jump_addr   = {dec_pc_o[31:28], dec_inst[25:0], 2'b00};
-    wire [INST_ADDR_WIDTH-1:0]  branch_addr = dec_pc_o + 4 + {{(INST_ADDR_WIDTH-18){dec_inst[15]}}, dec_inst[15:0], 2'b00};
+    wire [INST_ADDR_WIDTH-1:0]  jump_addr   = {the_pc[31:28], dec_inst[25:0], the_pc[1:0]};
+    wire [INST_ADDR_WIDTH-1:0]  branch_addr = the_pc + 4 + 
+                                            {{(INST_ADDR_WIDTH-18){dec_inst[15]}}, dec_inst[15:0], 2'b00};
+
+    wire dec_sign_ext   = |(dec_decoded[I_SLTIU:I_LB]);
+
+    wire undefined_inst = !dec_decoded;
+    wire privilege_inst = ~the_pc[0] && dec_decoded[I_MTC0:I_ERET];
+    wire privilege_addr = ~the_pc[0] && the_pc[31];
 
     always @(posedge clk) begin
-        if (rst || pipeline_flush) dec_init();
+        if (rst) dec_init();
+        else if (dec_pipeline_flush_i) begin
+            dec_init();
+            the_pc  <= dec_pc_i;
+        end
         else if (data_valid_i) begin
-            dec_exception_o     <=  hw_interrupt | (!dec_decoded);   // inst invalid
-            dec_cause_o         <=  hw_interrupt ? hw_cause : `INVALID_INST;
             case (1)
-                (dec_decoded[I_JAL:I_J]):                   dec_pc_o    <= jump_addr;
-                (dec_decoded[I_BGEZ:I_BEQ]):                dec_pc_o    <= branch_addr;
-                (dec_decoded[I_JALR:I_JR] || 
-                 dec_decoded[I_BREAK:I_SCALL]):             dec_pc_o    <= dec_pc_o;
-                default:                                    dec_pc_o    <= dec_pc_o + 4;
+                (|dec_decoded[I_JAL:I_J]):                  the_pc <= jump_addr;
+                (|dec_decoded[I_BGEZ:I_BEQ]):               the_pc <= branch_addr;
+                (|dec_decoded[I_JALR:I_JR] || 
+                 |dec_decoded[I_ERET:I_SCALL]):             the_pc <= the_pc;
+                default:                                    the_pc <= the_pc + 4;
             endcase
+            dec_exception_o     <= hw_interrupt | undefined_inst | privilege_inst | privilege_addr;
+            case (1)
+                (hw_interrupt):     dec_cause_o <= hw_cause;
+                (undefined_inst):   dec_cause_o <= `UNDEFINED_INST;
+                (privilege_inst):   dec_cause_o <= `PRIVILEGE_INST;
+                (privilege_addr):   dec_cause_o <= `PRIVILEGE_ADDR;
+            endcase
+            dec_pc_o            <=  the_pc;
+
             dec_rs_o            <=  dec_inst[25:21];
             dec_rt_o            <=  dec_inst[20:16];
             dec_rd_o            <=  dec_inst[15:11];
-            dec_imm_o           <=  dec_inst[15: 0];
+            dec_imm_o           <=  {{16{(dec_sign_ext && dec_inst[15])}}, dec_inst[15: 0]};
             dec_shamt_o         <=  dec_inst[10: 6];
             case (1)
-                (dec_decoded[I_JR:I_JALR]):                 dec_pc_we_o <= 0;
-                (dec_decoded[I_BGEZ:I_BEQ]):                dec_pc_we_o <= 1;
+                (|dec_decoded[I_JALR:I_JR]):                dec_pc_we_o <= 0;
+                (|dec_decoded[I_BGEZ:I_BEQ]):               dec_pc_we_o <= 1;
                 default:                                    dec_pc_we_o <= 2;
             endcase
             case (1)
-                (dec_decoded[I_BGEZ:I_BEQ]):                dec_pc_we_sel_o <= 0;
-                (dec_decoded[I_JALR:I_JR]):                 dec_pc_we_sel_o <= 1;
+                (|dec_decoded[I_BGEZ:I_BEQ]):               dec_pc_we_sel_o <= 0;
+                (|dec_decoded[I_JALR:I_JR]):                dec_pc_we_sel_o <= 1;
                 (dec_decoded[I_SCALL]):                     dec_pc_we_sel_o <= 2;
                 (dec_decoded[I_ERET]):                      dec_pc_we_sel_o <= 3;
             endcase
@@ -269,8 +307,8 @@ module Core(
                                     dec_decoded[I_JALR] ||
                                     dec_decoded[I_MFC0];
             case (1)
-                (dec_decoded[I_MTLO:I_ADDI]):                   dec_reg_we_sel_o <= 0;
-                (dec_decoded[I_LL:I_LB]):                       dec_reg_we_sel_o <= 1;
+                (|dec_decoded[I_MTLO:I_ADDI]):                  dec_reg_we_sel_o <= 0;
+                (|dec_decoded[I_LL:I_LB]):                      dec_reg_we_sel_o <= 1;
                 (dec_decoded[I_JAL] | (dec_decoded[I_JALR])):   dec_reg_we_sel_o <= 2;
                 (dec_decoded[I_MFC0]):                          dec_reg_we_sel_o <= 3;
             endcase
@@ -301,23 +339,27 @@ module Core(
                      dec_dst_in_exec[4:0] <= 5'b0;
                  end
 
-                (dec_decoded[I_DIVU:I_MULT] ||
-                 dec_decoded[I_MTLO]): begin
-                    dec_reg_we_dst_o <= 4;
+                (dec_decoded[I_MTLO]): begin
+                     dec_reg_we_dst_o <= 4;
+                     dec_dst_in_exec[4:0] <= 5'b0;
+                 end
+
+                (|dec_decoded[I_DIVU:I_MULT]): begin
+                    dec_reg_we_dst_o <= 5;
                     dec_dst_in_exec[4:0] <= 5'b0;
                  end
             endcase
             case (1)
-                (dec_decoded[I_SC:I_LB]):           dec_alu_op_o <= 0;
-                (dec_decoded[I_ADDIU:I_ADDI]):      dec_alu_op_o <= 0;
+                (|dec_decoded[I_SC:I_LB]):          dec_alu_op_o <= 0;
+                (|dec_decoded[I_ADDIU:I_ADDI]):     dec_alu_op_o <= 0;
                 (dec_decoded[I_SLTI]):              dec_alu_op_o <= 3;
                 (dec_decoded[I_SLTIU]):             dec_alu_op_o <= 10;
                 (dec_decoded[I_ANDI]):              dec_alu_op_o <= 2;
                 (dec_decoded[I_ORI]):               dec_alu_op_o <= 4;
                 (dec_decoded[I_XORI]):              dec_alu_op_o <= 5;
                 (dec_decoded[I_LUI]):               dec_alu_op_o <= 13;
-                (dec_decoded[I_ADDU:I_ADD]):        dec_alu_op_o <= 0;
-                (dec_decoded[I_SUBU:I_SUB]):        dec_alu_op_o <= 1;
+                (|dec_decoded[I_ADDU:I_ADD]):       dec_alu_op_o <= 0;
+                (|dec_decoded[I_SUBU:I_SUB]):       dec_alu_op_o <= 1;
                 (dec_decoded[I_SLT]):               dec_alu_op_o <= 3;
                 (dec_decoded[I_SLTU]):              dec_alu_op_o <= 10;
                 (dec_decoded[I_AND]):               dec_alu_op_o <= 2;
@@ -332,12 +374,12 @@ module Core(
                 (dec_decoded[I_SRAV]):              dec_alu_op_o <= 9;
                 (dec_decoded[I_MULT]):              dec_alu_op_o <= 14;
                 (dec_decoded[I_MULTU]):             dec_alu_op_o <= 15;
-                (dec_decoded[I_MTLO:I_MFHI]):       dec_alu_op_o <= 0;
+                (|dec_decoded[I_MTLO:I_MFHI]):      dec_alu_op_o <= 0;
                 (dec_decoded[I_BEQ]):               dec_alu_op_o <= 11;
                 (dec_decoded[I_BNE]):               dec_alu_op_o <= 12;
                 (dec_decoded[I_BLTZ]):              dec_alu_op_o <= 3;
                 (dec_decoded[I_BGEZ]):              dec_alu_op_o <= 3;
-                (dec_decoded[I_MTC0:I_MFC0]):       dec_alu_op_o <= 0;
+                (|dec_decoded[I_MTC0:I_MFC0]):      dec_alu_op_o <= 0;
                 default:                            dec_alu_op_o <= 0;
             endcase
             case (1)
@@ -367,19 +409,19 @@ module Core(
                  dec_decoded[I_BNE:I_BEQ]):     dec_alu_b_sel_o <= 
                                                     (dec_inst[20:16] == dec_dst_in_exec) ? 3 :
                                                     (dec_inst[20:16] == dec_dst_in_mem)  ? 4 : 0;
-                (dec_decoded[I_XORI:I_LB]):     dec_alu_b_sel_o <= 1;
-                (dec_decoded[I_SRA:I_SLL]):     dec_alu_b_sel_o <= 2;
+                (|dec_decoded[I_XORI:I_LB]):    dec_alu_b_sel_o <= 1;
+                (|dec_decoded[I_SRA:I_SLL]):    dec_alu_b_sel_o <= 2;
                 default:                        dec_alu_b_sel_o <= 5;
             endcase
-            dec_sign_ext_o      <= (dec_decoded[I_SLTIU:I_LB]);
             dec_load_unsigned_o <= (dec_decoded[I_LBU] | dec_decoded[I_LHU]);
-            dec_mem_rd_o        <= (dec_decoded[I_LL:I_LB]);
-            dec_mem_we_o        <= (dec_decoded[I_SW:I_SB]);
-            dec_mem_fc_o        <= (dec_decoded[I_SYNC]);
-            dec_mem_sc_o        <= (dec_decoded[I_SC]);
+            dec_overflow_o      <= (dec_decoded[I_ADD] | dec_decoded[I_ADDI] | dec_decoded[I_SUB]);
+            dec_mem_rd_o        <= (|dec_decoded[I_LL:I_LB]);
+            dec_mem_we_o        <= (|dec_decoded[I_SW:I_SB]);
+            dec_mem_fc_o        <= (|dec_decoded[I_SYNC]);
+            dec_mem_sc_o        <= (|dec_decoded[I_SC]);
             case (1)
-                (dec_decoded[I_LBU:I_LB] | dec_decoded[I_SB]):  dec_mem_sel_o <= 0;
-                (dec_decoded[I_LHU:I_LH] | dec_decoded[I_SH]):  dec_mem_sel_o <= 1;
+                (dec_decoded[I_LBU:I_LB] || dec_decoded[I_SB]): dec_mem_sel_o <= 0;
+                (dec_decoded[I_LHU:I_LH] || dec_decoded[I_SH]): dec_mem_sel_o <= 1;
                 default:                                        dec_mem_sel_o <= 2;
             endcase
 
@@ -392,5 +434,222 @@ module Core(
             dec_dst_in_mem  <= dec_dst_in_exec;
         end
     end
+
+    // exec part
+    wire [63:0]                 exec_mem_result_i;
+    wire                        exec_pipeline_flush_i;
+
+    reg                         exec_exception_o;
+    reg  [31:0]                 exec_cause_o;
+    reg  [INST_ADDR_WIDTH-1:0]  exec_pc_o;
+    reg  [4:0]                  exec_rt_o;
+    reg  [4:0]                  exec_rd_o;
+    reg  [1:0]                  exec_pc_we_o;
+    reg  [1:0]                  exec_pc_we_sel_o;
+    reg                         exec_reg_we_o;
+    reg  [2:0]                  exec_reg_we_sel_o;
+    reg  [2:0]                  exec_reg_we_dst_o;
+    reg                         exec_load_unsigned_o;
+    reg                         exec_mem_rd_o;
+    reg                         exec_mem_we_o;
+    reg                         exec_mem_fc_o;
+    reg                         exec_mem_sc_o;
+    reg  [1:0]                  exec_mem_sel_o;
+    reg  [63:0]                 exec_result_o;
+    reg  [DATA_DATA_WIDTH-1:0]  exec_data_o;
+
+    reg [DATA_DATA_WIDTH-1:0]   reg_file [0:31];
+    reg [63:0]                  lohi;
+
+    task exec_init;
+    integer i;
+    begin
+        exec_exception_o    <= 0;
+        exec_cause_o        <= 0;
+        exec_pc_o           <= 0;
+        exec_rt_o           <= 0;
+        exec_rd_o           <= 0;
+        exec_pc_we_o        <= 2;
+        exec_pc_we_sel_o    <= 0;
+        exec_reg_we_o       <= 0;
+        exec_reg_we_sel_o   <= 0;
+        exec_reg_we_dst_o   <= 0;
+        exec_load_unsigned_o <= 0;
+        exec_mem_rd_o       <= 0;
+        exec_mem_we_o       <= 0;
+        exec_mem_fc_o       <= 0;
+        exec_mem_sc_o       <= 0;
+        exec_mem_sel_o      <= 0;
+        exec_result_o       <= 64'h0;
+        lohi                <= 0;
+        for (i = 0; i < 32; i = i + 1)
+            reg_file[i]     <= 0;
+    end
+    endtask
+
+    initial exec_init();
+
+    wire [DATA_DATA_WIDTH-1:0]  exec_rs = reg_file[dec_rs_o];
+    wire [DATA_DATA_WIDTH-1:0]  exec_rt = reg_file[dec_rt_o];
+
+    reg  [DATA_DATA_WIDTH-1:0]  exec_alu_a;
+    reg  [DATA_DATA_WIDTH-1:0]  exec_alu_b;
+    reg  [63:0]                 exec_alu_out;
+    reg                         exec_overflow;
+
+    always @* begin
+        case (dec_alu_a_sel_o)
+            3'h0:   exec_alu_a  = exec_rs;
+            3'h1:   exec_alu_a  = exec_rt;
+            3'h2:   exec_alu_a  = exec_result_o[31:0];
+            3'h3:   exec_alu_a  = exec_mem_result_i[31:0];
+            3'h4:   exec_alu_a  = lohi[63:32];
+            3'h5:   exec_alu_a  = lohi[31: 0];
+            3'h6:   exec_alu_a  = 0;
+            3'h7:   exec_alu_a  = dec_imm_o;
+        endcase
+    end
+
+    always @* begin
+        case (dec_alu_b_sel_o)
+            3'h0:   exec_alu_b  = exec_rt;
+            3'h1:   exec_alu_b  = dec_imm_o;
+            3'h2:   exec_alu_b  = dec_shamt_o;
+            3'h3:   exec_alu_b  = exec_result_o[31:0];
+            3'h4:   exec_alu_b  = exec_mem_result_i[31:0];
+            3'h5:   exec_alu_b  = 0;
+        endcase
+    end
+
+    always @* begin
+        exec_overflow   = 0;
+        exec_alu_out    = 64'h0;
+        case (dec_alu_op_o)
+            4'h0:   {exec_overflow, exec_alu_out[31:0]} = exec_alu_a + exec_alu_b;
+            4'h1:   {exec_overflow, exec_alu_out[31:0]} = exec_alu_a - exec_alu_b;
+            4'h2:   exec_alu_out[31:0]                  = exec_alu_a & exec_alu_b;
+            4'h3:   exec_alu_out[31:0]                  = $signed(exec_alu_a) < $signed(exec_alu_b);
+            4'h4:   exec_alu_out[31:0]                  = exec_alu_a | exec_alu_b;
+            4'h5:   exec_alu_out[31:0]                  = exec_alu_a ^ exec_alu_b;
+            4'h6:   exec_alu_out[31:0]                  = ~(exec_alu_a | exec_alu_b);
+            4'h7:   exec_alu_out[31:0]                  = exec_alu_a << exec_alu_b[4:0];
+            4'h8:   exec_alu_out[31:0]                  = exec_alu_a >> exec_alu_b[4:0];
+            4'h9:   exec_alu_out[31:0]                  = $signed(exec_alu_a) >>> exec_alu_b[4:0];
+            4'ha:   exec_alu_out[31:0]                  = exec_alu_a < exec_alu_b;
+            4'hb:   exec_alu_out[31:0]                  = exec_alu_a == exec_alu_b;
+            4'hc:   exec_alu_out[31:0]                  = exec_alu_a != exec_alu_b;
+            4'hd:   exec_alu_out[31:0]                  = {exec_alu_a[15:0], 16'b0};
+            4'he:   exec_alu_out[31:0]                  = $signed(exec_alu_a) * $signed(exec_alu_b);
+            4'hf:   exec_alu_out[31:0]                  = exec_alu_a * exec_alu_b;
+        endcase
+    end
+
+    wire exec_overflow_err  = exec_overflow | dec_overflow_o;
+
+    always @(posedge clk) begin
+        if (rst || exec_pipeline_flush_i) exec_init();
+        else if (data_valid_i) begin
+            exec_exception_o        <= dec_exception_o | exec_overflow_err;
+            exec_cause_o            <= dec_exception_o ? dec_cause_o :
+                                       exec_overflow_err ? `OVERFLOW : 0;
+            exec_pc_o               <= dec_pc_o;
+            exec_rt_o               <= dec_rt_o;
+            exec_rd_o               <= dec_rd_o;
+            exec_pc_we_o            <= dec_pc_we_o;
+            exec_pc_we_sel_o        <= dec_pc_we_sel_o;
+            exec_reg_we_o           <= dec_reg_we_o;
+            exec_reg_we_sel_o       <= dec_reg_we_sel_o;
+            exec_reg_we_dst_o       <= dec_reg_we_dst_o;
+            exec_load_unsigned_o    <= dec_load_unsigned_o;
+            exec_mem_rd_o           <= dec_mem_rd_o && ~dec_exception_o;
+            exec_mem_we_o           <= dec_mem_we_o && ~dec_exception_o;
+            exec_mem_fc_o           <= dec_mem_fc_o && ~dec_exception_o;
+            exec_mem_sc_o           <= dec_mem_sc_o && ~dec_exception_o;
+            exec_mem_sel_o          <= dec_mem_sel_o;
+            exec_result_o           <= exec_alu_out;
+            exec_data_o             <= exec_rt;
+        end
+    end
+
+    // mem part
+    reg  [4:0]                  mem_rt_o;
+    reg  [4:0]                  mem_rd_o;
+    reg                         mem_reg_we_o;
+    reg  [2:0]                  mem_reg_we_dst_o;
+    reg  [63:0]                 mem_result_o;
+
+    reg  mem_pipeline_flush_o;
+    reg  [INST_ADDR_WIDTH-1:0] mem_pc_data_o;
+
+    task mem_init;
+    begin
+        mem_rt_o                <= 0;
+        mem_rd_o                <= 0;
+        mem_reg_we_o            <= 0;
+        mem_reg_we_dst_o        <= 0;
+        mem_result_o            <= 0;
+        mem_pipeline_flush_o    <= 0;
+        mem_pc_data_o           <= 0;
+    end
+    endtask
+
+    initial mem_init();
+
+    reg [DATA_DATA_WIDTH-1:0] mem_bus_data;
+    always @* begin
+        case (exec_mem_sel_o)
+            2'b0:       mem_bus_data = {{DATA_ADDR_WIDTH- 8{(~exec_load_unsigned_o) && data_data_i[ 7]}}, data_data_i[ 7:0]};
+            2'b1:       mem_bus_data = {{DATA_ADDR_WIDTH-16{(~exec_load_unsigned_o) && data_data_i[15]}}, data_data_i[15:0]};
+            default:    mem_bus_data = data_data_i;
+        endcase
+    end
+
+    always @(posedge clk) begin
+        if (rst) mem_init();
+        else if (data_valid_i) begin
+            case (exec_reg_we_sel_o)
+                3'h0:   mem_result_o    <= exec_result_o;
+                3'h1:   mem_result_o    <= mem_bus_data;
+                3'h2:   mem_result_o    <= exec_pc_o + 4;
+                3'h3:   mem_result_o    <= cp0_data_i;
+            endcase
+            mem_pipeline_flush_o    <= exec_exception_o ||
+                                       hw_page_fault ||
+                                      (exec_pc_we_o == 2'b0) ||                             // JR
+                                      (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0);   // predict missed
+
+            mem_pc_data_o           <= (exec_exception_o || hw_page_fault) ? cp0_exception_base :
+                                       (exec_pc_we_o == 2'b0)              ? exec_result_o[INST_ADDR_WIDTH-1:0] :
+                                                                             exec_pc_o + 4;
+        end
+    end
+
+    // wb part
+    always @(posedge clk) begin
+        if (data_valid_i) begin
+            case (exec_reg_we_dst_o)
+                3'h0:   reg_file[mem_rd_o]  <= mem_result_o[31:0];
+                3'h1:   reg_file[mem_rt_o]  <= mem_result_o[31:0];
+                3'h2:   reg_file[5'b11111]  <= mem_result_o[31:0];
+                3'h3:   lohi[63:32]         <= mem_result_o[31:0];
+                3'h4:   lohi[31: 0]         <= mem_result_o[31:0];
+                3'h5:   lohi                <= mem_result_o;
+            endcase
+        end
+    end
+
+    assign dec_pc_i                 = mem_pc_data_o;
+    assign exec_mem_result_i        = mem_result_o;
+    assign dec_pipeline_flush_i     = mem_pipeline_flush_o;
+    assign exec_pipeline_flush_i    = mem_pipeline_flush_o;
+
+    assign inst_addr_o  = the_pc;
+    assign data_addr_o  = exec_result_o[DATA_ADDR_WIDTH-1:0];
+    assign data_data_o  = exec_data_o;
+    assign data_sel_o   = exec_mem_sel_o;
+    assign data_we_o    = exec_mem_we_o;
+    assign data_rd_o    = exec_mem_rd_o;
+    assign mem_fc       = exec_mem_fc_o;
+    assign mem_sc       = exec_mem_sc_o;
 
 endmodule
