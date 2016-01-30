@@ -194,7 +194,7 @@ module core(
     reg  [3:0]                  dec_alu_op_o;       //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
                                                     //  add sub and slt or  xor nor sll srl sra sltueq  ne  lui mul mulu
     reg  [2:0]                  dec_alu_a_sel_o;    //  0: rs, 1: rt, 2: exec_result, 3: mem_result, 4: hi, 5: lo, 6: 0, 7: imm
-    reg  [2:0]                  dec_alu_b_sel_o;    //  0: rt, 1: imm, 2: shamt, 3: exec_result, 4: mem_result, 5: 0
+    reg  [2:0]                  dec_alu_b_sel_o;    //  0: rt, 1: imm, 2: shamt, 3: exec_result, 4: mem_result, 5: 0, 6: rs
     reg                         dec_load_unsigned_o;
     reg                         dec_overflow_o;
     reg                         dec_mem_rd_o;
@@ -393,7 +393,7 @@ module core(
                                                     (dec_inst[25:21] == dec_dst_in_exec) ? 2 :
                                                     (dec_inst[25:21] == dec_dst_in_mem)  ? 3 :
                                                                                            0;
-                (dec_decoded[I_SRAV:I_SLL]):    dec_alu_a_sel_o <= 
+                (|dec_decoded[I_SRAV:I_SLL]):   dec_alu_a_sel_o <= 
                                                     (dec_inst[20:16] == dec_dst_in_exec) ? 2 :
                                                     (dec_inst[20:16] == dec_dst_in_mem)  ? 3 :
                                                                                            1;
@@ -410,6 +410,9 @@ module core(
                                                     (dec_inst[20:16] == dec_dst_in_mem)  ? 4 : 0;
                 (|dec_decoded[I_XORI:I_LB]):    dec_alu_b_sel_o <= 1;
                 (|dec_decoded[I_SRA:I_SLL]):    dec_alu_b_sel_o <= 2;
+                (|dec_decoded[I_SRAV:I_SLLV]):  dec_alu_b_sel_o <=
+                                                    (dec_inst[25:21] == dec_dst_in_exec) ? 3 :
+                                                    (dec_inst[25:21] == dec_dst_in_mem)  ? 4 : 6;
                 default:                        dec_alu_b_sel_o <= 5;
             endcase
             dec_load_unsigned_o <= (dec_decoded[I_LBU] | dec_decoded[I_LHU]);
@@ -525,6 +528,7 @@ module core(
             3'h3:   exec_alu_b  = exec_result_o[31:0];
             3'h4:   exec_alu_b  = exec_mem_result_i[31:0];
             3'h5:   exec_alu_b  = 0;
+            3'h6:   exec_alu_b  = exec_rs;
         endcase
     end
 
