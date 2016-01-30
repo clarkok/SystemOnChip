@@ -502,7 +502,7 @@ module core(
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_a;
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_b;
     reg  [63:0]                 exec_alu_out;
-    reg                         exec_overflow;
+    reg                         exec_overf_r;
 
     always @* begin
         case (dec_alu_a_sel_o)
@@ -529,11 +529,11 @@ module core(
     end
 
     always @* begin
-        exec_overflow   = 0;
+        exec_overf_r    = 0;
         exec_alu_out    = 64'h0;
         case (dec_alu_op_o)
-            4'h0:   {exec_overflow, exec_alu_out[31:0]} = exec_alu_a + exec_alu_b;
-            4'h1:   {exec_overflow, exec_alu_out[31:0]} = exec_alu_a - exec_alu_b;
+            4'h0:   {exec_overf_r, exec_alu_out[31:0]}  = exec_alu_a + exec_alu_b;
+            4'h1:   {exec_overf_r, exec_alu_out[31:0]}  = exec_alu_a - exec_alu_b;
             4'h2:   exec_alu_out[31:0]                  = exec_alu_a & exec_alu_b;
             4'h3:   exec_alu_out[31:0]                  = $signed(exec_alu_a) < $signed(exec_alu_b);
             4'h4:   exec_alu_out[31:0]                  = exec_alu_a | exec_alu_b;
@@ -550,6 +550,8 @@ module core(
             4'hf:   exec_alu_out[31:0]                  = exec_alu_a * exec_alu_b;
         endcase
     end
+
+    wire exec_overflow      = (dec_alu_op_o == 4'h0) ? exec_overf_r : ~exec_overf_r;
 
     wire exec_overflow_err  = exec_overflow & dec_overflow_o;
     wire exec_no_exception  = ~( exec_exception_o ||
