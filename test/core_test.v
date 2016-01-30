@@ -70,7 +70,7 @@ module core_test;
         hw_interrupt = 0;
         hw_cause = 0;
         cp0_data_i = 0;
-        cp0_exception_base = 0;
+        cp0_exception_base = 32'hFFFFFFF0;
         $readmemh("/home/c/c-stack/SoC/hardware/test/core_test.hex", rom);
     end
 
