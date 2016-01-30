@@ -2,7 +2,6 @@ module core_test;
     reg clk;
     reg rst;
     reg inst_valid_i;
-    reg [31:0] data_data_i;
     reg data_valid_i;
     reg hw_page_fault;
     reg hw_interrupt;
@@ -10,6 +9,7 @@ module core_test;
     reg cp0_data_i;
     reg [31:0] cp0_exception_base;
 
+    wire [31:0] data_data_i;
     wire [31:0] inst_data_i;
 
     wire [31:0] inst_addr_o;
@@ -65,7 +65,6 @@ module core_test;
         clk = 0;
         rst = 0;
         inst_valid_i = 1;
-        data_data_i = 0;
         data_valid_i = 1;
         hw_page_fault = 0;
         hw_interrupt = 0;
@@ -76,5 +75,7 @@ module core_test;
     end
 
     initial forever #5 clk = ~clk;
+
+    assign data_data_i  = data_addr_o;
 
 endmodule

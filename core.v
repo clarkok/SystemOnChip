@@ -308,7 +308,7 @@ module core(
                                     dec_decoded[I_MFC0];
             case (1)
                 (|dec_decoded[I_MTLO:I_ADDI]):                  dec_reg_we_sel_o <= 0;
-                (|dec_decoded[I_LL:I_LB]):                      dec_reg_we_sel_o <= 1;
+                (|dec_decoded[I_LL:I_LB] || dec_decoded[I_SC]): dec_reg_we_sel_o <= 1;
                 (dec_decoded[I_JAL] | (dec_decoded[I_JALR])):   dec_reg_we_sel_o <= 2;
                 (dec_decoded[I_MFC0]):                          dec_reg_we_sel_o <= 3;
             endcase
@@ -383,7 +383,8 @@ module core(
                 default:                            dec_alu_op_o <= 0;
             endcase
             case (1)
-                (dec_decoded[I_NOR:I_ADD] ||
+                (dec_decoded[I_XORI:I_LB] ||
+                 dec_decoded[I_NOR:I_ADD] ||
                  dec_decoded[I_MULTU:I_MULT] ||
                  dec_decoded[I_MTHI] ||
                  dec_decoded[I_MTLO] ||
@@ -392,9 +393,7 @@ module core(
                                                     (dec_inst[25:21] == dec_dst_in_exec) ? 2 :
                                                     (dec_inst[25:21] == dec_dst_in_mem)  ? 3 :
                                                                                            0;
-                (dec_decoded[I_XORI:I_LB] ||
-                 dec_decoded[I_MTC0] ||
-                 dec_decoded[I_SRAV:I_SLL]):    dec_alu_a_sel_o <= 
+                (dec_decoded[I_SRAV:I_SLL]):    dec_alu_a_sel_o <= 
                                                     (dec_inst[20:16] == dec_dst_in_exec) ? 2 :
                                                     (dec_inst[20:16] == dec_dst_in_mem)  ? 3 :
                                                                                            1;
@@ -461,7 +460,7 @@ module core(
     reg [DATA_DATA_WIDTH-1:0]   reg_file [0:31];
     reg [63:0]                  lohi;
 
-    task exec_init;
+    task exec_reset;
     integer i;
     begin
         exec_exception_o    <= 0;
@@ -481,8 +480,15 @@ module core(
         exec_mem_sc_o       <= 0;
         exec_mem_sel_o      <= 0;
         exec_result_o       <= 64'h0;
-        lohi                <= 0;
         exec_data_o         <= 0;
+    end
+    endtask
+
+    task exec_init;
+    integer i;
+    begin
+        exec_reset();
+        lohi                <= 0;
         for (i = 0; i < 32; i = i + 1)
             reg_file[i]     <= 0;
     end
@@ -546,9 +552,13 @@ module core(
     end
 
     wire exec_overflow_err  = exec_overflow | dec_overflow_o;
+    wire exec_no_exception  = ~( exec_exception_o ||
+                                (exec_pc_we_o == 2'b0) ||                             // JR
+                                (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0));   // predict missed
 
     always @(posedge clk) begin
-        if (rst || exec_pipeline_flush_i) exec_init();
+        if (rst) exec_init();
+        else if (exec_pipeline_flush_i) exec_reset();
         else if (data_valid_i) begin
             exec_exception_o        <= dec_exception_o | exec_overflow_err;
             exec_cause_o            <= dec_exception_o ? dec_cause_o :
@@ -558,14 +568,14 @@ module core(
             exec_rd_o               <= dec_rd_o;
             exec_pc_we_o            <= dec_pc_we_o;
             exec_pc_we_sel_o        <= dec_pc_we_sel_o;
-            exec_reg_we_o           <= dec_reg_we_o;
+            exec_reg_we_o           <= dec_reg_we_o && exec_no_exception;
             exec_reg_we_sel_o       <= dec_reg_we_sel_o;
             exec_reg_we_dst_o       <= dec_reg_we_dst_o;
             exec_load_unsigned_o    <= dec_load_unsigned_o;
-            exec_mem_rd_o           <= dec_mem_rd_o && ~dec_exception_o;
-            exec_mem_we_o           <= dec_mem_we_o && ~dec_exception_o;
-            exec_mem_fc_o           <= dec_mem_fc_o && ~dec_exception_o;
-            exec_mem_sc_o           <= dec_mem_sc_o && ~dec_exception_o;
+            exec_mem_rd_o           <= dec_mem_rd_o && exec_no_exception;
+            exec_mem_we_o           <= dec_mem_we_o && exec_no_exception;
+            exec_mem_fc_o           <= dec_mem_fc_o && exec_no_exception;
+            exec_mem_sc_o           <= dec_mem_sc_o && exec_no_exception;
             exec_mem_sel_o          <= dec_mem_sel_o;
             exec_result_o           <= exec_alu_out;
             exec_data_o             <= exec_rt;
@@ -614,15 +624,16 @@ module core(
     always @(posedge clk) begin
         if (rst) mem_init();
         else if (data_valid_i) begin
+            mem_rt_o                <= exec_rt_o;
+            mem_rd_o                <= exec_rd_o;
+            mem_reg_we_o            <= exec_reg_we_o;
+            mem_reg_we_dst_o        <= exec_reg_we_dst_o;
             case (exec_reg_we_sel_o)
                 3'h0:   mem_result_o    <= exec_result_o;
                 3'h1:   mem_result_o    <= mem_bus_data;
                 3'h2:   mem_result_o    <= exec_pc_o + 4;
                 3'h3:   mem_result_o    <= cp0_data_i;
             endcase
-            mem_exception_o         <= exec_exception_o || hw_page_fault;
-            mem_cause_o             <= exec_exception_o ? exec_cause_o : `MMU_PAGE_FAULT;
-            mem_pc_o                <= exec_pc_o;
             mem_pipeline_flush_o    <= exec_exception_o ||
                                        hw_page_fault ||
                                       (exec_pc_we_o == 2'b0) ||                             // JR
@@ -631,19 +642,22 @@ module core(
             mem_pc_data_o           <= (exec_exception_o || hw_page_fault) ? cp0_exception_base :
                                        (exec_pc_we_o == 2'b0)              ? exec_result_o[INST_ADDR_WIDTH-1:0] :
                                                                              exec_pc_o + 4;
+            mem_exception_o         <= exec_exception_o || hw_page_fault;
+            mem_cause_o             <= exec_exception_o ? exec_cause_o : `MMU_PAGE_FAULT;
+            mem_pc_o                <= exec_pc_o;
         end
     end
 
     // wb part
     always @(posedge clk) begin
-        if (data_valid_i) begin
-            case (exec_reg_we_dst_o)
-                3'h0:   reg_file[mem_rd_o]  <= mem_result_o[31:0];
-                3'h1:   reg_file[mem_rt_o]  <= mem_result_o[31:0];
-                3'h2:   reg_file[5'b11111]  <= mem_result_o[31:0];
-                3'h3:   lohi[63:32]         <= mem_result_o[31:0];
-                3'h4:   lohi[31: 0]         <= mem_result_o[31:0];
-                3'h5:   lohi                <= mem_result_o;
+        if (data_valid_i && mem_reg_we_o) begin
+            case (mem_reg_we_dst_o)
+                3'h0:   if (mem_rd_o)   reg_file[mem_rd_o]  <= mem_result_o[31:0];
+                3'h1:   if (mem_rt_o)   reg_file[mem_rt_o]  <= mem_result_o[31:0];
+                3'h2:                   reg_file[5'b11111]  <= mem_result_o[31:0];
+                3'h3:                   lohi[63:32]         <= mem_result_o[31:0];
+                3'h4:                   lohi[31: 0]         <= mem_result_o[31:0];
+                3'h5:                   lohi                <= mem_result_o;
             endcase
         end
     end

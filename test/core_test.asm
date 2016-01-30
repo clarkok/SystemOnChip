@@ -7,5 +7,9 @@ init:
     sh      $15,    8($14)
     sw      $17,    9($16)
     dd      0xE253000A          #    sc      $19,    10($18)
-    beq     $zero, $zero, init
+    beq     $zero, $zero, fault
     j       init
+fault:
+    lb      $1,     5($0)
+forever:
+    j       forever
