@@ -482,6 +482,7 @@ module core(
         exec_mem_sel_o      <= 0;
         exec_result_o       <= 64'h0;
         lohi                <= 0;
+        exec_data_o         <= 0;
         for (i = 0; i < 32; i = i + 1)
             reg_file[i]     <= 0;
     end
@@ -577,6 +578,9 @@ module core(
     reg                         mem_reg_we_o;
     reg  [2:0]                  mem_reg_we_dst_o;
     reg  [63:0]                 mem_result_o;
+    reg                         mem_exception_o;
+    reg  [31:0]                 mem_cause_o;
+    reg  [INST_ADDR_WIDTH-1:0]  mem_pc_o;
 
     reg  mem_pipeline_flush_o;
     reg  [INST_ADDR_WIDTH-1:0] mem_pc_data_o;
@@ -590,6 +594,9 @@ module core(
         mem_result_o            <= 0;
         mem_pipeline_flush_o    <= 0;
         mem_pc_data_o           <= 0;
+        mem_exception_o         <= 0;
+        mem_cause_o             <= 0;
+        mem_pc_o                <= 0;
     end
     endtask
 
@@ -613,6 +620,9 @@ module core(
                 3'h2:   mem_result_o    <= exec_pc_o + 4;
                 3'h3:   mem_result_o    <= cp0_data_i;
             endcase
+            mem_exception_o         <= exec_exception_o || hw_page_fault;
+            mem_cause_o             <= exec_exception_o ? exec_cause_o : `MMU_PAGE_FAULT;
+            mem_pc_o                <= exec_pc_o;
             mem_pipeline_flush_o    <= exec_exception_o ||
                                        hw_page_fault ||
                                       (exec_pc_we_o == 2'b0) ||                             // JR
@@ -652,4 +662,8 @@ module core(
     assign mem_fc       = exec_mem_fc_o;
     assign mem_sc       = exec_mem_sc_o;
 
+    assign exception    = mem_exception_o;
+    assign cause        = mem_cause_o;
+    assign epc          = mem_pc_o;
+    // TODO assign eret         = mem_eret_o;
 endmodule

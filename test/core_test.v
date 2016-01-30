@@ -8,6 +8,7 @@ module core_test;
     reg hw_interrupt;
     reg [31:0] hw_cause;
     reg cp0_data_i;
+    reg [31:0] cp0_exception_base;
 
     wire [31:0] inst_data_i;
 
@@ -17,6 +18,8 @@ module core_test;
     wire [1:0] data_sel_o;
     wire data_we_o;
     wire data_rd_o;
+    wire mem_fc;
+    wire mem_sc;
     wire exception;
     wire [31:0] cause;
     wire [31:0] epc;
@@ -38,6 +41,9 @@ module core_test;
         .data_we_o(data_we_o),
         .data_rd_o(data_rd_o),
         .data_valid_i(data_valid_i),
+        .mem_fc(mem_fc),
+        .mem_sc(mem_sc),
+        .hw_page_fault(hw_page_fault),
         .hw_interrupt(hw_interrupt),
         .hw_cause(hw_cause),
         .exception(exception),
@@ -47,7 +53,8 @@ module core_test;
         .cp0_addr_o(cp0_addr_o),
         .cp0_data_i(cp0_data_i),
         .cp0_data_o(cp0_data_o),
-        .cp0_we_o(cp0_we_o)
+        .cp0_we_o(cp0_we_o),
+        .cp0_exception_base(cp0_exception_base)
     );
 
     reg [31:0] rom [63:0];
@@ -64,6 +71,7 @@ module core_test;
         hw_interrupt = 0;
         hw_cause = 0;
         cp0_data_i = 0;
+        cp0_exception_base = 0;
         $readmemh("/home/c/c-stack/SoC/hardware/test/core_test.hex", rom);
     end
 
