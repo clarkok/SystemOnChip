@@ -90,114 +90,6 @@ module soc(
         .data_received(data_received)
     );
 
-    wire [31:0] ddr3_addr_i;
-    wire [31:0] ddr3_data_i;
-    wire [31:0] ddr3_data_o;
-    wire        ddr3_we_i;
-    wire        ddr3_rd_i;
-    wire        ddr3_ack_o;
-
-    wire [15:0] cache_state_value;
-    wire [15:0] last_cache_state_value;
-    wire [15:0] ctrl_state_value;
-
-    ddr3_dev ddr3_dev(
-        .clk(clk_sys),
-        .clk_ddr(clk_ddr),
-        .clk_ref(clk_ddr_ref),
-        .rst(rst),
-
-        .addr_i(ddr3_addr_i),
-        .data_i(ddr3_data_i),
-        .data_o(ddr3_data_o),
-        .we_i(ddr3_we_i),
-        .rd_i(ddr3_rd_i),
-        .ack_o(ddr3_ack_o),
-
-        .ddr3_dq(ddr3_dq),
-        .ddr3_dqs_n(ddr3_dqs_n),
-        .ddr3_dqs_p(ddr3_dqs_p),
-        .ddr3_addr(ddr3_addr),
-        .ddr3_ba(ddr3_ba),
-        .ddr3_ras_n(ddr3_ras_n),
-        .ddr3_cas_n(ddr3_cas_n),
-        .ddr3_we_n(ddr3_we_n),
-        .ddr3_reset_n(ddr3_reset_n),
-        .ddr3_ck_p(ddr3_ck_p),
-        .ddr3_ck_n(ddr3_ck_n),
-        .ddr3_cke(ddr3_cke),
-        .ddr3_cs_n(ddr3_cs_n),
-        .ddr3_dm(ddr3_dm),
-        .ddr3_odt(ddr3_odt),
-
-        .cache_state_value(cache_state_value),
-        .last_cache_state_value(last_cache_state_value),
-        .ctrl_state_value(ctrl_state_value)
-    );
-
-    reg [31:0] counter;
-    reg [31:0] read_data;
-    reg        init;
-    reg [31:0] state;
-
-    initial begin
-        counter     <= 0;
-        read_data   <= 0;
-        state       <= 0;
-    end
-
-    assign ddr3_addr_i  = {counter[29:0], 2'b00};
-    assign ddr3_data_i  = counter;
-    assign ddr3_we_i    = (state == 1);
-    assign ddr3_rd_i    = (state == 3);
-
-    always @(posedge clk) begin
-        if (rst) begin
-            state       <= 0;
-            counter     <= 0;
-            read_data   <= 0;
-            init        <= 1'b0;
-        end
-        else begin
-            case (state)
-                0: if (ddr3_ack_o)  state <= 1;
-                1: if (ddr3_ack_o)  state <= 2;
-                2: begin
-                    if (counter == 134217727) begin
-                        counter <= 0;
-                        state   <= 3;
-                    end
-                    else begin
-                        counter <= counter + 1;
-                        state   <= 1;
-                    end
-                end
-                3: begin
-                    if (ddr3_ack_o) begin
-                        if (ddr3_data_o == counter) begin
-                            state       <= 4;
-                        end
-                        else begin
-                            state       <= 5;
-                        end
-                    end
-                end
-                4: begin
-                    if (counter == 134217727) begin
-                        counter <= 0;
-                        state   <= 1;
-                    end
-                    else begin
-                        counter <= counter + 1;
-                        state   <= 3;
-                    end
-                end
-            endcase
-
-            if (ddr3_rd_i && ddr3_ack_o)    read_data   <= ddr3_data_o;
-        end
-    end
-
     dsp dsp(
         .clk_in1(clk),
         .clk_out1(clk_sys),
@@ -226,6 +118,141 @@ module soc(
         .disp_value()
     );
 
+    wire [31:0] inst_addr_o;
+    wire [31:0] inst_data_i;
+
+    bios_rom bios_rom(
+        .a(inst_addr_o[11:2]),
+        .spo(inst_data_i)
+    );
+
+    wire [31:0] data_addr_o;
+    wire [31:0] data_data_i;
+    wire [31:0] data_data_o;
+    wire        data_we_o;
+    wire        data_rd_o;
+    wire [3:0]  data_sel_o;
+    wire        data_valid_i;
+
+    core core(
+        .clk(clk_sys),
+        .rst(rst),
+        .inst_addr_o(inst_addr_o),
+        .inst_data_i(inst_data_i),
+        .inst_valid_i(1'b1),
+        .data_addr_o(data_addr_o),
+        .data_data_i(data_data_i),
+        .data_data_o(data_data_o),
+        .data_sel_o(data_sel_o),
+        .data_we_o(data_we_o),
+        .data_rd_o(data_rd_o),
+        .data_valid_i(data_valid_i),
+        .mem_fc(),
+        .mem_sc(),
+        .hw_page_fault(1'b0),
+        .hw_interrupt(1'b0),
+        .hw_cause(32'b0),
+        .exception(),
+        .cause(),
+        .epc(),
+        .eret(),
+        .cp0_addr_o(),
+        .cp0_data_i(32'b0),
+        .cp0_data_o(),
+        .cp0_we_o(),
+        .cp0_exception_base(32'b0)
+    );
+
+    wire [31:0] cache_addr_o;
+    wire [31:0] cache_data_i;
+    wire [31:0] cache_data_o;
+    wire        cache_we_o;
+    wire        cache_rd_o;
+    wire        cache_ack_i;
+
+    data_cache data_cache(
+        .clk(clk_sys),
+        .rst(rst),
+        .data_addr(data_addr_o),
+        .data_in(data_data_i),
+        .data_out(data_data_o),
+        .data_we(data_we_o),
+        .data_rd(data_rd_o),
+        .data_sel(data_sel_o),
+        .data_sign_ext(1'b0),
+        .data_ready(data_valid_i),
+        .addr_o(cache_addr_o),
+        .data_i(cache_data_i),
+        .data_o(cache_data_o),
+        .we_o(cache_we_o),
+        .rd_o(cache_rd_o),
+        .ack_i(cache_ack_i),
+        .fence(1'b0)
+    );
+
+    wire [31:0] mmu_addr_o;
+    wire [31:0] mmu_data_i;
+    wire [31:0] mmu_data_o;
+    wire        mmu_we_o;
+    wire        mmu_rd_o;
+    wire        mmu_ack_i;
+
+    mmu mmu(
+        .clk(clk),
+        .rst(rst),
+        .mmu_base_i(32'b0),
+        .mmu_we(1'b0),
+        .mmu_base_o(),
+        .v_addr_i(cache_addr_o),
+        .v_data_i(cache_data_o),
+        .v_data_o(cache_data_i),
+        .v_we_i(cache_we_o),
+        .v_rd_i(cache_rd_o),
+        .v_ack_o(cache_ack_i),
+        .addr_o(mmu_addr_o),
+        .data_i(mmu_data_i),
+        .data_o(mmu_data_o),
+        .we_o(mmu_we_o),
+        .rd_o(mmu_rd_o),
+        .ack_i(mmu_ack_i),
+        .page_fault(),
+        .page_fault_addr()
+    );
+
+    ddr3_dev ddr3_dev(
+        .clk(clk_sys),
+        .clk_ddr(clk_ddr),
+        .clk_ref(clk_ddr_ref),
+        .rst(rst),
+
+        .addr_i(mmu_addr_o),
+        .data_i(mmu_data_o),
+        .data_o(mmu_data_i),
+        .we_i(mmu_we_o),
+        .rd_i(mmu_rd_o),
+        .ack_o(mmu_ack_i),
+
+        .ddr3_dq(ddr3_dq),
+        .ddr3_dqs_n(ddr3_dqs_n),
+        .ddr3_dqs_p(ddr3_dqs_p),
+        .ddr3_addr(ddr3_addr),
+        .ddr3_ba(ddr3_ba),
+        .ddr3_ras_n(ddr3_ras_n),
+        .ddr3_cas_n(ddr3_cas_n),
+        .ddr3_we_n(ddr3_we_n),
+        .ddr3_reset_n(ddr3_reset_n),
+        .ddr3_ck_p(ddr3_ck_p),
+        .ddr3_ck_n(ddr3_ck_n),
+        .ddr3_cke(ddr3_cke),
+        .ddr3_cs_n(ddr3_cs_n),
+        .ddr3_dm(ddr3_dm),
+        .ddr3_odt(ddr3_odt),
+
+        .cache_state_value(cache_state_value),
+        .last_cache_state_value(last_cache_state_value),
+        .ctrl_state_value(ctrl_state_value)
+    );
+
     assign tri_led0 = 3'b111;
     assign tri_led1 = 3'b111;
 
@@ -235,9 +262,10 @@ module soc(
         case (sw[2:0])
             0: led  = cache_state_value;
             1: led  = ctrl_state_value;
-            2: led  = {ddr3_we_i, ddr3_rd_i};
-            3: led  = counter[15:0];
+            2: led  = 32'b0;
+            3: led  = 32'b0;
             4: led  = last_cache_state_value;
+            5: led  = data_data_o;
         endcase
     end
 

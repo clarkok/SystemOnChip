@@ -463,7 +463,7 @@ module core(
     reg [DATA_DATA_WIDTH-1:0]   reg_file [0:31];
     reg [63:0]                  lohi;
 
-    task exec_reset;
+    task exec_init;
     integer i;
     begin
         exec_exception_o    <= 0;
@@ -484,16 +484,6 @@ module core(
         exec_mem_sel_o      <= 0;
         exec_result_o       <= 64'h0;
         exec_data_o         <= 0;
-    end
-    endtask
-
-    task exec_init;
-    integer i;
-    begin
-        exec_reset();
-        lohi                <= 0;
-        for (i = 0; i < 32; i = i + 1)
-            reg_file[i]     <= 0;
     end
     endtask
 
@@ -564,7 +554,7 @@ module core(
 
     always @(posedge clk) begin
         if (rst) exec_init();
-        else if (exec_pipeline_flush_i) exec_reset();
+        else if (exec_pipeline_flush_i) exec_init();
         else if (data_valid_i) begin
             exec_exception_o        <= dec_exception_o | exec_overflow_err;
             exec_cause_o            <= dec_exception_o ? dec_cause_o :
@@ -654,9 +644,21 @@ module core(
         end
     end
 
+    task wb_init;
+    integer i;
+    begin
+        lohi                <= 0;
+        for (i = 0; i < 32; i = i + 1)
+            reg_file[i]     <= 0;
+    end
+    endtask
+
+    initial wb_init();
+
     // wb part
     always @(posedge clk) begin
-        if (data_valid_i && mem_reg_we_o) begin
+        if (rst) wb_init();
+        else if (data_valid_i && mem_reg_we_o) begin
             case (mem_reg_we_dst_o)
                 3'h0:   if (mem_rd_o)   reg_file[mem_rd_o]  <= mem_result_o[31:0];
                 3'h1:   if (mem_rt_o)   reg_file[mem_rt_o]  <= mem_result_o[31:0];
