@@ -621,7 +621,7 @@ module core(
     end
 
     always @(posedge clk) begin
-        if (rst) mem_init();
+        if (rst || mem_pipeline_flush_o) mem_init();
         else if (data_valid_i) begin
             mem_rt_o                <= exec_rt_o;
             mem_rd_o                <= exec_rd_o;
