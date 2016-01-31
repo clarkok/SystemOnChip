@@ -60,6 +60,7 @@ module core_test;
     reg [31:0] rom [63:0];
 
     assign inst_data_i = rom[inst_addr_o[7:2]];
+    assign data_data_i = rom[data_addr_o[7:2]];
 
     initial begin
         clk = 0;
@@ -75,7 +76,5 @@ module core_test;
     end
 
     initial forever #5 clk = ~clk;
-
-    assign data_data_i  = data_addr_o;
 
 endmodule
