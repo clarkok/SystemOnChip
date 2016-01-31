@@ -429,7 +429,8 @@ module core(
 
             dec_dst_in_exec[5]  <= ~(dec_decoded[I_LL:I_LB] || 
                                      dec_decoded[I_SC] || 
-                                     dec_decoded[I_MTLO:I_ADDI] ||
+                                     dec_decoded[I_MTLO:I_MFHI] ||
+                                     dec_decoded[I_SRAV:I_ADDI] ||
                                      dec_decoded[I_JAL] ||
                                      dec_decoded[I_JALR] ||
                                      dec_decoded[I_MFC0]);
@@ -540,12 +541,14 @@ module core(
             4'hb:   exec_alu_out[31:0]                  = exec_alu_a == exec_alu_b;
             4'hc:   exec_alu_out[31:0]                  = exec_alu_a != exec_alu_b;
             4'hd:   exec_alu_out[31:0]                  = {exec_alu_a[15:0], 16'b0};
-            4'he:   exec_alu_out[31:0]                  = $signed(exec_alu_a) * $signed(exec_alu_b);
-            4'hf:   exec_alu_out[31:0]                  = exec_alu_a * exec_alu_b;
+            4'he:   exec_alu_out                        = $signed(exec_alu_a) * $signed(exec_alu_b);
+            4'hf:   exec_alu_out                        = exec_alu_a * exec_alu_b;
         endcase
     end
 
-    wire exec_overflow      = (dec_alu_op_o == 4'h0) ? exec_overf_r : ~exec_overf_r;
+    wire exec_overflow      = (dec_alu_op_o == 4'h0) ? exec_overf_r     :
+                              (dec_alu_op_o == 4'h1) ? ~exec_overf_r    :
+                                                       1'b0;
 
     wire exec_overflow_err  = exec_overflow & dec_overflow_o;
     wire exec_no_exception  = ~( exec_exception_o ||
