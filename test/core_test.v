@@ -6,12 +6,12 @@ module core_test;
     reg hw_page_fault;
     reg hw_interrupt;
     reg [31:0] hw_cause;
-    reg cp0_data_i;
-    reg [31:0] cp0_exception_base;
+    reg [31:0] cp0_ehb;
     reg [31:0] cp0_epc;
 
     wire [31:0] data_data_i;
     wire [31:0] inst_data_i;
+    wire [31:0] cp0_data_i;
 
     wire [31:0] inst_addr_o;
     wire [31:0] data_addr_o;
@@ -55,15 +55,17 @@ module core_test;
         .cp0_data_i(cp0_data_i),
         .cp0_data_o(cp0_data_o),
         .cp0_we_o(cp0_we_o),
-        .cp0_exception_base(cp0_exception_base),
+        .cp0_ehb(cp0_ehb),
         .cp0_epc(cp0_epc)
     );
 
     reg [31:0] rom [63:0];
+    reg [31:0] cp0 [31:0];
 
     assign inst_data_i = rom[inst_addr_o[7:2]];
     assign data_data_i = rom[data_addr_o[7:2]];
 
+    integer i;
     initial begin
         clk = 0;
         rst = 0;
@@ -72,15 +74,18 @@ module core_test;
         hw_page_fault = 0;
         hw_interrupt = 0;
         hw_cause = 0;
-        cp0_data_i = 0;
-        cp0_exception_base = 32'h00000004;
+        cp0_ehb = 32'h00000004;
         cp0_epc = 0;
+        for (i = 0; i < 32; i = i + 1)  cp0[i] = i;
         $readmemh("/home/c/c-stack/SoC/hardware/test/core_test.hex", rom);
     end
 
     initial forever #5 clk = ~clk;
 
+    assign cp0_data_i = cp0[cp0_addr_o[4:0]];
+
     always @(posedge clk) begin
-        if (exception) cp0_epc <= epc;
+        if (exception)  cp0_epc                 <= epc;
+        if (cp0_we_o)   cp0[cp0_addr_o[4:0]]    <= cp0_data_o;
     end
 endmodule

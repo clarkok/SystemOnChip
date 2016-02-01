@@ -33,7 +33,7 @@ module core(
     output [31:0]                   cp0_data_o,
     output                          cp0_we_o,
 
-    input  [INST_ADDR_WIDTH-1:0]    cp0_exception_base,
+    input  [INST_ADDR_WIDTH-1:0]    cp0_ehb,
     input  [INST_ADDR_WIDTH-1:0]    cp0_epc
     );
 
@@ -399,7 +399,8 @@ module core(
                                                     (dec_inst[25:21] == dec_dst_in_exec) ? 2 :
                                                     (dec_inst[25:21] == dec_dst_in_mem)  ? 3 :
                                                                                            0;
-                (|dec_decoded[I_SRAV:I_SLL]):   dec_alu_a_sel_o <= 
+                (dec_decoded[I_SRAV:I_SLL] ||
+                 dec_decoded[I_MTC0]):          dec_alu_a_sel_o <= 
                                                     (dec_inst[20:16] == dec_dst_in_exec) ? 2 :
                                                     (dec_inst[20:16] == dec_dst_in_mem)  ? 3 :
                                                                                            1;
@@ -658,7 +659,7 @@ module core(
                                       (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0);   // predict missed
             case (1)
                 (exec_exception_o ||
-                 hw_page_fault):        mem_pc_data_o   <= {cp0_exception_base[INST_ADDR_WIDTH-1:2], 2'b01};
+                 hw_page_fault):        mem_pc_data_o   <= {cp0_ehb[INST_ADDR_WIDTH-1:2], 2'b01};
                 (exec_eret_o):          mem_pc_data_o   <=  cp0_epc;
                 (exec_pc_we_o == 2'b0): mem_pc_data_o   <= {exec_result_o[INST_ADDR_WIDTH-1:2], exec_pc_o[1:0]};
                 default:                mem_pc_data_o   <= exec_pc_o + 4;

@@ -1,10 +1,6 @@
-j   init
-j   except_handler
 init:
-    syscall
-    break
+    mfc0    $t0,    1
+    nop
+    addi    $t0,    $t0,    1
+    mtc0    $t0,    1
     j       init
-
-except_handler:
-    addi    $v0,    $v0,    1
-    eret
