@@ -276,13 +276,14 @@ module core(
             the_pc  <= dec_pc_i;
         end
         else if (data_valid_i) begin
-            case (1)
-                (|dec_decoded[I_JAL:I_J]):                  the_pc <= jump_addr;
-                (|dec_decoded[I_BGEZ:I_BEQ]):               the_pc <= branch_addr;
-                (|dec_decoded[I_JALR:I_JR] || 
-                  dec_decoded[I_ERET]):                     the_pc <= the_pc;
-                default:                                    the_pc <= the_pc + 4;
-            endcase
+            if (inst_valid_i)
+                case (1)
+                    (|dec_decoded[I_JAL:I_J]):                  the_pc <= jump_addr;
+                    (|dec_decoded[I_BGEZ:I_BEQ]):               the_pc <= branch_addr;
+                    (|dec_decoded[I_JALR:I_JR] || 
+                      dec_decoded[I_ERET]):                     the_pc <= the_pc;
+                    default:                                    the_pc <= the_pc + 4;
+                endcase
             dec_exception_o     <= hw_interrupt | undefined_inst | privilege_inst | privilege_addr | syscall | break;
             case (1)
                 (hw_interrupt):     dec_cause_o <= hw_cause;
