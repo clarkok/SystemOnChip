@@ -17,7 +17,6 @@ module core(
     input                           data_valid_i,
 
     output                          mem_fc,
-    output                          mem_sc,
     input                           hw_page_fault,
 
     input                           hw_interrupt,
@@ -190,7 +189,7 @@ module core(
     reg  [1:0]                  dec_pc_we_o;        // 0: always flush, 1: conditional flush, 2: Non
     reg  [1:0]                  dec_pc_we_sel_o;    // 0: branch, 1: mem_result, 2: syscall, 3: eret
     reg                         dec_reg_we_o;
-    reg  [2:0]                  dec_reg_we_sel_o;   // 0: alu_out, 1: bus_data, 2: pc + 4, 3: c0
+    reg  [2:0]                  dec_reg_we_sel_o;   // 0: alu_out, 1: bus_data, 2: pc + 4, 3: c0, 4: sc
     reg  [2:0]                  dec_reg_we_dst_o;   // 0: rd, 1: rt, 2: $ra, 3: hi, 4: lo, 5:lohi
     reg  [3:0]                  dec_alu_op_o;       //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
                                                     //  add sub and slt or  xor nor sll srl sra sltueq  ne  lui mul mulu
@@ -201,11 +200,12 @@ module core(
     reg  [1:0]                  dec_data_sel_o;     //  0: rt, 1: exec_result, 2: mem_result
     reg                         dec_mem_rd_o;
     reg                         dec_mem_we_o;
-    reg                         dec_mem_fc_o;
     reg                         dec_mem_sc_o;
+    reg                         dec_mem_fc_o;
     reg  [1:0]                  dec_mem_sel_o;
     reg                         dec_cp0_we_o;
     reg                         dec_eret_o;
+    reg                         dec_sc_valid_o;
 
     reg  [INST_ADDR_WIDTH-1:0]  the_pc;
 
@@ -243,11 +243,12 @@ module core(
         dec_data_sel_o      <= 0;
         dec_mem_rd_o        <= 0;
         dec_mem_we_o        <= 0;
-        dec_mem_fc_o        <= 0;
         dec_mem_sc_o        <= 0;
+        dec_mem_fc_o        <= 0;
         dec_mem_sel_o       <= 0;
         dec_cp0_we_o        <= 0;
         dec_eret_o          <= 0;
+        dec_sc_valid_o      <= 0;
 
         dec_dst_in_exec     <= 6'b10_0000;
         dec_dst_in_mem      <= 6'b10_0000;
@@ -317,9 +318,10 @@ module core(
                                     dec_decoded[I_MFC0];
             case (1)
                 (|dec_decoded[I_MTLO:I_ADDI]):                  dec_reg_we_sel_o <= 0;
-                (|dec_decoded[I_LL:I_LB] || dec_decoded[I_SC]): dec_reg_we_sel_o <= 1;
+                (|dec_decoded[I_LL:I_LB]):                      dec_reg_we_sel_o <= 1;
                 (dec_decoded[I_JAL] | (dec_decoded[I_JALR])):   dec_reg_we_sel_o <= 2;
                 (dec_decoded[I_MFC0]):                          dec_reg_we_sel_o <= 3;
+                (dec_decoded[I_SC]):                            dec_reg_we_sel_o <= 4;
             endcase
             case (1)
                 (dec_decoded[I_SRAV:I_ADD] ||
@@ -441,6 +443,7 @@ module core(
             endcase
             dec_cp0_we_o        <= (dec_decoded[I_MTC0]);
             dec_eret_o          <= (dec_decoded[I_ERET]);
+            dec_sc_valid_o      <= (dec_decoded[I_LL] || (dec_sc_valid_o && ~|dec_decoded[I_SW:I_SB]));
 
             dec_dst_in_exec[5]  <= ~(dec_decoded[I_LL:I_LB] || 
                                      dec_decoded[I_SC] || 
@@ -471,12 +474,12 @@ module core(
     reg                         exec_mem_rd_o;
     reg                         exec_mem_we_o;
     reg                         exec_mem_fc_o;
-    reg                         exec_mem_sc_o;
     reg  [1:0]                  exec_mem_sel_o;
     reg  [63:0]                 exec_result_o;
     reg  [DATA_DATA_WIDTH-1:0]  exec_data_o;
     reg                         exec_cp0_we_o;
     reg                         exec_eret_o;
+    reg                         exec_sc_valid_o;
 
     reg [DATA_DATA_WIDTH-1:0]   reg_file [0:31];
     reg [63:0]                  lohi;
@@ -498,12 +501,12 @@ module core(
         exec_mem_rd_o       <= 0;
         exec_mem_we_o       <= 0;
         exec_mem_fc_o       <= 0;
-        exec_mem_sc_o       <= 0;
         exec_mem_sel_o      <= 0;
         exec_result_o       <= 64'h0;
         exec_data_o         <= 0;
         exec_cp0_we_o       <= 0;
         exec_eret_o         <= 0;
+        exec_sc_valid_o     <= 0;
     end
     endtask
 
@@ -593,9 +596,8 @@ module core(
             exec_reg_we_dst_o       <= dec_reg_we_dst_o;
             exec_load_unsigned_o    <= dec_load_unsigned_o;
             exec_mem_rd_o           <= dec_mem_rd_o && exec_no_exception;
-            exec_mem_we_o           <= dec_mem_we_o && exec_no_exception;
+            exec_mem_we_o           <=(dec_mem_we_o || (dec_mem_sc_o && dec_sc_valid_o)) && exec_no_exception;
             exec_mem_fc_o           <= dec_mem_fc_o && exec_no_exception;
-            exec_mem_sc_o           <= dec_mem_sc_o && exec_no_exception;
             exec_mem_sel_o          <= dec_mem_sel_o;
             exec_result_o           <= exec_alu_out;
             case (dec_data_sel_o)
@@ -605,6 +607,7 @@ module core(
             endcase
             exec_cp0_we_o           <= dec_cp0_we_o;
             exec_eret_o             <= dec_eret_o;
+            exec_sc_valid_o         <= dec_sc_valid_o;
         end
     end
 
@@ -661,6 +664,7 @@ module core(
                 3'h1:   mem_result_o    <= mem_bus_data;
                 3'h2:   mem_result_o    <= exec_pc_o + 4;
                 3'h3:   mem_result_o    <= cp0_data_i;
+                3'h4:   mem_result_o    <= exec_sc_valid_o;
             endcase
             mem_pipeline_flush_o    <= exec_exception_o ||
                                        hw_page_fault ||
@@ -719,7 +723,6 @@ module core(
     assign data_we_o    = exec_mem_we_o;
     assign data_rd_o    = exec_mem_rd_o;
     assign mem_fc       = exec_mem_fc_o;
-    assign mem_sc       = exec_mem_sc_o;
 
     assign cp0_addr_o   = exec_rd_o;
     assign cp0_data_o   = exec_result_o[31:0];

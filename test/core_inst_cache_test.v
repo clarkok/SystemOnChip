@@ -46,7 +46,6 @@ module core_inst_cache_test;
         .data_rd_o(data_rd_o),
         .data_valid_i(data_valid_i),
         .mem_fc(mem_fc),
-        .mem_sc(mem_sc),
         .hw_page_fault(hw_page_fault),
         .hw_interrupt(hw_interrupt),
         .hw_cause(hw_cause),
@@ -129,8 +128,8 @@ module core_inst_cache_test;
         counter = 100;
         ci_data_i = 256'b0;
         ci_ack_i = 0;
-        $readmemh("/home/c/c-stack/SoC/hardware/test/core_cp0_test.hex", ram);
-        $readmemh("/home/c/c-stack/SoC/hardware/test/core_cp0_test.256", insts);
+        $readmemh("/home/c/c-stack/SoC/hardware/test/core_inst_cache_test.hex", ram);
+        $readmemh("/home/c/c-stack/SoC/hardware/test/core_inst_cache_test.256", insts);
     end
 
     always @(posedge clk) begin
