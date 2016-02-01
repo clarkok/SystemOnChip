@@ -33,7 +33,8 @@ module core(
     output [31:0]                   cp0_data_o,
     output                          cp0_we_o,
 
-    input  [INST_ADDR_WIDTH-1:0]    cp0_exception_base
+    input  [INST_ADDR_WIDTH-1:0]    cp0_exception_base,
+    input  [INST_ADDR_WIDTH-1:0]    cp0_epc
     );
 
     parameter INST_ADDR_WIDTH = 32;
@@ -202,7 +203,8 @@ module core(
     reg                         dec_mem_fc_o;
     reg                         dec_mem_sc_o;
     reg  [1:0]                  dec_mem_sel_o;
-    reg                         dec_cp0_we;
+    reg                         dec_cp0_we_o;
+    reg                         dec_eret_o;
 
     reg  [INST_ADDR_WIDTH-1:0]  the_pc;
 
@@ -242,6 +244,8 @@ module core(
         dec_mem_fc_o        <= 0;
         dec_mem_sc_o        <= 0;
         dec_mem_sel_o       <= 0;
+        dec_cp0_we_o        <= 0;
+        dec_eret_o          <= 0;
 
         dec_dst_in_exec     <= 6'b10_0000;
         dec_dst_in_mem      <= 6'b10_0000;
@@ -260,6 +264,8 @@ module core(
     wire undefined_inst = !dec_decoded;
     wire privilege_inst = ~the_pc[0] && dec_decoded[I_MTC0:I_ERET];
     wire privilege_addr = ~the_pc[0] && the_pc[31];
+    wire syscall        =  dec_decoded[I_SCALL];
+    wire break          =  dec_decoded[I_BREAK];
 
     always @(posedge clk) begin
         if (rst) dec_init();
@@ -272,15 +278,17 @@ module core(
                 (|dec_decoded[I_JAL:I_J]):                  the_pc <= jump_addr;
                 (|dec_decoded[I_BGEZ:I_BEQ]):               the_pc <= branch_addr;
                 (|dec_decoded[I_JALR:I_JR] || 
-                 |dec_decoded[I_ERET:I_SCALL]):             the_pc <= the_pc;
+                  dec_decoded[I_ERET]):                     the_pc <= the_pc;
                 default:                                    the_pc <= the_pc + 4;
             endcase
-            dec_exception_o     <= hw_interrupt | undefined_inst | privilege_inst | privilege_addr;
+            dec_exception_o     <= hw_interrupt | undefined_inst | privilege_inst | privilege_addr | syscall | break;
             case (1)
                 (hw_interrupt):     dec_cause_o <= hw_cause;
                 (undefined_inst):   dec_cause_o <= `UNDEFINED_INST;
                 (privilege_inst):   dec_cause_o <= `PRIVILEGE_INST;
                 (privilege_addr):   dec_cause_o <= `PRIVILEGE_ADDR;
+                (syscall):          dec_cause_o <= `SYSCALL;
+                (break):            dec_cause_o <= `BREAK;
             endcase
             dec_pc_o            <=  the_pc;
 
@@ -297,8 +305,6 @@ module core(
             case (1)
                 (|dec_decoded[I_BGEZ:I_BEQ]):               dec_pc_we_sel_o <= 0;
                 (|dec_decoded[I_JALR:I_JR]):                dec_pc_we_sel_o <= 1;
-                (dec_decoded[I_SCALL]):                     dec_pc_we_sel_o <= 2;
-                (dec_decoded[I_ERET]):                      dec_pc_we_sel_o <= 3;
             endcase
             dec_reg_we_o        <=  dec_decoded[I_LL:I_LB] || 
                                     dec_decoded[I_SC] || 
@@ -419,13 +425,15 @@ module core(
             dec_overflow_o      <= (dec_decoded[I_ADD] | dec_decoded[I_ADDI] | dec_decoded[I_SUB]);
             dec_mem_rd_o        <= (|dec_decoded[I_LL:I_LB]);
             dec_mem_we_o        <= (|dec_decoded[I_SW:I_SB]);
-            dec_mem_fc_o        <= (|dec_decoded[I_SYNC]);
-            dec_mem_sc_o        <= (|dec_decoded[I_SC]);
+            dec_mem_fc_o        <= (dec_decoded[I_SYNC] | dec_decoded[I_ERET]);
+            dec_mem_sc_o        <= (dec_decoded[I_SC]);
             case (1)
                 (dec_decoded[I_LBU:I_LB] || dec_decoded[I_SB]): dec_mem_sel_o <= 0;
                 (dec_decoded[I_LHU:I_LH] || dec_decoded[I_SH]): dec_mem_sel_o <= 1;
                 default:                                        dec_mem_sel_o <= 2;
             endcase
+            dec_cp0_we_o        <= (dec_decoded[I_MTC0]);
+            dec_eret_o          <= (dec_decoded[I_ERET]);
 
             dec_dst_in_exec[5]  <= ~(dec_decoded[I_LL:I_LB] || 
                                      dec_decoded[I_SC] || 
@@ -460,6 +468,8 @@ module core(
     reg  [1:0]                  exec_mem_sel_o;
     reg  [63:0]                 exec_result_o;
     reg  [DATA_DATA_WIDTH-1:0]  exec_data_o;
+    reg                         exec_cp0_we_o;
+    reg                         exec_eret_o;
 
     reg [DATA_DATA_WIDTH-1:0]   reg_file [0:31];
     reg [63:0]                  lohi;
@@ -485,6 +495,8 @@ module core(
         exec_mem_sel_o      <= 0;
         exec_result_o       <= 64'h0;
         exec_data_o         <= 0;
+        exec_cp0_we_o       <= 0;
+        exec_eret_o         <= 0;
     end
     endtask
 
@@ -552,8 +564,10 @@ module core(
 
     wire exec_overflow_err  = exec_overflow & dec_overflow_o;
     wire exec_no_exception  = ~( exec_exception_o ||
-                                (exec_pc_we_o == 2'b0) ||                             // JR
-                                (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0));   // predict missed
+                                (exec_pc_we_o == 2'b0) ||                               // JR
+                                (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0) ||   // predict missed
+                                (exec_eret_o)
+                                );
 
     always @(posedge clk) begin
         if (rst) exec_init();
@@ -578,6 +592,8 @@ module core(
             exec_mem_sel_o          <= dec_mem_sel_o;
             exec_result_o           <= exec_alu_out;
             exec_data_o             <= exec_rt;
+            exec_cp0_we_o           <= dec_cp0_we_o;
+            exec_eret_o             <= dec_eret_o;
         end
     end
 
@@ -589,6 +605,7 @@ module core(
     reg  [63:0]                 mem_result_o;
     reg                         mem_exception_o;
     reg  [31:0]                 mem_cause_o;
+    reg                         mem_eret_o;
     reg  [INST_ADDR_WIDTH-1:0]  mem_pc_o;
 
     reg  mem_pipeline_flush_o;
@@ -605,6 +622,7 @@ module core(
         mem_pc_data_o           <= 0;
         mem_exception_o         <= 0;
         mem_cause_o             <= 0;
+        mem_eret_o              <= 0;
         mem_pc_o                <= 0;
     end
     endtask
@@ -635,14 +653,19 @@ module core(
             endcase
             mem_pipeline_flush_o    <= exec_exception_o ||
                                        hw_page_fault ||
+                                       exec_eret_o ||
                                       (exec_pc_we_o == 2'b0) ||                             // JR
                                       (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0);   // predict missed
-
-            mem_pc_data_o           <= (exec_exception_o || hw_page_fault) ? cp0_exception_base :
-                                       (exec_pc_we_o == 2'b0)              ? exec_result_o[INST_ADDR_WIDTH-1:0] :
-                                                                             exec_pc_o + 4;
+            case (1)
+                (exec_exception_o ||
+                 hw_page_fault):        mem_pc_data_o   <= {cp0_exception_base[INST_ADDR_WIDTH-1:2], 2'b01};
+                (exec_eret_o):          mem_pc_data_o   <=  cp0_epc;
+                (exec_pc_we_o == 2'b0): mem_pc_data_o   <= {exec_result_o[INST_ADDR_WIDTH-1:2], exec_pc_o[1:0]};
+                default:                mem_pc_data_o   <= exec_pc_o + 4;
+            endcase
             mem_exception_o         <= exec_exception_o || hw_page_fault;
             mem_cause_o             <= exec_exception_o ? exec_cause_o : `MMU_PAGE_FAULT;
+            mem_eret_o              <= exec_eret_o;
             mem_pc_o                <= exec_pc_o;
         end
     end
@@ -687,8 +710,12 @@ module core(
     assign mem_fc       = exec_mem_fc_o;
     assign mem_sc       = exec_mem_sc_o;
 
+    assign cp0_addr_o   = exec_rd_o;
+    assign cp0_data_o   = exec_result_o[31:0];
+    assign cp0_we_o     = exec_cp0_we_o;
+
     assign exception    = mem_exception_o;
     assign cause        = mem_cause_o;
-    assign epc          = mem_pc_o;
-    // TODO assign eret         = mem_eret_o;
+    assign epc          = exec_pc_o;
+    assign eret         = mem_eret_o;
 endmodule
