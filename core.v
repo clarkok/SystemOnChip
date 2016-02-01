@@ -198,6 +198,7 @@ module core(
     reg  [2:0]                  dec_alu_b_sel_o;    //  0: rt, 1: imm, 2: shamt, 3: exec_result, 4: mem_result, 5: 0, 6: rs
     reg                         dec_load_unsigned_o;
     reg                         dec_overflow_o;
+    reg  [1:0]                  dec_data_sel_o;     //  0: rt, 1: exec_result, 2: mem_result
     reg                         dec_mem_rd_o;
     reg                         dec_mem_we_o;
     reg                         dec_mem_fc_o;
@@ -239,6 +240,7 @@ module core(
         dec_alu_b_sel_o     <= 0;
         dec_load_unsigned_o <= 0;
         dec_overflow_o      <= 0;
+        dec_data_sel_o      <= 0;
         dec_mem_rd_o        <= 0;
         dec_mem_we_o        <= 0;
         dec_mem_fc_o        <= 0;
@@ -424,6 +426,9 @@ module core(
             endcase
             dec_load_unsigned_o <= (dec_decoded[I_LBU] | dec_decoded[I_LHU]);
             dec_overflow_o      <= (dec_decoded[I_ADD] | dec_decoded[I_ADDI] | dec_decoded[I_SUB]);
+            dec_data_sel_o      <= (dec_inst[20:16] == dec_dst_in_exec) ? 1 :
+                                   (dec_inst[20:16] == dec_dst_in_mem)  ? 2 :
+                                                                          0;
             dec_mem_rd_o        <= (|dec_decoded[I_LL:I_LB]);
             dec_mem_we_o        <= (|dec_decoded[I_SW:I_SB]);
             dec_mem_fc_o        <= (dec_decoded[I_SYNC] | dec_decoded[I_ERET]);
@@ -592,7 +597,11 @@ module core(
             exec_mem_sc_o           <= dec_mem_sc_o && exec_no_exception;
             exec_mem_sel_o          <= dec_mem_sel_o;
             exec_result_o           <= exec_alu_out;
-            exec_data_o             <= exec_rt;
+            case (dec_data_sel_o)
+                2'h0:   exec_data_o <= exec_rt;
+                2'h1:   exec_data_o <= exec_result_o;
+                2'h2:   exec_data_o <= exec_mem_result_i;
+            endcase
             exec_cp0_we_o           <= dec_cp0_we_o;
             exec_eret_o             <= dec_eret_o;
         end
