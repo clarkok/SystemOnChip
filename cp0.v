@@ -9,19 +9,19 @@ module cp0(
     input      [31:0] cp0_data_i,
     input             cp0_we_i,
 
-    output [31:0] cp0_epc_o,
-    output [31:0] cp0_ehb_o,
-    output [31:0] cp0_ptb_o,
+    output     [31:0] cp0_epc_o,
+    output     [31:0] cp0_ehb_o,
+    output     [31:0] cp0_ptb_o,
 
-    input         exception,
-    input  [31:0] cause,
-    input  [31:0] epc,
-    input         eret,
+    input             exception,
+    input      [31:0] cause,
+    input      [31:0] epc,
+    input             eret,
 
-    output             hw_interrupt,
-    output  reg [31:0] hw_cause,
+    output            hw_interrupt,
+    output reg [31:0] hw_cause,
 
-    input  [31:0] devices_interrupt
+    input      [31:0] devices_interrupt
     );
 
     reg [31:0] cp0_epc;
