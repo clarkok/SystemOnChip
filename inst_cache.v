@@ -1,5 +1,6 @@
 `include "functions.vh"
 
+// TODO support for hw_page_fault
 module inst_cache(
     input  clk,
     input  rst,
@@ -9,11 +10,13 @@ module inst_cache(
     output          inst_valid_o,
 
     input           mem_fc,
+    output          hw_page_fault_o,
 
     output reg [ 31:0]  addr_o,
     input      [255:0]  data_i,
     output reg          rd_o,
-    input               ack_i
+    input               ack_i,
+    input               hw_page_fault_i
     );
 
     localparam LINE_BITS    = 256;
@@ -36,8 +39,9 @@ module inst_cache(
 
     reg  [31:0] inst_data_r;
 
-    assign inst_valid_o = valids[addr_hash] && (tags[addr_hash] == addr_tag);
-    assign inst_data_o  = inst_data_r;
+    assign inst_valid_o     = valids[addr_hash] && (tags[addr_hash] == addr_tag);
+    assign inst_data_o      = inst_data_r;
+    assign hw_page_fault_o  = hw_page_fault_i;
 
     always @* begin
         case (addr_off[OFF_BITS-1:2])
@@ -78,7 +82,7 @@ module inst_cache(
                 if (ack_i) begin
                     caches[rd_hash]     <= data_i;
                     tags[rd_hash]       <= rd_tag;
-                    valids[rd_hash]     <= 1;
+                    valids[rd_hash]     <= ~hw_page_fault_i;
                     addr_o              <= 0;
                     rd_o                <= 0;
                 end
