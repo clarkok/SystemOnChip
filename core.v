@@ -110,6 +110,8 @@ module core(
 
                 NR_INST = I_SYNC + 1;
 
+    wire core_run   = ~(data_rd_o || data_we_o) || data_valid_i;
+
     // decode part
     function [NR_INST-1:0] decode;
     input [31:0] inst;
@@ -276,7 +278,7 @@ module core(
             dec_init();
             the_pc  <= dec_pc_i;
         end
-        else if (data_valid_i) begin
+        else if (core_run) begin
             if (inst_valid_i)
                 case (1)
                     (|dec_decoded[I_JAL:I_J]):                  the_pc <= jump_addr;
@@ -582,7 +584,7 @@ module core(
     always @(posedge clk) begin
         if (rst) exec_init();
         else if (exec_pipeline_flush_i) exec_init();
-        else if (data_valid_i) begin
+        else if (core_run) begin
             exec_exception_o        <= dec_exception_o | exec_overflow_err;
             exec_cause_o            <= dec_exception_o ? dec_cause_o :
                                        exec_overflow_err ? `OVERFLOW : 0;
@@ -654,7 +656,7 @@ module core(
 
     always @(posedge clk) begin
         if (rst || mem_pipeline_flush_o) mem_init();
-        else if (data_valid_i) begin
+        else if (core_run) begin
             mem_rt_o                <= exec_rt_o;
             mem_rd_o                <= exec_rd_o;
             mem_reg_we_o            <= exec_reg_we_o;
@@ -699,7 +701,7 @@ module core(
     // wb part
     always @(posedge clk) begin
         if (rst) wb_init();
-        else if (data_valid_i && mem_reg_we_o) begin
+        else if (core_run && mem_reg_we_o) begin
             case (mem_reg_we_dst_o)
                 3'h0:   if (mem_rd_o)   reg_file[mem_rd_o]  <= mem_result_o[31:0];
                 3'h1:   if (mem_rt_o)   reg_file[mem_rt_o]  <= mem_result_o[31:0];
