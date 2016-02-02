@@ -113,110 +113,43 @@ module soc(
         .vga_g(vga_g),
         .vga_r(vga_r),
         .vga_hs(vga_hs),
-        .vga_vs(vga_vs),
-
-        .disp_value()
+        .vga_vs(vga_vs)
     );
 
-    wire [31:0] inst_addr_o;
-    wire [31:0] inst_data_i;
+    wire [ 31:0]    mem_addr_o;
+    wire [255:0]    mem_data_i;
+    wire [255:0]    mem_data_o;
+    wire            mem_we_o;
+    wire            mem_rd_o;
+    wire            mem_ack_i;
 
-    bios_rom bios_rom(
-        .a(inst_addr_o[11:2]),
-        .spo(inst_data_i)
-    );
+    wire [ 31:0]    bus_addr_o;
+    wire [ 31:0]    bus_data_i;
+    wire [ 31:0]    bus_data_o;
+    wire [  1:0]    bus_sel_o;
+    wire            bus_we_o;
+    wire            bus_rd_o;
+    wire            bus_ack_i;
 
-    wire [31:0] data_addr_o;
-    wire [31:0] data_data_i;
-    wire [31:0] data_data_o;
-    wire        data_we_o;
-    wire        data_rd_o;
-    wire [3:0]  data_sel_o;
-    wire        data_valid_i;
+    wire [ 31:0]    devices_interrupt;
 
-    core core(
+    cpu cpu(
         .clk(clk_sys),
         .rst(rst),
-        .inst_addr_o(inst_addr_o),
-        .inst_data_i(inst_data_i),
-        .inst_valid_i(1'b1),
-        .data_addr_o(data_addr_o),
-        .data_data_i(data_data_i),
-        .data_data_o(data_data_o),
-        .data_sel_o(data_sel_o),
-        .data_we_o(data_we_o),
-        .data_rd_o(data_rd_o),
-        .data_valid_i(data_valid_i),
-        .mem_fc(),
-        .mem_sc(),
-        .hw_page_fault(1'b0),
-        .hw_interrupt(1'b0),
-        .hw_cause(32'b0),
-        .exception(),
-        .cause(),
-        .epc(),
-        .eret(),
-        .cp0_addr_o(),
-        .cp0_data_i(32'b0),
-        .cp0_data_o(),
-        .cp0_we_o(),
-        .cp0_exception_base(32'b0)
-    );
-
-    wire [31:0] cache_addr_o;
-    wire [31:0] cache_data_i;
-    wire [31:0] cache_data_o;
-    wire        cache_we_o;
-    wire        cache_rd_o;
-    wire        cache_ack_i;
-
-    data_cache data_cache(
-        .clk(clk_sys),
-        .rst(rst),
-        .data_addr(data_addr_o),
-        .data_in(data_data_i),
-        .data_out(data_data_o),
-        .data_we(data_we_o),
-        .data_rd(data_rd_o),
-        .data_sel(data_sel_o),
-        .data_sign_ext(1'b0),
-        .data_ready(data_valid_i),
-        .addr_o(cache_addr_o),
-        .data_i(cache_data_i),
-        .data_o(cache_data_o),
-        .we_o(cache_we_o),
-        .rd_o(cache_rd_o),
-        .ack_i(cache_ack_i),
-        .fence(1'b0)
-    );
-
-    wire [31:0] mmu_addr_o;
-    wire [31:0] mmu_data_i;
-    wire [31:0] mmu_data_o;
-    wire        mmu_we_o;
-    wire        mmu_rd_o;
-    wire        mmu_ack_i;
-
-    mmu mmu(
-        .clk(clk),
-        .rst(rst),
-        .mmu_base_i(32'b0),
-        .mmu_we(1'b0),
-        .mmu_base_o(),
-        .v_addr_i(cache_addr_o),
-        .v_data_i(cache_data_o),
-        .v_data_o(cache_data_i),
-        .v_we_i(cache_we_o),
-        .v_rd_i(cache_rd_o),
-        .v_ack_o(cache_ack_i),
-        .addr_o(mmu_addr_o),
-        .data_i(mmu_data_i),
-        .data_o(mmu_data_o),
-        .we_o(mmu_we_o),
-        .rd_o(mmu_rd_o),
-        .ack_i(mmu_ack_i),
-        .page_fault(),
-        .page_fault_addr()
+        .mem_addr_o(mem_addr_o),
+        .mem_data_i(mem_data_i),
+        .mem_data_o(mem_data_o),
+        .mem_we_o(mem_we_o),
+        .mem_rd_o(mem_rd_o),
+        .mem_ack_i(mem_ack_i),
+        .bus_addr_o(bus_addr_o),
+        .bus_data_i(bus_data_i),
+        .bus_data_o(bus_data_o),
+        .bus_sel_o(bus_sel_o),
+        .bus_we_o(bus_we_o),
+        .bus_rd_o(bus_rd_o),
+        .bus_ack_i(bus_ack_i),
+        .devices_interrupt(devices_interrupt)
     );
 
     ddr3_dev ddr3_dev(
@@ -225,12 +158,12 @@ module soc(
         .clk_ref(clk_ddr_ref),
         .rst(rst),
 
-        .addr_i(mmu_addr_o),
-        .data_i(mmu_data_o),
-        .data_o(mmu_data_i),
-        .we_i(mmu_we_o),
-        .rd_i(mmu_rd_o),
-        .ack_o(mmu_ack_i),
+        .addr_i(mem_addr_o),
+        .data_i(mem_data_o),
+        .data_o(mem_data_i),
+        .we_i(mem_we_o),
+        .rd_i(mem_rd_o),
+        .ack_o(mem_ack_i),
 
         .ddr3_dq(ddr3_dq),
         .ddr3_dqs_n(ddr3_dqs_n),
@@ -246,28 +179,13 @@ module soc(
         .ddr3_cke(ddr3_cke),
         .ddr3_cs_n(ddr3_cs_n),
         .ddr3_dm(ddr3_dm),
-        .ddr3_odt(ddr3_odt),
-
-        .cache_state_value(cache_state_value),
-        .last_cache_state_value(last_cache_state_value),
-        .ctrl_state_value(ctrl_state_value)
+        .ddr3_odt(ddr3_odt)
     );
 
     assign tri_led0 = 3'b111;
     assign tri_led1 = 3'b111;
 
-    reg [15:0] led;
-
-    always @* begin
-        case (sw[2:0])
-            0: led  = cache_state_value;
-            1: led  = ctrl_state_value;
-            2: led  = 32'b0;
-            3: led  = 32'b0;
-            4: led  = last_cache_state_value;
-            5: led  = data_data_o;
-        endcase
-    end
+    reg [15:0] led = 0;
 
     board_disp_sword board_disp_sword(
         .clk(clk_sys),

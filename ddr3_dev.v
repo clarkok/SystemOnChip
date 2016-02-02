@@ -6,32 +6,28 @@ module ddr3_dev(
     input  clk_ref,
     input  rst,
 
-    input  [31:0]  addr_i,
-    input  [31:0]  data_i,
-    output [31:0]  data_o,
-    input          we_i,
-    input          rd_i,
-    output         ack_o,
+    input  [ 31:0]  addr_i,
+    input  [255:0]  data_i,
+    output [255:0]  data_o,
+    input           we_i,
+    input           rd_i,
+    output          ack_o,
 
-    inout  [31:0] ddr3_dq,
-    inout  [ 3:0] ddr3_dqs_n,
-    inout  [ 3:0] ddr3_dqs_p,
-    output [13:0] ddr3_addr,
-    output [ 2:0] ddr3_ba,
-    output        ddr3_ras_n,
-    output        ddr3_cas_n,
-    output        ddr3_we_n,
-    output        ddr3_reset_n,
-    output        ddr3_ck_p,
-    output        ddr3_ck_n,
-    output        ddr3_cke,
-    output        ddr3_cs_n,
-    output [ 3:0] ddr3_dm,
-    output        ddr3_odt,
-
-    output [15:0] cache_state_value,
-    output [15:0] last_cache_state_value,
-    output [15:0] ctrl_state_value
+    inout  [31:0]   ddr3_dq,
+    inout  [ 3:0]   ddr3_dqs_n,
+    inout  [ 3:0]   ddr3_dqs_p,
+    output [13:0]   ddr3_addr,
+    output [ 2:0]   ddr3_ba,
+    output          ddr3_ras_n,
+    output          ddr3_cas_n,
+    output          ddr3_we_n,
+    output          ddr3_reset_n,
+    output          ddr3_ck_p,
+    output          ddr3_ck_n,
+    output          ddr3_cke,
+    output          ddr3_cs_n,
+    output [ 3:0]   ddr3_dm,
+    output          ddr3_odt
     );
 
     wire [28:0]     ctrl_addr_i;
@@ -68,12 +64,10 @@ module ddr3_dev(
         .data_o(ctrl_data_o),
         .we_i(ctrl_we_i),
         .rd_i(ctrl_rd_i),
-        .ack_o(ctrl_ack_o),
-
-        .state_value(ctrl_state_value)
+        .ack_o(ctrl_ack_o)
     );
 
-    ddr3_cache_ctrl ddr3_cache_ctrl(
+    ddr3_cache ddr3_cache(
         .clk(clk),
         .rst(rst),
 
@@ -84,15 +78,12 @@ module ddr3_dev(
         .rd_i(rd_i),
         .ack_o(ack_o),
 
-        .ctrl_addr_i(ctrl_addr_i),
-        .ctrl_data_i(ctrl_data_i),
-        .ctrl_data_o(ctrl_data_o),
-        .ctrl_we_i(ctrl_we_i),
-        .ctrl_rd_i(ctrl_rd_i),
-        .ctrl_ack_o(ctrl_ack_o),
-
-        .state_value(cache_state_value),
-        .last_state_value(last_cache_state_value)
+        .ctrl_addr_o(ctrl_addr_i),
+        .ctrl_data_o(ctrl_data_i),
+        .ctrl_data_i(ctrl_data_o),
+        .ctrl_we_o(ctrl_we_i),
+        .ctrl_rd_o(ctrl_rd_i),
+        .ctrl_ack_i(ctrl_ack_o)
     );
 
 endmodule
