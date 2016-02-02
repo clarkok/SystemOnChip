@@ -35,7 +35,6 @@ exception_handler:
     lui     $k1,    %hi(PC_TABLE)
     sll     $k0,    $k0,    2
     add     $k1,    $k1,    $k0
-    addiu   $s0,    $s0,    -4
     sw      $s0,    %lo(PC_TABLE)($k1)
     xori    $k1,    $k1,    4
     lw      $s0,    %lo(PC_TABLE)($k1)

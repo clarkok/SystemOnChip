@@ -110,7 +110,7 @@ module core(
 
                 NR_INST = I_SYNC + 1;
 
-    wire core_run   = ~(data_rd_o || data_we_o) || data_valid_i;
+    wire core_run   = ~(data_rd_o || data_we_o || mem_fc) || data_valid_i;
 
     // decode part
     function [NR_INST-1:0] decode;
