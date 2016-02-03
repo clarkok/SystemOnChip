@@ -459,7 +459,7 @@ module core(
     end
 
     // exec part
-    wire [63:0]                 exec_mem_result_i;
+    wire [31:0]                 exec_mem_result_i;
     wire                        exec_pipeline_flush_i;
 
     reg                         exec_exception_o;
@@ -477,7 +477,8 @@ module core(
     reg                         exec_mem_we_o;
     reg                         exec_mem_fc_o;
     reg  [1:0]                  exec_mem_sel_o;
-    reg  [63:0]                 exec_result_o;
+    reg  [31:0]                 exec_result_o;
+    reg  [63:0]                 exec_lohi_o;
     reg  [DATA_DATA_WIDTH-1:0]  exec_data_o;
     reg                         exec_cp0_we_o;
     reg                         exec_eret_o;
@@ -504,7 +505,8 @@ module core(
         exec_mem_we_o       <= 0;
         exec_mem_fc_o       <= 0;
         exec_mem_sel_o      <= 0;
-        exec_result_o       <= 64'h0;
+        exec_result_o       <= 0;
+        exec_lohi_o         <= 0;
         exec_data_o         <= 0;
         exec_cp0_we_o       <= 0;
         exec_eret_o         <= 0;
@@ -519,15 +521,16 @@ module core(
 
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_a;
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_b;
-    reg  [63:0]                 exec_alu_out;
+    reg  [DATA_DATA_WIDTH-1:0]  exec_alu_out;
+    reg  [63:0]                 exec_lohi_out;
     reg                         exec_overf_r;
 
     always @* begin
         case (dec_alu_a_sel_o)
             3'h0:   exec_alu_a  = exec_rs;
             3'h1:   exec_alu_a  = exec_rt;
-            3'h2:   exec_alu_a  = exec_result_o[31:0];
-            3'h3:   exec_alu_a  = exec_mem_result_i[31:0];
+            3'h2:   exec_alu_a  = exec_result_o;
+            3'h3:   exec_alu_a  = exec_mem_result_i;
             3'h4:   exec_alu_a  = lohi[63:32];
             3'h5:   exec_alu_a  = lohi[31: 0];
             3'h6:   exec_alu_a  = 0;
@@ -540,8 +543,8 @@ module core(
             3'h0:   exec_alu_b  = exec_rt;
             3'h1:   exec_alu_b  = dec_imm_o;
             3'h2:   exec_alu_b  = dec_shamt_o;
-            3'h3:   exec_alu_b  = exec_result_o[31:0];
-            3'h4:   exec_alu_b  = exec_mem_result_i[31:0];
+            3'h3:   exec_alu_b  = exec_result_o;
+            3'h4:   exec_alu_b  = exec_mem_result_i;
             3'h5:   exec_alu_b  = 0;
             3'h6:   exec_alu_b  = exec_rs;
         endcase
@@ -549,24 +552,25 @@ module core(
 
     always @* begin
         exec_overf_r    = 0;
-        exec_alu_out    = 64'h0;
+        exec_alu_out    = 0;
+        exec_lohi_out   = 0;
         case (dec_alu_op_o)
-            4'h0:   {exec_overf_r, exec_alu_out[31:0]}  = exec_alu_a + exec_alu_b;
-            4'h1:   {exec_overf_r, exec_alu_out[31:0]}  = exec_alu_a - exec_alu_b;
-            4'h2:   exec_alu_out[31:0]                  = exec_alu_a & exec_alu_b;
-            4'h3:   exec_alu_out[31:0]                  = $signed(exec_alu_a) < $signed(exec_alu_b);
-            4'h4:   exec_alu_out[31:0]                  = exec_alu_a | exec_alu_b;
-            4'h5:   exec_alu_out[31:0]                  = exec_alu_a ^ exec_alu_b;
-            4'h6:   exec_alu_out[31:0]                  = ~(exec_alu_a | exec_alu_b);
-            4'h7:   exec_alu_out[31:0]                  = exec_alu_a << exec_alu_b[4:0];
-            4'h8:   exec_alu_out[31:0]                  = exec_alu_a >> exec_alu_b[4:0];
-            4'h9:   exec_alu_out[31:0]                  = $signed(exec_alu_a) >>> exec_alu_b[4:0];
-            4'ha:   exec_alu_out[31:0]                  = exec_alu_a < exec_alu_b;
-            4'hb:   exec_alu_out[31:0]                  = exec_alu_a == exec_alu_b;
-            4'hc:   exec_alu_out[31:0]                  = exec_alu_a != exec_alu_b;
-            4'hd:   exec_alu_out[31:0]                  = {exec_alu_a[15:0], 16'b0};
-            4'he:   exec_alu_out                        = $signed(exec_alu_a) * $signed(exec_alu_b);
-            4'hf:   exec_alu_out                        = exec_alu_a * exec_alu_b;
+            4'h0:   {exec_overf_r, exec_alu_out}    = exec_alu_a + exec_alu_b;
+            4'h1:   {exec_overf_r, exec_alu_out}    = exec_alu_a - exec_alu_b;
+            4'h2:   exec_alu_out                    = exec_alu_a & exec_alu_b;
+            4'h3:   exec_alu_out                    = $signed(exec_alu_a) < $signed(exec_alu_b);
+            4'h4:   exec_alu_out                    = exec_alu_a | exec_alu_b;
+            4'h5:   exec_alu_out                    = exec_alu_a ^ exec_alu_b;
+            4'h6:   exec_alu_out                    = ~(exec_alu_a | exec_alu_b);
+            4'h7:   exec_alu_out                    = exec_alu_a << exec_alu_b[4:0];
+            4'h8:   exec_alu_out                    = exec_alu_a >> exec_alu_b[4:0];
+            4'h9:   exec_alu_out                    = $signed(exec_alu_a) >>> exec_alu_b[4:0];
+            4'ha:   exec_alu_out                    = exec_alu_a < exec_alu_b;
+            4'hb:   exec_alu_out                    = exec_alu_a == exec_alu_b;
+            4'hc:   exec_alu_out                    = exec_alu_a != exec_alu_b;
+            4'hd:   exec_alu_out                    = {exec_alu_a[15:0], 16'b0};
+            4'he:   exec_lohi_out                   = $signed(exec_alu_a) * $signed(exec_alu_b);
+            4'hf:   exec_lohi_out                   = exec_alu_a * exec_alu_b;
         endcase
     end
 
@@ -577,7 +581,7 @@ module core(
     wire exec_overflow_err  = exec_overflow & dec_overflow_o;
     wire exec_no_exception  = ~( exec_exception_o ||
                                 (exec_pc_we_o == 2'b0) ||                               // JR
-                                (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0) ||   // predict missed
+                                (exec_pc_we_o == 2'b1 && exec_result_o == 0) ||         // predict missed
                                 (exec_eret_o)
                                 );
 
@@ -602,6 +606,7 @@ module core(
             exec_mem_fc_o           <= dec_mem_fc_o && exec_no_exception;
             exec_mem_sel_o          <= dec_mem_sel_o;
             exec_result_o           <= exec_alu_out;
+            exec_lohi_o             <= exec_lohi_out;
             case (dec_data_sel_o)
                 2'h0:   exec_data_o <= exec_rt;
                 2'h1:   exec_data_o <= exec_result_o;
@@ -618,7 +623,8 @@ module core(
     reg  [4:0]                  mem_rd_o;
     reg                         mem_reg_we_o;
     reg  [2:0]                  mem_reg_we_dst_o;
-    reg  [63:0]                 mem_result_o;
+    reg  [31:0]                 mem_result_o;
+    reg  [63:0]                 mem_lohi_o;
     reg                         mem_exception_o;
     reg  [31:0]                 mem_cause_o;
     reg                         mem_eret_o;
@@ -634,6 +640,7 @@ module core(
         mem_reg_we_o            <= 0;
         mem_reg_we_dst_o        <= 0;
         mem_result_o            <= 0;
+        mem_lohi_o              <= 0;
         mem_pipeline_flush_o    <= 0;
         mem_pc_data_o           <= 0;
         mem_exception_o         <= 0;
@@ -668,6 +675,7 @@ module core(
                 3'h3:   mem_result_o    <= cp0_data_i;
                 3'h4:   mem_result_o    <= exec_sc_valid_o;
             endcase
+            mem_lohi_o              <= exec_lohi_o;
             mem_pipeline_flush_o    <= exec_exception_o ||
                                        hw_page_fault ||
                                        exec_eret_o ||
@@ -703,12 +711,12 @@ module core(
         if (rst) wb_init();
         else if (core_run && mem_reg_we_o) begin
             case (mem_reg_we_dst_o)
-                3'h0:   if (mem_rd_o)   reg_file[mem_rd_o]  <= mem_result_o[31:0];
-                3'h1:   if (mem_rt_o)   reg_file[mem_rt_o]  <= mem_result_o[31:0];
-                3'h2:                   reg_file[5'b11111]  <= mem_result_o[31:0];
-                3'h3:                   lohi[63:32]         <= mem_result_o[31:0];
-                3'h4:                   lohi[31: 0]         <= mem_result_o[31:0];
-                3'h5:                   lohi                <= mem_result_o;
+                3'h0:   if (mem_rd_o)   reg_file[mem_rd_o]  <= mem_result_o;
+                3'h1:   if (mem_rt_o)   reg_file[mem_rt_o]  <= mem_result_o;
+                3'h2:                   reg_file[5'b11111]  <= mem_result_o;
+                3'h3:                   lohi[63:32]         <= mem_result_o;
+                3'h4:                   lohi[31: 0]         <= mem_result_o;
+                3'h5:                   lohi                <= mem_lohi_o;
             endcase
         end
     end

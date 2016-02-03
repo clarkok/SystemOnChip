@@ -3,22 +3,21 @@ module mmu_test;
     reg rst;
     reg [31:0] mmu_base_i;
     reg mmu_we;
-    reg [31:0] v_addr_i;
-    reg [31:0] v_data_i;
+    reg [255:0] v_addr_i;
+    reg [255:0] v_data_i;
     reg v_we_i;
     reg v_rd_i;
-    reg [31:0] data_i;
+    reg [255:0] data_i;
     reg ack_i;
 
     wire [31:0] mmu_base_o;
-    wire [31:0] v_data_o;
+    wire [255:0] v_data_o;
     wire v_ack_o;
     wire [31:0] addr_o;
-    wire [31:0] data_o;
+    wire [255:0] data_o;
     wire we_o;
     wire rd_o;
     wire page_fault;
-    wire [31:0] page_fault_addr;
 
     mmu uut(
         .clk(clk),
@@ -38,8 +37,7 @@ module mmu_test;
         .we_o(we_o),
         .rd_o(rd_o),
         .ack_i(ack_i),
-        .page_fault(page_fault),
-        .page_fault_addr(page_fault_addr)
+        .page_fault(page_fault)
     );
 
     task write_base;
