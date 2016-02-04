@@ -58,11 +58,14 @@ module arbiter(
             if (in_operation) begin
                 if (ack_i) begin
                     in_operation    <= 0;
+                    rd_o            <= 0;
+                    we_o            <= 0;
                 end
             end
             else begin
                 if (cd_rd_i || cd_we_i) begin
                     ci_operating    <= 0;
+                    in_operation    <= 1;
                     addr_o          <= cd_addr_i;
                     data_o          <= cd_data_i;
                     we_o            <= cd_we_i;
@@ -70,10 +73,16 @@ module arbiter(
                 end
                 else if (ci_rd_i) begin
                     ci_operating    <= 1;
+                    in_operation    <= 1;
                     addr_o          <= ci_addr_i;
                     data_o          <= 256'b0;
                     we_o            <= 1'b0;
                     rd_o            <= 1'b1;
+                end
+                else begin
+                    in_operation    <= 0;
+                    rd_o            <= 0;
+                    we_o            <= 0;
                 end
             end
         end

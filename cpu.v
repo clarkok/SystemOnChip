@@ -75,6 +75,9 @@ module cpu(
     );
 
     wire [31:0] cp0_ptb;
+    wire        cp0_ptb_we;
+    wire        cp0_hw_page_fault;
+    wire        cp0_hw_page_fault_addr;
 
     cp0 cp0(
         .clk(clk),
@@ -86,13 +89,16 @@ module cpu(
         .cp0_epc_o(cp0_epc),
         .cp0_ehb_o(cp0_ehb),
         .cp0_ptb_o(cp0_ptb),
+        .cp0_ptb_we(cp0_ptb_we),
         .exception(exception),
         .cause(cause),
         .epc(epc),
         .eret(eret),
         .hw_interrupt(hw_interrupt),
         .hw_cause(hw_cause),
-        .devices_interrupt(devices_interrupt)
+        .devices_interrupt(devices_interrupt),
+        .hw_page_fault(cp0_hw_page_fault),
+        .hw_page_fault_addr(cp0_hw_page_fault_addr)
     );
 
     wire [ 31:0]    ci_addr_o;
@@ -191,16 +197,28 @@ module cpu(
         .page_ent_i(v_page_ent_i)
     );
 
-    assign hw_page_fault    = cd_hw_page_fault_o | ci_hw_page_fault_o;
+    mmu mmu(
+        .clk(clk),
+        .rst(rst),
+        .cp0_ptb_i(cp0_ptb),
+        .cp0_ptb_we(cp0_ptb_we),
+        .v_addr_i(v_addr_o),
+        .v_data_o(v_data_i),
+        .v_data_i(v_data_o),
+        .v_rd_i(v_rd_o),
+        .v_we_i(v_we_o),
+        .v_ack_o(v_ack_i),
+        .v_page_ent_o(v_page_ent_i),
+        .v_hw_page_fault_o(v_hw_page_fault_i),
+        .v_hw_page_fault_addr_o(cp0_hw_page_fault_addr),
+        .addr_o(mem_addr_o),
+        .data_i(mem_data_i),
+        .data_o(mem_data_o),
+        .rd_o(mem_rd_o),
+        .we_o(mem_we_o),
+        .ack_i(mem_ack_i)
+    );
 
-    // TODO mmu
-    assign  mem_addr_o  = v_addr_o;
-    assign  mem_data_o  = v_data_o;
-    assign  mem_we_o    = v_we_o;
-    assign  mem_rd_o    = v_rd_o;
-    assign  v_data_i    = mem_data_i;
-    assign  v_ack_i     = mem_ack_i;
-    assign  v_hw_page_fault_i   = 1'b0;
-    assign  v_page_ent_i        = 32'hFFFFFFFF;
-
+    assign hw_page_fault        = cd_hw_page_fault_o | ci_hw_page_fault_o;
+    assign cp0_hw_page_fault    = v_hw_page_fault_i;
 endmodule

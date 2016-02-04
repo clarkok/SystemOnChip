@@ -4,3 +4,4 @@
 `define CP0_IS          3       // Interrupt status
 `define CP0_EHB         4       // Exception handler base
 `define CP0_PTB         5       // Page table base
+`define CP0_PFA         6       // Page fault addr

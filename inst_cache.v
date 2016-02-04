@@ -1,6 +1,5 @@
 `include "functions.vh"
 
-// TODO support for hw_page_fault
 module inst_cache(
     input  clk,
     input  rst,

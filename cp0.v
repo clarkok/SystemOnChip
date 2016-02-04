@@ -4,24 +4,28 @@ module cp0(
     input  clk,
     input  rst,
 
-    input      [ 4:0] cp0_addr_i,
-    output reg [31:0] cp0_data_o,
-    input      [31:0] cp0_data_i,
-    input             cp0_we_i,
+    input      [ 4:0]   cp0_addr_i,
+    output reg [31:0]   cp0_data_o,
+    input      [31:0]   cp0_data_i,
+    input               cp0_we_i,
 
-    output     [31:0] cp0_epc_o,
-    output     [31:0] cp0_ehb_o,
-    output     [31:0] cp0_ptb_o,
+    output     [31:0]   cp0_epc_o,
+    output     [31:0]   cp0_ehb_o,
+    output     [31:0]   cp0_ptb_o,
+    output              cp0_ptb_we,
 
-    input             exception,
-    input      [31:0] cause,
-    input      [31:0] epc,
-    input             eret,
+    input               exception,
+    input      [31:0]   cause,
+    input      [31:0]   epc,
+    input               eret,
 
-    output            hw_interrupt,
-    output reg [31:0] hw_cause,
+    output              hw_interrupt,
+    output reg [31:0]   hw_cause,
 
-    input      [31:0] devices_interrupt
+    input      [31:0]   devices_interrupt,
+
+    input               hw_page_fault,
+    input      [31:0]   hw_page_fault_addr
     );
 
     reg [31:0] cp0_epc;
@@ -30,10 +34,12 @@ module cp0(
     reg [31:0] cp0_is;
     reg [31:0] cp0_ehb;
     reg [31:0] cp0_ptb;
+    reg [31:0] cp0_pfa;
 
     assign cp0_epc_o    = cp0_epc;
     assign cp0_ehb_o    = cp0_ehb;
     assign cp0_ptb_o    = cp0_ptb;
+    assign cp0_ptb_we   = cp0_we_i && (cp0_addr_i == `CP0_PTB);
 
     always @* begin
         case (cp0_addr_i)
@@ -43,6 +49,7 @@ module cp0(
             `CP0_IS:        cp0_data_o  = cp0_is;
             `CP0_EHB:       cp0_data_o  = cp0_ehb;
             `CP0_PTB:       cp0_data_o  = cp0_ptb;
+            `CP0_PFA:       cp0_data_o  = cp0_pfa;
             default:        cp0_data_o  = 32'h0;
         endcase
     end
@@ -95,6 +102,7 @@ module cp0(
         cp0_is      <= 0;
         cp0_ehb     <= 0;
         cp0_ptb     <= 0;
+        cp0_pfa     <= 0;
     end
     endtask
 
@@ -110,6 +118,7 @@ module cp0(
                     `CP0_IE:        cp0_ie      <= cp0_data_i;
                     `CP0_EHB:       cp0_ehb     <= cp0_data_i;
                     `CP0_PTB:       cp0_ptb     <= cp0_data_i;
+                    `CP0_PFA:       cp0_pfa     <= cp0_data_i;
                 endcase
             end
 
@@ -121,6 +130,10 @@ module cp0(
             end
             if (eret) begin
                 cp0_ie[31]  <= 1;
+            end
+
+            if (hw_page_fault) begin
+                cp0_pfa     <= hw_page_fault_addr;
             end
         end
     end

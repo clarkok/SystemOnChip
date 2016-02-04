@@ -1,39 +1,49 @@
 `include "exceptions.vh"
 
-module core(
+module core_dec(
     input  clk,
     input  rst,
+
+    input  core_run,
 
     output [INST_ADDR_WIDTH-1:0]    inst_addr_o,
     input  [31:0]                   inst_data_i,
     input                           inst_valid_i,
 
-    output [DATA_ADDR_WIDTH-1:0]    data_addr_o,
-    input  [DATA_DATA_WIDTH-1:0]    data_data_i,
-    output [DATA_DATA_WIDTH-1:0]    data_data_o,
-    output [1:0]                    data_sel_o,
-    output                          data_we_o,
-    output                          data_rd_o,
-    input                           data_valid_i,
-
-    output                          mem_fc,
-    input                           hw_page_fault,
-
     input                           hw_interrupt,
     input  [31:0]                   hw_cause,
 
-    output                          exception,
-    output [31:0]                   cause,
-    output [INST_ADDR_WIDTH-1:0]    epc,
-    output                          eret,
+    input                           dec_pipeline_flush_i,
+    input  [INST_ADDR_WIDTH-1:0]    dec_pc_i,
 
-    output [4:0]                    cp0_addr_o,
-    input  [31:0]                   cp0_data_i,
-    output [31:0]                   cp0_data_o,
-    output                          cp0_we_o,
-
-    input  [INST_ADDR_WIDTH-1:0]    cp0_ehb,
-    input  [INST_ADDR_WIDTH-1:0]    cp0_epc
+    output reg                          dec_exception_o,
+    output reg  [31:0]                  dec_cause_o,
+    output reg  [INST_ADDR_WIDTH-1:0]   dec_pc_o,
+    output reg  [4:0]                   dec_rs_o,
+    output reg  [4:0]                   dec_rt_o,
+    output reg  [4:0]                   dec_rd_o,
+    output reg  [DATA_DATA_WIDTH-1:0]   dec_imm_o,
+    output reg  [4:0]                   dec_shamt_o,
+    output reg  [1:0]                   dec_pc_we_o,        // 0: always flush, 1: conditional flush, 2: Non
+    output reg  [1:0]                   dec_pc_we_sel_o,    // 0: branch, 1: mem_result, 2: syscall, 3: eret
+    output reg                          dec_reg_we_o,
+    output reg  [2:0]                   dec_reg_we_sel_o,   // 0: alu_out, 1: bus_data, 2: pc + 4, 3: c0, 4: sc
+    output reg  [2:0]                   dec_reg_we_dst_o,   // 0: rd, 1: rt, 2: $ra, 3: hi, 4: lo, 5:lohi
+    output reg  [3:0]                   dec_alu_op_o,       //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+                                                            //  add sub and slt or  xor nor sll srl sra sltueq  ne  lui mul mulu
+    output reg  [2:0]                   dec_alu_a_sel_o,    //  0: rs, 1: rt, 2: exec_result, 3: mem_result, 4: hi, 5: lo, 6: 0, 7: imm
+    output reg  [2:0]                   dec_alu_b_sel_o,    //  0: rt, 1: imm, 2: shamt, 3: exec_result, 4: mem_result, 5: 0, 6: rs
+    output reg                          dec_load_unsigned_o,
+    output reg                          dec_overflow_o,
+    output reg  [1:0]                   dec_data_sel_o,     //  0: rt, 1: exec_result, 2: mem_result
+    output reg                          dec_mem_rd_o,
+    output reg                          dec_mem_we_o,
+    output reg                          dec_mem_sc_o,
+    output reg                          dec_mem_fc_o,
+    output reg  [1:0]                   dec_mem_sel_o,
+    output reg                          dec_cp0_we_o,
+    output reg                          dec_eret_o,
+    output reg                          dec_sc_valid_o
     );
 
     parameter INST_ADDR_WIDTH = 32;
@@ -110,9 +120,6 @@ module core(
 
                 NR_INST = I_SYNC + 1;
 
-    wire core_run   = ~(data_rd_o || data_we_o || mem_fc) || data_valid_i;
-
-    // decode part
     function [NR_INST-1:0] decode;
     input [31:0] inst;
     `define op      (inst[31:26])
@@ -178,47 +185,15 @@ module core(
     end
     endfunction
 
-    wire dec_pipeline_flush_i;
-
-    reg                         dec_exception_o;
-    reg  [31:0]                 dec_cause_o;
-    reg  [INST_ADDR_WIDTH-1:0]  dec_pc_o;
-    reg  [4:0]                  dec_rs_o;
-    reg  [4:0]                  dec_rt_o;
-    reg  [4:0]                  dec_rd_o;
-    reg  [DATA_DATA_WIDTH-1:0]  dec_imm_o;
-    reg  [4:0]                  dec_shamt_o;
-    reg  [1:0]                  dec_pc_we_o;        // 0: always flush, 1: conditional flush, 2: Non
-    reg  [1:0]                  dec_pc_we_sel_o;    // 0: branch, 1: mem_result, 2: syscall, 3: eret
-    reg                         dec_reg_we_o;
-    reg  [2:0]                  dec_reg_we_sel_o;   // 0: alu_out, 1: bus_data, 2: pc + 4, 3: c0, 4: sc
-    reg  [2:0]                  dec_reg_we_dst_o;   // 0: rd, 1: rt, 2: $ra, 3: hi, 4: lo, 5:lohi
-    reg  [3:0]                  dec_alu_op_o;       //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
-                                                    //  add sub and slt or  xor nor sll srl sra sltueq  ne  lui mul mulu
-    reg  [2:0]                  dec_alu_a_sel_o;    //  0: rs, 1: rt, 2: exec_result, 3: mem_result, 4: hi, 5: lo, 6: 0, 7: imm
-    reg  [2:0]                  dec_alu_b_sel_o;    //  0: rt, 1: imm, 2: shamt, 3: exec_result, 4: mem_result, 5: 0, 6: rs
-    reg                         dec_load_unsigned_o;
-    reg                         dec_overflow_o;
-    reg  [1:0]                  dec_data_sel_o;     //  0: rt, 1: exec_result, 2: mem_result
-    reg                         dec_mem_rd_o;
-    reg                         dec_mem_we_o;
-    reg                         dec_mem_sc_o;
-    reg                         dec_mem_fc_o;
-    reg  [1:0]                  dec_mem_sel_o;
-    reg                         dec_cp0_we_o;
-    reg                         dec_eret_o;
-    reg                         dec_sc_valid_o;
-
     reg  [INST_ADDR_WIDTH-1:0]  the_pc;
 
     reg  [5:0]                  dec_dst_in_exec;
     reg  [5:0]                  dec_dst_in_mem;
 
-    wire [INST_ADDR_WIDTH-1:0]  dec_pc_i;
-
     wire [31:0]                 dec_inst;
     wire [NR_INST-1:0]          dec_decoded;
 
+    assign inst_addr_o  = the_pc;
     assign dec_inst     = inst_valid_i ? inst_data_i : NOP;
     assign dec_decoded  = decode(dec_inst);
 
@@ -254,7 +229,7 @@ module core(
 
         dec_dst_in_exec     <= 6'b10_0000;
         dec_dst_in_mem      <= 6'b10_0000;
-        the_pc              <= 1;
+        the_pc              <= 32'hFFFF_F001;
     end
     endtask
 
@@ -457,35 +432,79 @@ module core(
             dec_dst_in_mem  <= dec_dst_in_exec;
         end
     end
+endmodule
 
-    // exec part
-    wire [31:0]                 exec_mem_result_i;
-    wire                        exec_pipeline_flush_i;
+module core_exe(
+    input  clk,
+    input  rst,
+    input  core_run,
 
-    reg                         exec_exception_o;
-    reg  [31:0]                 exec_cause_o;
-    reg  [INST_ADDR_WIDTH-1:0]  exec_pc_o;
-    reg  [4:0]                  exec_rt_o;
-    reg  [4:0]                  exec_rd_o;
-    reg  [1:0]                  exec_pc_we_o;
-    reg  [1:0]                  exec_pc_we_sel_o;
-    reg                         exec_reg_we_o;
-    reg  [2:0]                  exec_reg_we_sel_o;
-    reg  [2:0]                  exec_reg_we_dst_o;
-    reg                         exec_load_unsigned_o;
-    reg                         exec_mem_rd_o;
-    reg                         exec_mem_we_o;
-    reg                         exec_mem_fc_o;
-    reg  [1:0]                  exec_mem_sel_o;
-    reg  [31:0]                 exec_result_o;
-    reg  [63:0]                 exec_lohi_o;
-    reg  [DATA_DATA_WIDTH-1:0]  exec_data_o;
-    reg                         exec_cp0_we_o;
-    reg                         exec_eret_o;
-    reg                         exec_sc_valid_o;
+    input  [31:0]   exec_mem_result_i,
+    input           exec_pipeline_flush_i,
 
-    reg [DATA_DATA_WIDTH-1:0]   reg_file [0:31];
-    reg [63:0]                  lohi;
+    input                           dec_exception_o,
+    input  [31:0]                   dec_cause_o,
+    input  [INST_ADDR_WIDTH-1:0]    dec_pc_o,
+    input  [4:0]                    dec_rs_o,
+    input  [4:0]                    dec_rt_o,
+    input  [4:0]                    dec_rd_o,
+    input  [DATA_DATA_WIDTH-1:0]    dec_imm_o,
+    input  [4:0]                    dec_shamt_o,
+    input  [1:0]                    dec_pc_we_o,
+    input  [1:0]                    dec_pc_we_sel_o,
+    input                           dec_reg_we_o,
+    input  [2:0]                    dec_reg_we_sel_o,
+    input  [2:0]                    dec_reg_we_dst_o,
+    input  [3:0]                    dec_alu_op_o,
+    input  [2:0]                    dec_alu_a_sel_o,
+    input  [2:0]                    dec_alu_b_sel_o,
+    input                           dec_load_unsigned_o,
+    input                           dec_overflow_o,
+    input  [1:0]                    dec_data_sel_o,
+    input                           dec_mem_rd_o,
+    input                           dec_mem_we_o,
+    input                           dec_mem_sc_o,
+    input                           dec_mem_fc_o,
+    input  [1:0]                    dec_mem_sel_o,
+    input                           dec_cp0_we_o,
+    input                           dec_eret_o,
+    input                           dec_sc_valid_o,
+
+    output reg                          exec_exception_o,
+    output reg  [31:0]                  exec_cause_o,
+    output reg  [INST_ADDR_WIDTH-1:0]   exec_pc_o,
+    output reg  [4:0]                   exec_rt_o,
+    output reg  [4:0]                   exec_rd_o,
+    output reg  [1:0]                   exec_pc_we_o,
+    output reg  [1:0]                   exec_pc_we_sel_o,
+    output reg                          exec_reg_we_o,
+    output reg  [2:0]                   exec_reg_we_sel_o,
+    output reg  [2:0]                   exec_reg_we_dst_o,
+    output reg                          exec_load_unsigned_o,
+    output reg                          exec_mem_rd_o,
+    output reg                          exec_mem_we_o,
+    output reg                          exec_mem_fc_o,
+    output reg  [1:0]                   exec_mem_sel_o,
+    output reg  [31:0]                  exec_result_o,
+    output reg  [63:0]                  exec_lohi_o,
+    output reg  [DATA_DATA_WIDTH-1:0]   exec_data_o,
+    output reg                          exec_cp0_we_o,
+    output reg                          exec_eret_o,
+    output reg                          exec_sc_valid_o,
+
+    input  [63:0]                   lohi,
+    output [4:0]                    reg_addr_a,
+    input  [DATA_DATA_WIDTH-1:0]    reg_data_a,
+    output [4:0]                    reg_addr_b,
+    input  [DATA_DATA_WIDTH-1:0]    reg_data_b
+    );
+
+    parameter INST_ADDR_WIDTH = 32;
+    parameter DATA_ADDR_WIDTH = 32;
+    parameter DATA_DATA_WIDTH = 32;
+
+    assign  reg_addr_a  = dec_rs_o;
+    assign  reg_addr_b  = dec_rt_o;
 
     task exec_init;
     integer i;
@@ -516,8 +535,8 @@ module core(
 
     initial exec_init();
 
-    wire [DATA_DATA_WIDTH-1:0]  exec_rs = reg_file[dec_rs_o];
-    wire [DATA_DATA_WIDTH-1:0]  exec_rt = reg_file[dec_rt_o];
+    wire [DATA_DATA_WIDTH-1:0]  exec_rs = reg_data_a;
+    wire [DATA_DATA_WIDTH-1:0]  exec_rt = reg_data_b;
 
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_a;
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_b;
@@ -617,21 +636,59 @@ module core(
             exec_sc_valid_o         <= dec_sc_valid_o;
         end
     end
+endmodule
 
-    // mem part
-    reg  [4:0]                  mem_rt_o;
-    reg  [4:0]                  mem_rd_o;
-    reg                         mem_reg_we_o;
-    reg  [2:0]                  mem_reg_we_dst_o;
-    reg  [31:0]                 mem_result_o;
-    reg  [63:0]                 mem_lohi_o;
-    reg                         mem_exception_o;
-    reg  [31:0]                 mem_cause_o;
-    reg                         mem_eret_o;
-    reg  [INST_ADDR_WIDTH-1:0]  mem_pc_o;
+module core_mem(
+    input  clk,
+    input  rst,
+    input  core_run,
 
-    reg  mem_pipeline_flush_o;
-    reg  [INST_ADDR_WIDTH-1:0] mem_pc_data_o;
+    input [31:0]                data_data_i,
+    input [31:0]                cp0_data_i,
+    input                       hw_page_fault,
+    input [31:0]                cp0_ehb,
+    input [31:0]                cp0_epc,
+
+    input [31:0]                exec_mem_result_i,
+    input                       exec_exception_o,
+    input [31:0]                exec_cause_o,
+    input [INST_ADDR_WIDTH-1:0] exec_pc_o,
+    input [4:0]                 exec_rt_o,
+    input [4:0]                 exec_rd_o,
+    input [1:0]                 exec_pc_we_o,
+    input [1:0]                 exec_pc_we_sel_o,
+    input                       exec_reg_we_o,
+    input [2:0]                 exec_reg_we_sel_o,
+    input [2:0]                 exec_reg_we_dst_o,
+    input                       exec_load_unsigned_o,
+    input                       exec_mem_rd_o,
+    input                       exec_mem_we_o,
+    input                       exec_mem_fc_o,
+    input [1:0]                 exec_mem_sel_o,
+    input [31:0]                exec_result_o,
+    input [63:0]                exec_lohi_o,
+    input [DATA_DATA_WIDTH-1:0] exec_data_o,
+    input                       exec_cp0_we_o,
+    input                       exec_eret_o,
+    input                       exec_sc_valid_o,
+
+    output reg  [4:0]                   mem_rt_o,
+    output reg  [4:0]                   mem_rd_o,
+    output reg                          mem_reg_we_o,
+    output reg  [2:0]                   mem_reg_we_dst_o,
+    output reg  [31:0]                  mem_result_o,
+    output reg  [63:0]                  mem_lohi_o,
+    output reg                          mem_exception_o,
+    output reg  [31:0]                  mem_cause_o,
+    output reg                          mem_eret_o,
+    output reg  [INST_ADDR_WIDTH-1:0]   mem_pc_o,
+    output reg                          mem_pipeline_flush_o,
+    output reg  [INST_ADDR_WIDTH-1:0]   mem_pc_data_o
+    );
+
+    parameter INST_ADDR_WIDTH = 32;
+    parameter DATA_ADDR_WIDTH = 32;
+    parameter DATA_DATA_WIDTH = 32;
 
     task mem_init;
     begin
@@ -694,8 +751,41 @@ module core(
             mem_pc_o                <= exec_pc_o;
         end
     end
+endmodule
 
-    task wb_init;
+module core_reg(
+    input  clk,
+    input  rst,
+    input  core_run,
+
+    input  [4:0]                    mem_rt_o,
+    input  [4:0]                    mem_rd_o,
+    input                           mem_reg_we_o,
+    input  [2:0]                    mem_reg_we_dst_o,
+    input  [31:0]                   mem_result_o,
+    input  [63:0]                   mem_lohi_o,
+    input                           mem_exception_o,
+    input  [31:0]                   mem_cause_o,
+    input                           mem_eret_o,
+    input  [INST_ADDR_WIDTH-1:0]    mem_pc_o,
+
+    output reg [63:0]               lohi,
+    input  [4:0]                    reg_addr_a,
+    output [DATA_DATA_WIDTH-1:0]    reg_data_a,
+    input  [4:0]                    reg_addr_b,
+    output [DATA_DATA_WIDTH-1:0]    reg_data_b
+    );
+
+    parameter INST_ADDR_WIDTH = 32;
+    parameter DATA_ADDR_WIDTH = 32;
+    parameter DATA_DATA_WIDTH = 32;
+
+    reg [DATA_DATA_WIDTH-1:0]   reg_file [0:31];
+
+    assign reg_data_a   = reg_file[reg_addr_a];
+    assign reg_data_b   = reg_file[reg_addr_b];
+
+    task reg_init;
     integer i;
     begin
         lohi                <= 0;
@@ -704,11 +794,10 @@ module core(
     end
     endtask
 
-    initial wb_init();
+    initial reg_init();
 
-    // wb part
     always @(posedge clk) begin
-        if (rst) wb_init();
+        if (rst) reg_init();
         else if (core_run && mem_reg_we_o) begin
             case (mem_reg_we_dst_o)
                 3'h0:   if (mem_rd_o)   reg_file[mem_rd_o]  <= mem_result_o;
@@ -720,13 +809,293 @@ module core(
             endcase
         end
     end
+endmodule
+
+module core(
+    input  clk,
+    input  rst,
+
+    output [INST_ADDR_WIDTH-1:0]    inst_addr_o,
+    input  [31:0]                   inst_data_i,
+    input                           inst_valid_i,
+
+    output [DATA_ADDR_WIDTH-1:0]    data_addr_o,
+    input  [DATA_DATA_WIDTH-1:0]    data_data_i,
+    output [DATA_DATA_WIDTH-1:0]    data_data_o,
+    output [1:0]                    data_sel_o,
+    output                          data_we_o,
+    output                          data_rd_o,
+    input                           data_valid_i,
+
+    output                          mem_fc,
+    input                           hw_page_fault,
+
+    input                           hw_interrupt,
+    input  [31:0]                   hw_cause,
+
+    output                          exception,
+    output [31:0]                   cause,
+    output [INST_ADDR_WIDTH-1:0]    epc,
+    output                          eret,
+
+    output [4:0]                    cp0_addr_o,
+    input  [31:0]                   cp0_data_i,
+    output [31:0]                   cp0_data_o,
+    output                          cp0_we_o,
+
+    input  [INST_ADDR_WIDTH-1:0]    cp0_ehb,
+    input  [INST_ADDR_WIDTH-1:0]    cp0_epc
+    );
+
+    parameter INST_ADDR_WIDTH = 32;
+    parameter DATA_ADDR_WIDTH = 32;
+    parameter DATA_DATA_WIDTH = 32;
+
+    wire core_run   = ~(data_rd_o || data_we_o || mem_fc) || data_valid_i;
+
+    wire [INST_ADDR_WIDTH-1:0]  dec_pc_i;
+    wire                        dec_pipeline_flush_i;
+    wire                        dec_exception_o;
+    wire [31:0]                 dec_cause_o;
+    wire [INST_ADDR_WIDTH-1:0]  dec_pc_o;
+    wire [4:0]                  dec_rs_o;
+    wire [4:0]                  dec_rt_o;
+    wire [4:0]                  dec_rd_o;
+    wire [DATA_DATA_WIDTH-1:0]  dec_imm_o;
+    wire [4:0]                  dec_shamt_o;
+    wire [1:0]                  dec_pc_we_o;
+    wire [1:0]                  dec_pc_we_sel_o;
+    wire                        dec_reg_we_o;
+    wire [2:0]                  dec_reg_we_sel_o;
+    wire [2:0]                  dec_reg_we_dst_o;
+    wire [3:0]                  dec_alu_op_o;
+    wire [2:0]                  dec_alu_a_sel_o;
+    wire [2:0]                  dec_alu_b_sel_o;
+    wire                        dec_load_unsigned_o;
+    wire                        dec_overflow_o;
+    wire [1:0]                  dec_data_sel_o;
+    wire                        dec_mem_rd_o;
+    wire                        dec_mem_we_o;
+    wire                        dec_mem_sc_o;
+    wire                        dec_mem_fc_o;
+    wire [1:0]                  dec_mem_sel_o;
+    wire                        dec_cp0_we_o;
+    wire                        dec_eret_o;
+    wire                        dec_sc_valid_o;
+
+    core_dec core_dec(
+        .clk(clk),
+        .rst(rst),
+        .core_run(core_run),
+        .inst_addr_o(inst_addr_o),
+        .inst_data_i(inst_data_i),
+        .inst_valid_i(inst_valid_i),
+        .hw_interrupt(hw_interrupt),
+        .hw_cause(hw_cause),
+        .dec_pc_i(dec_pc_i),
+        .dec_pipeline_flush_i(dec_pipeline_flush_i),
+        .dec_exception_o(dec_exception_o),
+        .dec_cause_o(dec_cause_o),
+        .dec_pc_o(dec_pc_o),
+        .dec_rs_o(dec_rs_o),
+        .dec_rt_o(dec_rt_o),
+        .dec_rd_o(dec_rd_o),
+        .dec_imm_o(dec_imm_o),
+        .dec_shamt_o(dec_shamt_o),
+        .dec_pc_we_o(dec_pc_we_o),
+        .dec_pc_we_sel_o(dec_pc_we_sel_o),
+        .dec_reg_we_o(dec_reg_we_o),
+        .dec_reg_we_sel_o(dec_reg_we_sel_o),
+        .dec_reg_we_dst_o(dec_reg_we_dst_o),
+        .dec_alu_op_o(dec_alu_op_o),
+        .dec_alu_a_sel_o(dec_alu_a_sel_o),
+        .dec_alu_b_sel_o(dec_alu_b_sel_o),
+        .dec_load_unsigned_o(dec_load_unsigned_o),
+        .dec_overflow_o(dec_overflow_o),
+        .dec_data_sel_o(dec_data_sel_o),
+        .dec_mem_rd_o(dec_mem_rd_o),
+        .dec_mem_we_o(dec_mem_we_o),
+        .dec_mem_sc_o(dec_mem_sc_o),
+        .dec_mem_fc_o(dec_mem_fc_o),
+        .dec_mem_sel_o(dec_mem_sel_o),
+        .dec_cp0_we_o(dec_cp0_we_o),
+        .dec_eret_o(dec_eret_o),
+        .dec_sc_valid_o(dec_sc_valid_o)
+    );
+
+    wire [31:0]                 exec_mem_result_i;
+    wire                        exec_exception_o;
+    wire [31:0]                 exec_cause_o;
+    wire [INST_ADDR_WIDTH-1:0]  exec_pc_o;
+    wire [4:0]                  exec_rt_o;
+    wire [4:0]                  exec_rd_o;
+    wire [1:0]                  exec_pc_we_o;
+    wire [1:0]                  exec_pc_we_sel_o;
+    wire                        exec_reg_we_o;
+    wire [2:0]                  exec_reg_we_sel_o;
+    wire [2:0]                  exec_reg_we_dst_o;
+    wire                        exec_load_unsigned_o;
+    wire                        exec_mem_rd_o;
+    wire                        exec_mem_we_o;
+    wire                        exec_mem_fc_o;
+    wire [1:0]                  exec_mem_sel_o;
+    wire [31:0]                 exec_result_o;
+    wire [63:0]                 exec_lohi_o;
+    wire [DATA_DATA_WIDTH-1:0]  exec_data_o;
+    wire                        exec_cp0_we_o;
+    wire                        exec_eret_o;
+    wire                        exec_sc_valid_o;
+    wire [63:0]                 lohi;
+    wire [4:0]                  reg_addr_a;
+    wire [DATA_DATA_WIDTH-1:0]  reg_data_a;
+    wire [4:0]                  reg_addr_b;
+    wire [DATA_DATA_WIDTH-1:0]  reg_data_b;
+
+    core_exe core_exe(
+        .clk(clk),
+        .rst(rst),
+        .core_run(core_run),
+        .exec_mem_result_i(exec_mem_result_i),
+        .exec_pipeline_flush_i(exec_pipeline_flush_i),
+        .dec_exception_o(dec_exception_o),
+        .dec_cause_o(dec_cause_o),
+        .dec_pc_o(dec_pc_o),
+        .dec_rs_o(dec_rs_o),
+        .dec_rt_o(dec_rt_o),
+        .dec_rd_o(dec_rd_o),
+        .dec_imm_o(dec_imm_o),
+        .dec_shamt_o(dec_shamt_o),
+        .dec_pc_we_o(dec_pc_we_o),
+        .dec_pc_we_sel_o(dec_pc_we_sel_o),
+        .dec_reg_we_o(dec_reg_we_o),
+        .dec_reg_we_sel_o(dec_reg_we_sel_o),
+        .dec_reg_we_dst_o(dec_reg_we_dst_o),
+        .dec_alu_op_o(dec_alu_op_o),
+        .dec_alu_a_sel_o(dec_alu_a_sel_o),
+        .dec_alu_b_sel_o(dec_alu_b_sel_o),
+        .dec_load_unsigned_o(dec_load_unsigned_o),
+        .dec_overflow_o(dec_overflow_o),
+        .dec_data_sel_o(dec_data_sel_o),
+        .dec_mem_rd_o(dec_mem_rd_o),
+        .dec_mem_we_o(dec_mem_we_o),
+        .dec_mem_sc_o(dec_mem_sc_o),
+        .dec_mem_fc_o(dec_mem_fc_o),
+        .dec_mem_sel_o(dec_mem_sel_o),
+        .dec_cp0_we_o(dec_cp0_we_o),
+        .dec_eret_o(dec_eret_o),
+        .dec_sc_valid_o(dec_sc_valid_o),
+        .exec_exception_o(exec_exception_o),
+        .exec_cause_o(exec_cause_o),
+        .exec_pc_o(exec_pc_o),
+        .exec_rt_o(exec_rt_o),
+        .exec_rd_o(exec_rd_o),
+        .exec_pc_we_o(exec_pc_we_o),
+        .exec_pc_we_sel_o(exec_pc_we_sel_o),
+        .exec_reg_we_o(exec_reg_we_o),
+        .exec_reg_we_sel_o(exec_reg_we_sel_o),
+        .exec_reg_we_dst_o(exec_reg_we_dst_o),
+        .exec_load_unsigned_o(exec_load_unsigned_o),
+        .exec_mem_rd_o(exec_mem_rd_o),
+        .exec_mem_we_o(exec_mem_we_o),
+        .exec_mem_fc_o(exec_mem_fc_o),
+        .exec_mem_sel_o(exec_mem_sel_o),
+        .exec_result_o(exec_result_o),
+        .exec_lohi_o(exec_lohi_o),
+        .exec_data_o(exec_data_o),
+        .exec_cp0_we_o(exec_cp0_we_o),
+        .exec_eret_o(exec_eret_o),
+        .exec_sc_valid_o(exec_sc_valid_o),
+        .lohi(lohi),
+        .reg_addr_a(reg_addr_a),
+        .reg_data_a(reg_data_a),
+        .reg_addr_b(reg_addr_b),
+        .reg_data_b(reg_data_b)
+    );
+
+    wire [4:0]                  mem_rt_o;
+    wire [4:0]                  mem_rd_o;
+    wire                        mem_reg_we_o;
+    wire [2:0]                  mem_reg_we_dst_o;
+    wire [31:0]                 mem_result_o;
+    wire [63:0]                 mem_lohi_o;
+    wire                        mem_exception_o;
+    wire [31:0]                 mem_cause_o;
+    wire                        mem_eret_o;
+    wire [INST_ADDR_WIDTH-1:0]  mem_pc_o;
+
+    wire                        mem_pipeline_flush_o;
+    wire [INST_ADDR_WIDTH-1:0]  mem_pc_data_o;
+
+    core_mem core_mem(
+        .clk(clk),
+        .rst(rst),
+        .core_run(core_run),
+        .data_data_i(data_data_i),
+        .cp0_data_i(cp0_data_i),
+        .hw_page_fault(hw_page_fault),
+        .cp0_ehb(cp0_ehb),
+        .cp0_epc(cp0_epc),
+        .exec_exception_o(exec_exception_o),
+        .exec_cause_o(exec_cause_o),
+        .exec_pc_o(exec_pc_o),
+        .exec_rt_o(exec_rt_o),
+        .exec_rd_o(exec_rd_o),
+        .exec_pc_we_o(exec_pc_we_o),
+        .exec_pc_we_sel_o(exec_pc_we_sel_o),
+        .exec_reg_we_o(exec_reg_we_o),
+        .exec_reg_we_sel_o(exec_reg_we_sel_o),
+        .exec_reg_we_dst_o(exec_reg_we_dst_o),
+        .exec_load_unsigned_o(exec_load_unsigned_o),
+        .exec_mem_rd_o(exec_mem_rd_o),
+        .exec_mem_we_o(exec_mem_we_o),
+        .exec_mem_fc_o(exec_mem_fc_o),
+        .exec_mem_sel_o(exec_mem_sel_o),
+        .exec_result_o(exec_result_o),
+        .exec_lohi_o(exec_lohi_o),
+        .exec_data_o(exec_data_o),
+        .exec_cp0_we_o(exec_cp0_we_o),
+        .exec_eret_o(exec_eret_o),
+        .exec_sc_valid_o(exec_sc_valid_o),
+        .mem_rt_o(mem_rt_o),
+        .mem_rd_o(mem_rd_o),
+        .mem_reg_we_o(mem_reg_we_o),
+        .mem_reg_we_dst_o(mem_reg_we_dst_o),
+        .mem_result_o(mem_result_o),
+        .mem_lohi_o(mem_lohi_o),
+        .mem_exception_o(mem_exception_o),
+        .mem_cause_o(mem_cause_o),
+        .mem_eret_o(mem_eret_o),
+        .mem_pc_o(mem_pc_o),
+        .mem_pipeline_flush_o(mem_pipeline_flush_o),
+        .mem_pc_data_o(mem_pc_data_o)
+    );
+
+    core_reg core_reg(
+        .clk(clk),
+        .rst(rst),
+        .core_run(core_run),
+        .mem_rt_o(mem_rt_o),
+        .mem_rd_o(mem_rd_o),
+        .mem_reg_we_o(mem_reg_we_o),
+        .mem_reg_we_dst_o(mem_reg_we_dst_o),
+        .mem_result_o(mem_result_o),
+        .mem_lohi_o(mem_lohi_o),
+        .mem_exception_o(mem_exception_o),
+        .mem_cause_o(mem_cause_o),
+        .mem_eret_o(mem_eret_o),
+        .mem_pc_o(mem_pc_o),
+        .lohi(lohi),
+        .reg_addr_a(reg_addr_a),
+        .reg_data_a(reg_data_a),
+        .reg_addr_b(reg_addr_b),
+        .reg_data_b(reg_data_b)
+    );
 
     assign dec_pc_i                 = mem_pc_data_o;
     assign exec_mem_result_i        = mem_result_o;
     assign dec_pipeline_flush_i     = mem_pipeline_flush_o;
     assign exec_pipeline_flush_i    = mem_pipeline_flush_o;
 
-    assign inst_addr_o  = the_pc;
     assign data_addr_o  = exec_result_o[DATA_ADDR_WIDTH-1:0];
     assign data_data_o  = exec_data_o;
     assign data_sel_o   = exec_mem_sel_o;

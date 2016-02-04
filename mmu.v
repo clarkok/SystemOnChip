@@ -26,6 +26,8 @@ module mmu(
     input               ack_i
     );
 
+    parameter   PAGING_MASK     = 32'hC000_0000;
+
     localparam  DIR_LINES       = 4;
     localparam  DIR_OFF_BITS    = 3;
     localparam  DIR_HASH_BITS   = `GET_WIDTH(DIR_LINES-1);
@@ -43,6 +45,8 @@ module mmu(
     reg  [255:0]            tlb_ent         [0:ENT_LINES-1];
     reg  [ENT_TAG_BITS-1:0] tlb_ent_tags    [0:ENT_LINES-1];
     reg                     tlb_ent_valids  [0:ENT_LINES-1];
+
+    wire                        paging_en       = ((v_addr_i & PAGING_MASK) != PAGING_MASK);
 
     wire [9:0]                  v_dir           = v_addr_i[31:22];
     wire [DIR_OFF_BITS-1:0]     v_dir_off       = v_dir[DIR_OFF_BITS-1:0];
@@ -72,9 +76,11 @@ module mmu(
     reg  [1:0] state;
 
     assign  v_data_o                = data_i;
-    assign  v_ack_o                 =(v_rd_i || v_we_i) &&
-                                     (state == S_IDLE) && 
-                                     (v_ent_valid ? ack_i : (v_ent_pfault || v_dir_pfault));
+    assign  v_ack_o                 = (~v_rd_i && ~v_we_i)  ? 0 :
+                                      (~paging_en)          ? ack_i :
+                                                              (state == S_IDLE) &&
+                                                              (v_ent_valid ? ack_i : 
+                                                                (v_ent_pfault || v_dir_pfault));
     assign  v_page_ent_o            = tlb_ent_r;
     assign  v_hw_page_fault_o       =(v_dir_pfault || v_ent_pfault);
     assign  v_hw_page_fault_addr_o  = v_addr_i;
@@ -115,15 +121,15 @@ module mmu(
         state       <= S_IDLE;
 
         for (i = 0; i < 4; i = i + 1) begin
-            tlb_dir         <= 256'b0;
-            tlb_dir_tags    <= {DIR_TAG_BITS{1'b0}};
-            tlb_dir_valids  <= 1'b0;
+            tlb_dir[i]          <= 256'b0;
+            tlb_dir_tags[i]     <= {DIR_TAG_BITS{1'b0}};
+            tlb_dir_valids[i]   <= 1'b0;
         end
 
         for (i = 0; i < 16; i = i + 1) begin
-            tlb_ent         <= 256'b0;
-            tlb_ent_tags    <= {ENT_TAG_BITS{1'b0}};
-            tlb_ent_valids  <= 1'b0;
+            tlb_ent[i]          <= 256'b0;
+            tlb_ent_tags[i]     <= {ENT_TAG_BITS{1'b0}};
+            tlb_ent_valids[i]   <= 1'b0;
         end
     end
     endtask 
@@ -137,6 +143,19 @@ module mmu(
             case (state)
                 S_IDLE: begin
                     if      (~v_rd_i && ~v_we_i)        state   <= S_IDLE;
+                    else if (~paging_en) begin
+                        state   <= S_IDLE;
+                        if (ack_i) begin
+                            rd_o    <= 0;
+                            we_o    <= 0;
+                        end
+                        else begin
+                            addr_o  <= v_addr_i;
+                            data_o  <= v_data_o;
+                            rd_o    <= v_rd_i;
+                            we_o    <= v_we_i;
+                        end
+                    end
                     else if (v_ent_valid) begin
                         state   <= S_IDLE;
 
