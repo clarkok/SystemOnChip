@@ -541,8 +541,11 @@ module core_exe(
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_a;
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_b;
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_out;
-    reg  [63:0]                 exec_lohi_out;
     reg                         exec_overf_r;
+
+    wire [63:0]                 exec_lohi_out   = dec_alu_op_o[0]
+                                                    ? exec_alu_a * exec_alu_b
+                                                    : $signed(exec_alu_a) * $signed(exec_alu_b);
 
     always @* begin
         case (dec_alu_a_sel_o)
@@ -570,9 +573,6 @@ module core_exe(
     end
 
     always @* begin
-        exec_overf_r    = 0;
-        exec_alu_out    = 0;
-        exec_lohi_out   = 0;
         case (dec_alu_op_o)
             4'h0:   {exec_overf_r, exec_alu_out}    = exec_alu_a + exec_alu_b;
             4'h1:   {exec_overf_r, exec_alu_out}    = exec_alu_a - exec_alu_b;
@@ -588,8 +588,7 @@ module core_exe(
             4'hb:   exec_alu_out                    = exec_alu_a == exec_alu_b;
             4'hc:   exec_alu_out                    = exec_alu_a != exec_alu_b;
             4'hd:   exec_alu_out                    = {exec_alu_a[15:0], 16'b0};
-            4'he:   exec_lohi_out                   = $signed(exec_alu_a) * $signed(exec_alu_b);
-            4'hf:   exec_lohi_out                   = exec_alu_a * exec_alu_b;
+            default:    exec_alu_out                = 0;
         endcase
     end
 
@@ -1109,6 +1108,6 @@ module core(
 
     assign exception    = mem_exception_o;
     assign cause        = mem_cause_o;
-    assign epc          = exec_pc_o;
+    assign epc          = exec_pc_o;    // FIXME
     assign eret         = mem_eret_o;
 endmodule
