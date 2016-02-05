@@ -541,7 +541,6 @@ module core_exe(
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_a;
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_b;
     reg  [DATA_DATA_WIDTH-1:0]  exec_alu_out;
-    reg                         exec_overf_r;
 
     wire [63:0]                 exec_lohi_out   = dec_alu_op_o[0]
                                                     ? exec_alu_a * exec_alu_b
@@ -572,30 +571,10 @@ module core_exe(
         endcase
     end
 
-    always @* begin
-        case (dec_alu_op_o)
-            4'h0:   {exec_overf_r, exec_alu_out}    = exec_alu_a + exec_alu_b;
-            4'h1:   {exec_overf_r, exec_alu_out}    = exec_alu_a - exec_alu_b;
-            4'h2:   exec_alu_out                    = exec_alu_a & exec_alu_b;
-            4'h3:   exec_alu_out                    = $signed(exec_alu_a) < $signed(exec_alu_b);
-            4'h4:   exec_alu_out                    = exec_alu_a | exec_alu_b;
-            4'h5:   exec_alu_out                    = exec_alu_a ^ exec_alu_b;
-            4'h6:   exec_alu_out                    = ~(exec_alu_a | exec_alu_b);
-            4'h7:   exec_alu_out                    = exec_alu_a << exec_alu_b[4:0];
-            4'h8:   exec_alu_out                    = exec_alu_a >> exec_alu_b[4:0];
-            4'h9:   exec_alu_out                    = $signed(exec_alu_a) >>> exec_alu_b[4:0];
-            4'ha:   exec_alu_out                    = exec_alu_a < exec_alu_b;
-            4'hb:   exec_alu_out                    = exec_alu_a == exec_alu_b;
-            4'hc:   exec_alu_out                    = exec_alu_a != exec_alu_b;
-            4'hd:   exec_alu_out                    = {exec_alu_a[15:0], 16'b0};
-            default:    exec_alu_out                = 0;
-        endcase
-    end
-
-    wire exec_overflow      = (dec_alu_op_o == 4'h0) ? exec_overf_r     :
-                              (dec_alu_op_o == 4'h1) ? ~exec_overf_r    :
-                                                       1'b0;
-
+    wire [32:0] exec_add_res    = (dec_alu_op_o == 4'h0) ? (exec_alu_a + exec_alu_b)    :
+                                  (dec_alu_op_o == 4'h1) ? (exec_alu_a - exec_alu_b)    :
+                                                           33'b0;
+    wire exec_overflow      = (exec_add_res[32] ^ dec_alu_op_o[0]);
     wire exec_overflow_err  = exec_overflow & dec_overflow_o;
     wire exec_no_exception  = ~( exec_exception_o ||
                                 (exec_pc_we_o == 2'b0) ||                               // JR
@@ -623,7 +602,23 @@ module core_exe(
             exec_mem_we_o           <=(dec_mem_we_o || (dec_mem_sc_o && dec_sc_valid_o)) && exec_no_exception;
             exec_mem_fc_o           <= dec_mem_fc_o && exec_no_exception;
             exec_mem_sel_o          <= dec_mem_sel_o;
-            exec_result_o           <= exec_alu_out;
+            case (dec_alu_op_o)
+                4'h0:       exec_result_o   <= exec_alu_a + exec_alu_b;
+                4'h1:       exec_result_o   <= exec_alu_a - exec_alu_b;
+                4'h2:       exec_result_o   <= exec_alu_a & exec_alu_b;
+                4'h3:       exec_result_o   <= $signed(exec_alu_a) < $signed(exec_alu_b);
+                4'h4:       exec_result_o   <= exec_alu_a | exec_alu_b;
+                4'h5:       exec_result_o   <= exec_alu_a ^ exec_alu_b;
+                4'h6:       exec_result_o   <= ~(exec_alu_a | exec_alu_b);
+                4'h7:       exec_result_o   <= exec_alu_a << exec_alu_b[4:0];
+                4'h8:       exec_result_o   <= exec_alu_a >> exec_alu_b[4:0];
+                4'h9:       exec_result_o   <= $signed(exec_alu_a) >>> exec_alu_b[4:0];
+                4'ha:       exec_result_o   <= exec_alu_a < exec_alu_b;
+                4'hb:       exec_result_o   <= exec_alu_a == exec_alu_b;
+                4'hc:       exec_result_o   <= exec_alu_a != exec_alu_b;
+                4'hd:       exec_result_o   <= {exec_alu_a[15:0], 16'b0};
+                default:    exec_result_o   <= 0;
+            endcase
             exec_lohi_o             <= exec_lohi_out;
             case (dec_data_sel_o)
                 2'h0:   exec_data_o <= exec_rt;

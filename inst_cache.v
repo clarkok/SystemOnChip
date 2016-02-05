@@ -19,7 +19,7 @@ module inst_cache(
     );
 
     localparam LINE_BITS    = 256;
-    localparam LINE_COUNT   = 128;
+    localparam LINE_COUNT   = 64;
 
     localparam LINE_BYTES   = LINE_BITS / 8;
     localparam OFF_BITS     = `GET_WIDTH(LINE_BYTES-1);
