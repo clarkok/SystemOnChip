@@ -26,7 +26,6 @@ module inst_cache(
     localparam HASH_BITS    = `GET_WIDTH(LINE_COUNT-1);
     localparam TAG_BITS     = 32 - OFF_BITS - HASH_BITS;
 
-    reg [LINE_BITS-1:0] caches  [0:LINE_COUNT-1];
     reg [TAG_BITS-1:0]  tags    [0:LINE_COUNT-1];
     reg                 valids  [0:LINE_COUNT-1];
 
@@ -34,7 +33,18 @@ module inst_cache(
     wire [HASH_BITS-1:0]    addr_hash   = inst_addr_i[HASH_BITS+OFF_BITS-1:OFF_BITS];
     wire [TAG_BITS-1:0]     addr_tag    = inst_addr_i[31:HASH_BITS+OFF_BITS];
 
-    wire [LINE_BITS-1:0]    cached_line = caches[addr_hash];
+    wire [LINE_BITS-1:0]    cached_line;
+
+    wire [HASH_BITS-1:0]    rd_hash = addr_o[HASH_BITS+OFF_BITS-1:OFF_BITS];
+    wire [TAG_BITS-1:0]     rd_tag  = addr_o[31:HASH_BITS+OFF_BITS];
+
+    inst_cache_bram inst_cache_bram(
+        .clka(clk),
+        .addra(ack_i ? rd_hash : addr_hash),
+        .dina(data_i),
+        .douta(cached_line),
+        .wea(ack_i)
+    );
 
     reg  [31:0] inst_data_r;
 
@@ -61,7 +71,6 @@ module inst_cache(
         addr_o  <= 0;
         rd_o    <= 0;
         for (i = 0; i < LINE_COUNT; i = i + 1) begin
-            caches[i]   <= {LINE_BITS{1'b0}};
             tags[i]     <= {TAG_BITS{1'b0}};
             valids[i]   <= 1'b0;
         end
@@ -70,16 +79,12 @@ module inst_cache(
 
     initial init();
 
-    wire [HASH_BITS-1:0]    rd_hash = addr_o[HASH_BITS+OFF_BITS-1:OFF_BITS];
-    wire [TAG_BITS-1:0]     rd_tag  = addr_o[31:HASH_BITS+OFF_BITS];
-
     integer i;
     always @(posedge clk) begin
         if (rst) init();
         else begin
             if (rd_o) begin
                 if (ack_i) begin
-                    caches[rd_hash]     <= data_i;
                     tags[rd_hash]       <= rd_tag;
                     valids[rd_hash]     <= ~hw_page_fault_i;
                     addr_o              <= 0;
