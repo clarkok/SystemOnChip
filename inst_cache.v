@@ -38,12 +38,12 @@ module inst_cache(
     wire [HASH_BITS-1:0]    rd_hash = addr_o[HASH_BITS+OFF_BITS-1:OFF_BITS];
     wire [TAG_BITS-1:0]     rd_tag  = addr_o[31:HASH_BITS+OFF_BITS];
 
-    inst_cache_bram inst_cache_bram(
-        .clka(clk),
-        .addra(ack_i ? rd_hash : addr_hash),
-        .dina(data_i),
-        .douta(cached_line),
-        .wea(ack_i)
+    inst_cache_dram inst_cache_dram(
+        .clk(clk),
+        .a(ack_i ? rd_hash : addr_hash),
+        .d(data_i),
+        .spo(cached_line),
+        .we(ack_i)
     );
 
     reg  [31:0] inst_data_r;

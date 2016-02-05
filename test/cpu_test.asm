@@ -5,4 +5,7 @@ init:
     nop
     mflo    $1
     mflo    $2
+    nop
+    nop
+    nop
     j       init

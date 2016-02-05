@@ -1,2 +1,2 @@
 	SECTION	OFFSET	ABSOLUTE
-init	.text	0	0
+init	.text	0	4294963200
