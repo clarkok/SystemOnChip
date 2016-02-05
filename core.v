@@ -538,38 +538,26 @@ module core_exe(
     wire [DATA_DATA_WIDTH-1:0]  exec_rs = reg_data_a;
     wire [DATA_DATA_WIDTH-1:0]  exec_rt = reg_data_b;
 
-    reg  [DATA_DATA_WIDTH-1:0]  exec_alu_a;
-    reg  [DATA_DATA_WIDTH-1:0]  exec_alu_b;
-    reg  [DATA_DATA_WIDTH-1:0]  exec_alu_out;
+    wire [DATA_DATA_WIDTH-1:0]  exec_alu_a      = (dec_alu_a_sel_o == 3'h0) ? exec_rs           :
+                                                  (dec_alu_a_sel_o == 3'h1) ? exec_rt           :
+                                                  (dec_alu_a_sel_o == 3'h2) ? exec_result_o     :
+                                                  (dec_alu_a_sel_o == 3'h3) ? exec_mem_result_i :
+                                                  (dec_alu_a_sel_o == 3'h4) ? lohi[63:32]       :
+                                                  (dec_alu_a_sel_o == 3'h5) ? lohi[31: 0]       :
+                                                  (dec_alu_a_sel_o == 3'h6) ? 32'b0             :
+                                                                              dec_imm_o;
+    wire [DATA_DATA_WIDTH-1:0]  exec_alu_b      = (dec_alu_b_sel_o == 3'h0) ? exec_rt           :
+                                                  (dec_alu_b_sel_o == 3'h1) ? dec_imm_o         :
+                                                  (dec_alu_b_sel_o == 3'h2) ? dec_shamt_o       :
+                                                  (dec_alu_b_sel_o == 3'h3) ? exec_result_o     :
+                                                  (dec_alu_b_sel_o == 3'h4) ? exec_mem_result_i :
+                                                  (dec_alu_b_sel_o == 3'h5) ? 32'b0             :
+                                                  (dec_alu_b_sel_o == 3'h6) ? exec_rs           :
+                                                                              32'b0;
 
     wire [63:0]                 exec_lohi_out   = dec_alu_op_o[0]
                                                     ? exec_alu_a * exec_alu_b
                                                     : $signed(exec_alu_a) * $signed(exec_alu_b);
-
-    always @* begin
-        case (dec_alu_a_sel_o)
-            3'h0:   exec_alu_a  = exec_rs;
-            3'h1:   exec_alu_a  = exec_rt;
-            3'h2:   exec_alu_a  = exec_result_o;
-            3'h3:   exec_alu_a  = exec_mem_result_i;
-            3'h4:   exec_alu_a  = lohi[63:32];
-            3'h5:   exec_alu_a  = lohi[31: 0];
-            3'h6:   exec_alu_a  = 0;
-            3'h7:   exec_alu_a  = dec_imm_o;
-        endcase
-    end
-
-    always @* begin
-        case (dec_alu_b_sel_o)
-            3'h0:   exec_alu_b  = exec_rt;
-            3'h1:   exec_alu_b  = dec_imm_o;
-            3'h2:   exec_alu_b  = dec_shamt_o;
-            3'h3:   exec_alu_b  = exec_result_o;
-            3'h4:   exec_alu_b  = exec_mem_result_i;
-            3'h5:   exec_alu_b  = 0;
-            3'h6:   exec_alu_b  = exec_rs;
-        endcase
-    end
 
     wire [32:0] exec_add_res    = (dec_alu_op_o == 4'h0) ? (exec_alu_a + exec_alu_b)    :
                                   (dec_alu_op_o == 4'h1) ? (exec_alu_a - exec_alu_b)    :
