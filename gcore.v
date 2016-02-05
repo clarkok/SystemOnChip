@@ -489,9 +489,9 @@ module GCoreMEM(
             mem_result      <= next_mem_result;
 
             case (pc_we_sel)
-                0: pc_o     <= (pc + 4 + (exec_result ? pc_offset : 0));
-                1: pc_o     <= exec_result[INST_ADDR_WIDTH-1:0];
-                4: pc_o     <= next_mem_result[INST_ADDR_WIDTH-1:0];
+                3'd0: pc_o  <= (pc + 4 + (exec_result ? pc_offset : 0));
+                3'd1: pc_o  <= exec_result[INST_ADDR_WIDTH-1:0];
+                3'd4: pc_o  <= next_mem_result[INST_ADDR_WIDTH-1:0];
                 // TODO
             endcase
         end
