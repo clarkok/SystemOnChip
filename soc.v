@@ -55,67 +55,6 @@ module soc(
     wire clk_ddr_ref;
     wire rst = ~rstn;
 
-    reg [31:0] disp_value;
-
-    initial begin
-        disp_value  <= 0;
-    end
-
-    wire data_send;
-    wire data_sent;
-    wire [7:0] data_in;
-    wire [7:0] data_out;
-    wire data_received;
-
-    assign data_send = data_received;
-    assign data_in = data_out;
-
-    always @(posedge clk) begin
-        if (data_received) begin
-            disp_value <= {disp_value[23:0], data_out};
-        end
-    end
-
-    uart uart(
-        .clk(clk_sys),
-        .rst(rst),
-
-        .uart_rxd(uart_rxd),
-        .uart_txd(uart_txd),
-
-        .data_in(data_in),
-        .data_send(data_send),
-        .data_sent(data_sent),
-        .data_out(data_out),
-        .data_received(data_received)
-    );
-
-    dsp dsp(
-        .clk_in1(clk),
-        .clk_out1(clk_sys),
-        .clk_out2(clk_vga),
-        .clk_out3(clk_ddr),
-        .clk_out4(clk_ddr_ref)
-    );
-
-    gpu gpu(
-        .clk(clk_sys),
-        .clk_vga(clk_vga),
-        .rst(rst),
-
-        .sram_addr(sram_addr),
-        .sram_dq(sram_dq),
-        .sram_ce(sram_ce),
-        .sram_oen(sram_oen),
-        .sram_wen(sram_wen),
-
-        .vga_b(vga_b),
-        .vga_g(vga_g),
-        .vga_r(vga_r),
-        .vga_hs(vga_hs),
-        .vga_vs(vga_vs)
-    );
-
     wire [ 31:0]    mem_addr_o;
     wire [255:0]    mem_data_i;
     wire [255:0]    mem_data_o;
@@ -180,6 +119,99 @@ module soc(
         .ddr3_cs_n(ddr3_cs_n),
         .ddr3_dm(ddr3_dm),
         .ddr3_odt(ddr3_odt)
+    );
+
+    wire [31:0] gpu_addr_o;
+    wire [31:0] gpu_data_i;
+    wire [31:0] gpu_data_o;
+    wire [ 1:0] gpu_sel_o;
+    wire        gpu_rd_o;
+    wire        gpu_we_o;
+    wire        gpu_ack_i;
+
+    bus bus(
+        .clk(clk_sys),
+        .rst(rst),
+
+        .m_addr_i(bus_addr_i),
+        .m_data_o(bus_data_o),
+        .m_data_i(bus_data_i),
+        .m_sel_i(bus_sel_i),
+        .m_rd_i(bus_rd_i),
+        .m_we_i(bus_we_i),
+        .m_ack_o(bus_ack_o),
+
+        .gpu_addr_o(gpu_addr_o),
+        .gpu_data_i(gpu_data_i),
+        .gpu_data_o(gpu_data_o),
+        .gpu_sel_o(gpu_sel_o),
+        .gpu_rd_o(gpu_rd_o),
+        .gpu_we_o(gpu_we_o),
+        .gpu_ack_i(gpu_ack_i),
+
+        .uart_addr_o(uart_addr_o),
+        .uart_data_i(uart_data_i),
+        .uart_data_o(uart_data_o),
+        .uart_sel_o(uart_sel_o),
+        .uart_rd_o(uart_rd_o),
+        .uart_we_o(uart_we_o),
+        .uart_ack_i(uart_ack_i),
+
+        .ps2_addr_o(ps2_addr_o),
+        .ps2_data_i(ps2_data_i),
+        .ps2_data_o(ps2_data_o),
+        .ps2_sel_o(ps2_sel_o),
+        .ps2_rd_o(ps2_rd_o),
+        .ps2_we_o(ps2_we_o),
+        .ps2_ack_i(ps2_ack_i)
+    );
+
+    gpu gpu(
+        .clk(clk_sys),
+        .clk_vga(clk_vga),
+        .rst(rst),
+
+        .sram_addr(sram_addr),
+        .sram_dq(sram_dq),
+        .sram_ce(sram_ce),
+        .sram_oen(sram_oen),
+        .sram_wen(sram_wen),
+
+        .vga_b(vga_b),
+        .vga_g(vga_g),
+        .vga_r(vga_r),
+        .vga_hs(vga_hs),
+        .vga_vs(vga_vs),
+
+        .bus_addr_i(gpu_addr_o),
+        .bus_data_o(gpu_data_i),
+        .bus_data_i(gpu_data_o),
+        .bus_sel_i(gpu_sel_o),
+        .bus_rd_i(gpu_rd_o),
+        .bus_we_i(gpu_we_o),
+        .bus_ack_o(gpu_ack_i)
+    );
+
+    uart uart(
+        .clk(clk_sys),
+        .rst(rst),
+
+        .uart_rxd(uart_rxd),
+        .uart_txd(uart_txd),
+
+        .data_in(data_in),
+        .data_send(data_send),
+        .data_sent(data_sent),
+        .data_out(data_out),
+        .data_received(data_received)
+    );
+
+    dsp dsp(
+        .clk_in1(clk),
+        .clk_out1(clk_sys),
+        .clk_out2(clk_vga),
+        .clk_out3(clk_ddr),
+        .clk_out4(clk_ddr_ref)
     );
 
     assign tri_led0 = 3'b111;

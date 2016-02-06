@@ -15,8 +15,13 @@ module gpu(
     output        vga_hs,
     output        vga_vs,
 
-    // debug
-    output [31:0] disp_value
+    input  [31:0] bus_addr_i,
+    output [31:0] bus_data_o,
+    input  [31:0] bus_data_i,
+    input  [ 1:0] bus_sel_i,
+    input         bus_rd_i,
+    input         bus_we_i,
+    output        bus_ack_o
     );
 
     reg [31:0] gcore_master_rom [0:63];
@@ -168,7 +173,15 @@ module gpu(
         .gpu_slave_data_i(gcore_slave_data_out),
         .gpu_slave_sel((~gcore_slave_data_addr[20]) && gcore_slave_data_sel),
         .gpu_slave_we((~gcore_slave_data_addr[20]) && gcore_slave_data_we),
-        .gpu_slave_valid(gcore_slave_data_ready_from_sram)
+        .gpu_slave_valid(gcore_slave_data_ready_from_sram),
+
+        .bus_addr_i(bus_addr_i),
+        .bus_data_o(bus_data_o),
+        .bus_data_i(bus_data_i),
+        .bus_sel_i(bus_sel_i),
+        .bus_rd_i(bus_rd_i),
+        .bus_we_i(bus_we_i),
+        .bus_ack_o(bus_ack_o)
     );
 
     assign disp_value = vga_data[31:0];
