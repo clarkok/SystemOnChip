@@ -81,7 +81,7 @@ module mmu(
                                                               (state == S_IDLE) &&
                                                               (v_ent_valid ? ack_i : 
                                                                 (v_ent_pfault || v_dir_pfault));
-    assign  v_page_ent_o            = tlb_ent_r;
+    assign  v_page_ent_o            = tlb_ent_r | {30'b0, ~paging_en, 1'b0};
     assign  v_hw_page_fault_o       = paging_en && (v_dir_pfault || v_ent_pfault);
     assign  v_hw_page_fault_addr_o  = v_addr_i;
 
