@@ -45,7 +45,7 @@ module data_cache(
 
     wire        data_uncached   = (data_addr_i & UNCACHED_MASK) == UNCACHED_MASK;
 
-    reg [LINE_BITS-1:0] caches  [0:LINE_COUNT-1];
+    // reg [LINE_BITS-1:0] caches  [0:LINE_COUNT-1];
     reg [31:0]          ents    [0:LINE_COUNT-1];
     reg [TAG_BITS-1:0]  tags    [0:LINE_COUNT-1];
     reg                 valids  [0:LINE_COUNT-1];
@@ -57,12 +57,24 @@ module data_cache(
 
     wire                    cache_valid =  data_uncached || 
                                           (valids[addr_hash] && (tags[addr_hash] == addr_tag));
-    wire [LINE_BITS-1:0]    cached_line = caches[addr_hash];
+    wire [LINE_BITS-1:0]    cached_line;
     reg  [HASH_BITS:0]      next_dirty;
     reg  [31:0]             data_data_r;
 
     wire [HASH_BITS-1:0]    out_hash    = addr_o[HASH_BITS+OFF_BITS-1:OFF_BITS];
     wire [TAG_BITS-1:0]     out_tag     = addr_o[31:HASH_BITS+OFF_BITS];
+
+    wire [HASH_BITS-1:0]    cache_addr;
+    reg  [LINE_BITS-1:0]    cache_data_i;
+    wire                    cache_we;
+
+    data_cache_dram data_cache_dram(
+        .clk(clk),
+        .a(cache_addr),
+        .d(cache_data_i),
+        .spo(cached_line),
+        .we(cache_we)
+    );
 
     localparam  S_IDLE  = 0,
                 S_READ  = 1,
@@ -70,6 +82,10 @@ module data_cache(
                 S_FENCE = 3;
 
     reg [1:0] state;
+
+    assign cache_addr       = (state == S_IDLE) ?   addr_hash :
+                              (state == S_FENCE) ?  next_dirty[5:0] : 
+                                                    out_hash;
 
     assign data_valid_o     = data_uncached
                                 ? uncached_valid_i
@@ -83,6 +99,84 @@ module data_cache(
     assign uncached_we_o    = data_uncached & data_we_i;
     assign uncached_rd_o    = data_uncached & data_rd_i;
 
+    always @* begin
+        if (state == S_READ && ack_i)   cache_data_i    = data_i;
+        else begin
+            case (data_sel_i)
+                2'h0: begin
+                    case (addr_off[OFF_BITS-1:0])
+                        5'h00:  cache_data_i    = {cached_line[8'hFF:8'h08], data_data_i[7:0]};
+                        5'h01:  cache_data_i    = {cached_line[8'hFF:8'h10], data_data_i[7:0], cached_line[8'h07:8'h00]};
+                        5'h02:  cache_data_i    = {cached_line[8'hFF:8'h18], data_data_i[7:0], cached_line[8'h0f:8'h00]};
+                        5'h03:  cache_data_i    = {cached_line[8'hFF:8'h20], data_data_i[7:0], cached_line[8'h17:8'h00]};
+                        5'h04:  cache_data_i    = {cached_line[8'hFF:8'h28], data_data_i[7:0], cached_line[8'h1f:8'h00]};
+                        5'h05:  cache_data_i    = {cached_line[8'hFF:8'h30], data_data_i[7:0], cached_line[8'h27:8'h00]};
+                        5'h06:  cache_data_i    = {cached_line[8'hFF:8'h38], data_data_i[7:0], cached_line[8'h2f:8'h00]};
+                        5'h07:  cache_data_i    = {cached_line[8'hFF:8'h40], data_data_i[7:0], cached_line[8'h37:8'h00]};
+                        5'h08:  cache_data_i    = {cached_line[8'hFF:8'h48], data_data_i[7:0], cached_line[8'h3f:8'h00]};
+                        5'h09:  cache_data_i    = {cached_line[8'hFF:8'h50], data_data_i[7:0], cached_line[8'h47:8'h00]};
+                        5'h0a:  cache_data_i    = {cached_line[8'hFF:8'h58], data_data_i[7:0], cached_line[8'h4f:8'h00]};
+                        5'h0b:  cache_data_i    = {cached_line[8'hFF:8'h60], data_data_i[7:0], cached_line[8'h57:8'h00]};
+                        5'h0c:  cache_data_i    = {cached_line[8'hFF:8'h68], data_data_i[7:0], cached_line[8'h5f:8'h00]};
+                        5'h0d:  cache_data_i    = {cached_line[8'hFF:8'h70], data_data_i[7:0], cached_line[8'h67:8'h00]};
+                        5'h0e:  cache_data_i    = {cached_line[8'hFF:8'h78], data_data_i[7:0], cached_line[8'h6f:8'h00]};
+                        5'h0f:  cache_data_i    = {cached_line[8'hFF:8'h80], data_data_i[7:0], cached_line[8'h77:8'h00]};
+                        5'h10:  cache_data_i    = {cached_line[8'hFF:8'h88], data_data_i[7:0], cached_line[8'h7f:8'h00]};
+                        5'h11:  cache_data_i    = {cached_line[8'hFF:8'h90], data_data_i[7:0], cached_line[8'h87:8'h00]};
+                        5'h12:  cache_data_i    = {cached_line[8'hFF:8'h98], data_data_i[7:0], cached_line[8'h8f:8'h00]};
+                        5'h13:  cache_data_i    = {cached_line[8'hFF:8'ha0], data_data_i[7:0], cached_line[8'h97:8'h00]};
+                        5'h14:  cache_data_i    = {cached_line[8'hFF:8'ha8], data_data_i[7:0], cached_line[8'h9f:8'h00]};
+                        5'h15:  cache_data_i    = {cached_line[8'hFF:8'hb0], data_data_i[7:0], cached_line[8'ha7:8'h00]};
+                        5'h16:  cache_data_i    = {cached_line[8'hFF:8'hb8], data_data_i[7:0], cached_line[8'haf:8'h00]};
+                        5'h17:  cache_data_i    = {cached_line[8'hFF:8'hc0], data_data_i[7:0], cached_line[8'hb7:8'h00]};
+                        5'h18:  cache_data_i    = {cached_line[8'hFF:8'hc8], data_data_i[7:0], cached_line[8'hbf:8'h00]};
+                        5'h19:  cache_data_i    = {cached_line[8'hFF:8'hd0], data_data_i[7:0], cached_line[8'hc7:8'h00]};
+                        5'h1a:  cache_data_i    = {cached_line[8'hFF:8'hd8], data_data_i[7:0], cached_line[8'hcf:8'h00]};
+                        5'h1b:  cache_data_i    = {cached_line[8'hFF:8'he0], data_data_i[7:0], cached_line[8'hd7:8'h00]};
+                        5'h1c:  cache_data_i    = {cached_line[8'hFF:8'he8], data_data_i[7:0], cached_line[8'hdf:8'h00]};
+                        5'h1d:  cache_data_i    = {cached_line[8'hFF:8'hf0], data_data_i[7:0], cached_line[8'he7:8'h00]};
+                        5'h1e:  cache_data_i    = {cached_line[8'hFF:8'hf8], data_data_i[7:0], cached_line[8'hef:8'h00]};
+                        5'h1f:  cache_data_i    = {                          data_data_i[7:0], cached_line[8'hf7:8'h00]};
+                    endcase
+                end
+                2'h1: begin
+                    case (addr_off[OFF_BITS-1:1])
+                        4'h0:   cache_data_i    = {cached_line[8'hFF:8'h10], data_data_i[15:0]};
+                        4'h1:   cache_data_i    = {cached_line[8'hFF:8'h20], data_data_i[15:0], cached_line[8'h0F:8'h00]};
+                        4'h2:   cache_data_i    = {cached_line[8'hFF:8'h30], data_data_i[15:0], cached_line[8'h1F:8'h00]};
+                        4'h3:   cache_data_i    = {cached_line[8'hFF:8'h40], data_data_i[15:0], cached_line[8'h2F:8'h00]};
+                        4'h4:   cache_data_i    = {cached_line[8'hFF:8'h50], data_data_i[15:0], cached_line[8'h3F:8'h00]};
+                        4'h5:   cache_data_i    = {cached_line[8'hFF:8'h60], data_data_i[15:0], cached_line[8'h4F:8'h00]};
+                        4'h6:   cache_data_i    = {cached_line[8'hFF:8'h70], data_data_i[15:0], cached_line[8'h5F:8'h00]};
+                        4'h7:   cache_data_i    = {cached_line[8'hFF:8'h80], data_data_i[15:0], cached_line[8'h6F:8'h00]};
+                        4'h8:   cache_data_i    = {cached_line[8'hFF:8'h90], data_data_i[15:0], cached_line[8'h7F:8'h00]};
+                        4'h9:   cache_data_i    = {cached_line[8'hFF:8'ha0], data_data_i[15:0], cached_line[8'h8F:8'h00]};
+                        4'ha:   cache_data_i    = {cached_line[8'hFF:8'hb0], data_data_i[15:0], cached_line[8'h9F:8'h00]};
+                        4'hb:   cache_data_i    = {cached_line[8'hFF:8'hc0], data_data_i[15:0], cached_line[8'haF:8'h00]};
+                        4'hc:   cache_data_i    = {cached_line[8'hFF:8'hd0], data_data_i[15:0], cached_line[8'hbF:8'h00]};
+                        4'hd:   cache_data_i    = {cached_line[8'hFF:8'he0], data_data_i[15:0], cached_line[8'hcF:8'h00]};
+                        4'he:   cache_data_i    = {cached_line[8'hFF:8'hf0], data_data_i[15:0], cached_line[8'hdF:8'h00]};
+                        4'hf:   cache_data_i    = {                          data_data_i[15:0], cached_line[8'heF:8'h00]};
+                    endcase
+                end
+                2'h2: begin
+                    case (addr_off[OFF_BITS-1:2])
+                        3'h0:   cache_data_i    = {cached_line[8'hFF:8'h20], data_data_i};
+                        3'h1:   cache_data_i    = {cached_line[8'hFF:8'h40], data_data_i, cached_line[8'h1F:8'h00]};
+                        3'h2:   cache_data_i    = {cached_line[8'hFF:8'h60], data_data_i, cached_line[8'h3F:8'h00]};
+                        3'h3:   cache_data_i    = {cached_line[8'hFF:8'h80], data_data_i, cached_line[8'h5F:8'h00]};
+                        3'h4:   cache_data_i    = {cached_line[8'hFF:8'ha0], data_data_i, cached_line[8'h7F:8'h00]};
+                        3'h5:   cache_data_i    = {cached_line[8'hFF:8'hc0], data_data_i, cached_line[8'h9F:8'h00]};
+                        3'h6:   cache_data_i    = {cached_line[8'hFF:8'he0], data_data_i, cached_line[8'hbF:8'h00]};
+                        3'h7:   cache_data_i    = {                          data_data_i, cached_line[8'hdF:8'h00]};
+                    endcase
+                end
+            endcase
+        end
+    end
+    assign cache_we     = (state == S_READ && ack_i) || 
+                          (data_we_i && cache_valid && ~data_uncached && ents[addr_hash[1]]);
+
     task init;
     integer i;
     begin
@@ -93,7 +187,6 @@ module data_cache(
         state           <= S_IDLE;
         hw_page_fault_o <= 0;
         for (i = 0; i < LINE_COUNT; i = i + 1) begin
-            caches[i]   <= {LINE_BITS{1'b0}};
             ents[i]     <= 32'b0;
             tags[i]     <= {TAG_BITS{1'b0}};
             valids[i]   <= 1'b0;
@@ -123,7 +216,7 @@ module data_cache(
                     else if (dirties[addr_hash]) begin
                         state   <= S_WRITE;
                         addr_o  <={tags[addr_hash], addr_hash, {OFF_BITS{1'b0}}};
-                        data_o  <= caches[addr_hash];
+                        data_o  <= cached_line;
                         we_o    <= 1'b1;
                     end
                     else begin
@@ -137,7 +230,6 @@ module data_cache(
                         state           <= S_IDLE;
                         rd_o            <= 1'b0;
 
-                        caches[out_hash]    <= data_i;
                         ents[out_hash]      <= page_ent_i;
                         tags[out_hash]      <= out_tag;
                         valids[out_hash]    <= 1'b1;
@@ -175,90 +267,14 @@ module data_cache(
                         else begin
                             we_o            <= 1'b1;
                             addr_o          <={tags[next_dirty[5:0]], next_dirty[5:0], {OFF_BITS{1'b0}}};
-                            data_o          <= caches[next_dirty[5:0]];
+                            data_o          <= cached_line;
                         end
                     end
                 end
             endcase
             if (data_we_i && (cache_valid && ~data_uncached)) begin
-                if (ents[addr_hash][1]) begin
-                    case (data_sel_i)
-                        2'h0: begin
-                            case (addr_off[OFF_BITS-1:0])
-                                5'h00:  caches[addr_hash][8'h07:8'h00]  <= data_data_i[7:0];
-                                5'h01:  caches[addr_hash][8'h0f:8'h08]  <= data_data_i[7:0];
-                                5'h02:  caches[addr_hash][8'h17:8'h10]  <= data_data_i[7:0];
-                                5'h03:  caches[addr_hash][8'h1f:8'h18]  <= data_data_i[7:0];
-                                5'h04:  caches[addr_hash][8'h27:8'h20]  <= data_data_i[7:0];
-                                5'h05:  caches[addr_hash][8'h2f:8'h28]  <= data_data_i[7:0];
-                                5'h06:  caches[addr_hash][8'h37:8'h30]  <= data_data_i[7:0];
-                                5'h07:  caches[addr_hash][8'h3f:8'h38]  <= data_data_i[7:0];
-                                5'h08:  caches[addr_hash][8'h47:8'h40]  <= data_data_i[7:0];
-                                5'h09:  caches[addr_hash][8'h4f:8'h48]  <= data_data_i[7:0];
-                                5'h0a:  caches[addr_hash][8'h57:8'h50]  <= data_data_i[7:0];
-                                5'h0b:  caches[addr_hash][8'h5f:8'h58]  <= data_data_i[7:0];
-                                5'h0c:  caches[addr_hash][8'h67:8'h60]  <= data_data_i[7:0];
-                                5'h0d:  caches[addr_hash][8'h6f:8'h68]  <= data_data_i[7:0];
-                                5'h0e:  caches[addr_hash][8'h77:8'h70]  <= data_data_i[7:0];
-                                5'h0f:  caches[addr_hash][8'h7f:8'h78]  <= data_data_i[7:0];
-                                5'h10:  caches[addr_hash][8'h87:8'h80]  <= data_data_i[7:0];
-                                5'h11:  caches[addr_hash][8'h8f:8'h88]  <= data_data_i[7:0];
-                                5'h12:  caches[addr_hash][8'h97:8'h90]  <= data_data_i[7:0];
-                                5'h13:  caches[addr_hash][8'h9f:8'h98]  <= data_data_i[7:0];
-                                5'h14:  caches[addr_hash][8'ha7:8'ha0]  <= data_data_i[7:0];
-                                5'h15:  caches[addr_hash][8'haf:8'ha8]  <= data_data_i[7:0];
-                                5'h16:  caches[addr_hash][8'hb7:8'hb0]  <= data_data_i[7:0];
-                                5'h17:  caches[addr_hash][8'hbf:8'hb8]  <= data_data_i[7:0];
-                                5'h18:  caches[addr_hash][8'hc7:8'hc0]  <= data_data_i[7:0];
-                                5'h19:  caches[addr_hash][8'hcf:8'hc8]  <= data_data_i[7:0];
-                                5'h1a:  caches[addr_hash][8'hd7:8'hd0]  <= data_data_i[7:0];
-                                5'h1b:  caches[addr_hash][8'hdf:8'hd8]  <= data_data_i[7:0];
-                                5'h1c:  caches[addr_hash][8'he7:8'he0]  <= data_data_i[7:0];
-                                5'h1d:  caches[addr_hash][8'hef:8'he8]  <= data_data_i[7:0];
-                                5'h1e:  caches[addr_hash][8'hf7:8'hf0]  <= data_data_i[7:0];
-                                5'h1f:  caches[addr_hash][8'hff:8'hf8]  <= data_data_i[7:0];
-                            endcase
-                        end
-                        2'h1: begin
-                            case (addr_off[OFF_BITS-1:1])
-                                4'h0:   caches[addr_hash][8'h0f:8'h00]  <= data_data_i[15:0];
-                                4'h1:   caches[addr_hash][8'h1f:8'h10]  <= data_data_i[15:0];
-                                4'h2:   caches[addr_hash][8'h2f:8'h20]  <= data_data_i[15:0];
-                                4'h3:   caches[addr_hash][8'h3f:8'h30]  <= data_data_i[15:0];
-                                4'h4:   caches[addr_hash][8'h4f:8'h40]  <= data_data_i[15:0];
-                                4'h5:   caches[addr_hash][8'h5f:8'h50]  <= data_data_i[15:0];
-                                4'h6:   caches[addr_hash][8'h6f:8'h60]  <= data_data_i[15:0];
-                                4'h7:   caches[addr_hash][8'h7f:8'h70]  <= data_data_i[15:0];
-                                4'h8:   caches[addr_hash][8'h8f:8'h80]  <= data_data_i[15:0];
-                                4'h9:   caches[addr_hash][8'h9f:8'h90]  <= data_data_i[15:0];
-                                4'ha:   caches[addr_hash][8'haf:8'ha0]  <= data_data_i[15:0];
-                                4'hb:   caches[addr_hash][8'hbf:8'hb0]  <= data_data_i[15:0];
-                                4'hc:   caches[addr_hash][8'hcf:8'hc0]  <= data_data_i[15:0];
-                                4'hd:   caches[addr_hash][8'hdf:8'hd0]  <= data_data_i[15:0];
-                                4'he:   caches[addr_hash][8'hef:8'he0]  <= data_data_i[15:0];
-                                4'hf:   caches[addr_hash][8'hff:8'hf0]  <= data_data_i[15:0];
-                            endcase
-                        end
-                        2'h2: begin
-                            case (addr_off[OFF_BITS-1:2])
-                                3'h0:   caches[addr_hash][8'h1f:8'h00]  <= data_data_i[31:0];
-                                3'h1:   caches[addr_hash][8'h3f:8'h20]  <= data_data_i[31:0];
-                                3'h2:   caches[addr_hash][8'h5f:8'h40]  <= data_data_i[31:0];
-                                3'h3:   caches[addr_hash][8'h7f:8'h60]  <= data_data_i[31:0];
-                                3'h4:   caches[addr_hash][8'h9f:8'h80]  <= data_data_i[31:0];
-                                3'h5:   caches[addr_hash][8'hbf:8'ha0]  <= data_data_i[31:0];
-                                3'h6:   caches[addr_hash][8'hdf:8'hc0]  <= data_data_i[31:0];
-                                3'h7:   caches[addr_hash][8'hff:8'he0]  <= data_data_i[31:0];
-                            endcase
-                        end
-
-                        default: begin  end
-                    endcase
-                    dirties[addr_hash]  <= 1'b1;
-                end
-                else begin
-                    hw_page_fault_o     <= 1'b1;
-                end
+                dirties[addr_hash]  <= ents[addr_hash][1];
+                hw_page_fault_o     <=~ents[addr_hash][1];
             end
         end
     end

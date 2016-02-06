@@ -507,7 +507,6 @@ module core_exe(
     assign  reg_addr_b  = dec_rt_o;
 
     task exec_init;
-    integer i;
     begin
         exec_exception_o    <= 0;
         exec_cause_o        <= 0;
@@ -583,8 +582,7 @@ module core_exe(
                                 );
 
     always @(posedge clk) begin
-        if (rst) exec_init();
-        else if (exec_pipeline_flush_i) exec_init();
+        if (rst || exec_pipeline_flush_i) exec_init();
         else if (core_run) begin
             exec_exception_o        <= dec_exception_o | exec_overflow_err;
             exec_cause_o            <= dec_exception_o ? dec_cause_o :
@@ -643,7 +641,6 @@ module core_mem(
     input [31:0]                cp0_ehb,
     input [31:0]                cp0_epc,
 
-    input [31:0]                exec_mem_result_i,
     input                       exec_exception_o,
     input [31:0]                exec_cause_o,
     input [INST_ADDR_WIDTH-1:0] exec_pc_o,
