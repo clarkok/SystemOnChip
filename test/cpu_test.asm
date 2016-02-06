@@ -1,11 +1,6 @@
 init:
-    addiu   $1,     $zero,  10
-    addiu   $2,     $zero,  20
-    mult    $1,     $2
-    nop
-    mflo    $1
-    mflo    $2
-    nop
-    nop
-    nop
-    j       init
+    lui     $t1,    0xC000
+loop:
+    sw      $t1,    0($t1)
+    addiu   $t1,    $t1,    4
+    j       loop

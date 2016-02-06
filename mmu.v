@@ -82,7 +82,7 @@ module mmu(
                                                               (v_ent_valid ? ack_i : 
                                                                 (v_ent_pfault || v_dir_pfault));
     assign  v_page_ent_o            = tlb_ent_r;
-    assign  v_hw_page_fault_o       =(v_dir_pfault || v_ent_pfault);
+    assign  v_hw_page_fault_o       = paging_en && (v_dir_pfault || v_ent_pfault);
     assign  v_hw_page_fault_addr_o  = v_addr_i;
 
     always @* begin
@@ -189,6 +189,7 @@ module mmu(
                 S_READ_DIR: begin
                     if (ack_i) begin
                         state   <= S_CHECK_DIR;
+                        rd_o    <= 0;
 
                         tlb_dir[v_dir_hash]         <= data_i;
                         tlb_dir_tags[v_dir_hash]    <= addr_o[DIR_TAG_BITS+DIR_HASH_BITS+4:DIR_HASH_BITS+5];
