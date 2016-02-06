@@ -1,3 +1,5 @@
+`include "exceptions.vh"
+
 module soc(
     input clk,
     input rstn,
@@ -129,6 +131,14 @@ module soc(
     wire        gpu_we_o;
     wire        gpu_ack_i;
 
+    wire [31:0] timer_addr_o;
+    wire [31:0] timer_data_i;
+    wire [31:0] timer_data_o;
+    wire [ 1:0] timer_sel_o;
+    wire        timer_rd_o;
+    wire        timer_we_o;
+    wire        timer_ack_i;
+
     bus bus(
         .clk(clk_sys),
         .rst(rst),
@@ -163,7 +173,15 @@ module soc(
         .ps2_sel_o(ps2_sel_o),
         .ps2_rd_o(ps2_rd_o),
         .ps2_we_o(ps2_we_o),
-        .ps2_ack_i(ps2_ack_i)
+        .ps2_ack_i(ps2_ack_i),
+
+        .timer_addr_o(timer_addr_o),
+        .timer_data_i(timer_data_i),
+        .timer_data_o(timer_data_o),
+        .timer_sel_o(timer_sel_o),
+        .timer_rd_o(timer_rd_o),
+        .timer_we_o(timer_we_o),
+        .timer_ack_i(timer_ack_i)
     );
 
     gpu gpu(
@@ -190,6 +208,19 @@ module soc(
         .bus_rd_i(gpu_rd_o),
         .bus_we_i(gpu_we_o),
         .bus_ack_o(gpu_ack_i)
+    );
+
+    timer timer(
+        .clk(clk_sys),
+        .rst(rst),
+        .addr_i(timer_addr_o),
+        .data_o(timer_data_i),
+        .data_i(timer_data_o),
+        .sel_i(timer_sel_o),
+        .rd_i(timer_sel_o),
+        .we_i(timer_sel_o),
+        .ack_o(timer_ack_i),
+        .interrupt(devices_interrupt[`TIMER_INT])
     );
 
     uart uart(
