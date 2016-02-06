@@ -17,6 +17,11 @@ module cpu(
     output          bus_rd_o,
     input           bus_ack_i,
 
+    output [ 31:0]  bios_addr_o,
+    input  [ 31:0]  bios_data_i,
+    output          bios_rd_o,
+    input           bios_ack_i,
+
     input  [31:0]   devices_interrupt
     );
 
@@ -116,6 +121,10 @@ module cpu(
         .inst_valid_o(inst_valid_i),
         .mem_fc(mem_fc),
         .hw_page_fault_o(ci_hw_page_fault_o),
+        .uncached_addr_o(bios_addr_o),
+        .uncached_data_i(bios_data_i),
+        .uncached_rd_o(bios_rd_o),
+        .uncached_ack_i(bios_ack_i),
         .addr_o(ci_addr_o),
         .data_i(ci_data_i),
         .rd_o(ci_rd_o),

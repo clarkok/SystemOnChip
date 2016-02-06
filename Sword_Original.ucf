@@ -326,8 +326,8 @@
 #   NET "UART_RXD"                                 LOC = L25       | IOSTANDARD = LVCMOS33 | SLEW = FAST |              PULLUP ;
 #   NET "UART_TXD"                                 LOC = P24       | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16 | PULLUP ;
 
-#   NET "PS2_DATA"                                 LOC = N18       | IOSTANDARD = LVCMOS33 | SLEW = FAST |              PULLUP ;
-#   NET "PS2_CLK"                                  LOC = M19       | IOSTANDARD = LVCMOS33 | SLEW = FAST |              PULLUP ;
+#   NET "PS2_DATA"                                 LOC = M18       | IOSTANDARD = LVCMOS33 | SLEW = FAST |              PULLUP ;
+#   NET "PS2_CLK"                                  LOC = N19       | IOSTANDARD = LVCMOS33 | SLEW = FAST |              PULLUP ;
 
     NET "vga_b[0]"                                 LOC = T20       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
     NET "vga_b[1]"                                 LOC = R20       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
