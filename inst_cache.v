@@ -11,12 +11,19 @@ module inst_cache(
     input           mem_fc,
     output          hw_page_fault_o,
 
+    output     [ 31:0]  uncached_addr_o,
+    input      [ 31:0]  uncached_data_i,
+    output              uncached_rd_o,
+    input               uncached_ack_i,
+
     output reg [ 31:0]  addr_o,
     input      [255:0]  data_i,
     output reg          rd_o,
     input               ack_i,
     input               hw_page_fault_i
     );
+
+    parameter UNCACHED_MASK = 32'hFFFF_F000;
 
     localparam LINE_BITS    = 256;
     localparam LINE_COUNT   = 64;
@@ -25,6 +32,8 @@ module inst_cache(
     localparam OFF_BITS     = `GET_WIDTH(LINE_BYTES-1);
     localparam HASH_BITS    = `GET_WIDTH(LINE_COUNT-1);
     localparam TAG_BITS     = 32 - OFF_BITS - HASH_BITS;
+
+    wire    inst_uncached   = (inst_addr_i & UNCACHED_MASK) == UNCACHED_MASK;
 
     reg [TAG_BITS-1:0]  tags    [0:LINE_COUNT-1];
     reg                 valids  [0:LINE_COUNT-1];
@@ -48,8 +57,8 @@ module inst_cache(
 
     reg  [31:0] inst_data_r;
 
-    assign inst_valid_o     = valids[addr_hash] && (tags[addr_hash] == addr_tag);
-    assign inst_data_o      = inst_data_r;
+    assign inst_data_o      = inst_uncached ? uncached_data_i : inst_data_r;
+    assign inst_valid_o     = inst_uncached ? uncached_ack_i  : valids[addr_hash] && (tags[addr_hash] == addr_tag);
     assign hw_page_fault_o  = hw_page_fault_i;
 
     always @* begin
@@ -92,7 +101,7 @@ module inst_cache(
                 end
             end
             else begin
-                if (~inst_valid_o) begin
+                if (~inst_uncached && ~inst_valid_o) begin
                     addr_o  <= inst_addr_i;
                     rd_o    <= 1;
                 end

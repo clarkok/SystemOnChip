@@ -43,7 +43,7 @@ module data_cache(
     localparam HASH_BITS    = `GET_WIDTH(LINE_COUNT-1);
     localparam TAG_BITS     = 32 - OFF_BITS - HASH_BITS;
 
-    wire        data_uncached   = (data_addr_i & UNCACHED_MASK) == UNCACHED_MASK;
+    wire    data_uncached   = (data_addr_i & UNCACHED_MASK) == UNCACHED_MASK;
 
     reg [31:0]          ents    [0:LINE_COUNT-1];
     reg [TAG_BITS-1:0]  tags    [0:LINE_COUNT-1];

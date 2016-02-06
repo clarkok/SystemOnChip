@@ -34,6 +34,9 @@ module soc(
     input  uart_rxd,
     output uart_txd,
 
+    input  ps2_clk,
+    input  ps2_data,
+
     inout  [31:0] ddr3_dq,
     inout  [ 3:0] ddr3_dqs_n,
     inout  [ 3:0] ddr3_dqs_p,
@@ -72,6 +75,9 @@ module soc(
     wire            bus_rd_o;
     wire            bus_ack_i;
 
+    wire [ 31:0]    bios_addr_o;
+    wire [ 31:0]    bios_data_i;
+
     wire [ 31:0]    devices_interrupt;
 
     cpu cpu(
@@ -90,7 +96,16 @@ module soc(
         .bus_we_o(bus_we_o),
         .bus_rd_o(bus_rd_o),
         .bus_ack_i(bus_ack_i),
+        .bios_addr_o(bios_addr_o),
+        .bios_data_i(bios_data_i),
+        .bios_rd_o(),
+        .bios_ack_i(1'b1),
         .devices_interrupt(devices_interrupt)
+    );
+
+    bios_rom bios_rom(
+        .a(bios_addr_o[11:2]),
+        .spo(bios_data_i)
     );
 
     ddr3_dev ddr3_dev(
@@ -130,6 +145,14 @@ module soc(
     wire        gpu_rd_o;
     wire        gpu_we_o;
     wire        gpu_ack_i;
+
+    wire [31:0] ps2_addr_o;
+    wire [31:0] ps2_data_i;
+    wire [31:0] ps2_data_o;
+    wire [ 1:0] ps2_sel_o;
+    wire        ps2_rd_o;
+    wire        ps2_we_o;
+    wire        ps2_ack_i;
 
     wire [31:0] timer_addr_o;
     wire [31:0] timer_data_i;
@@ -221,6 +244,21 @@ module soc(
         .we_i(timer_sel_o),
         .ack_o(timer_ack_i),
         .interrupt(devices_interrupt[`TIMER_INT])
+    );
+
+    ps2 ps2(
+        .clk(clk_sys),
+        .rst(rst),
+        .ps2_clk(ps2_clk),
+        .ps2_data(ps2_data),
+        .addr_i(ps2_addr_o),
+        .data_o(ps2_data_i),
+        .data_i(ps2_data_o),
+        .sel_i(ps2_sel_o),
+        .rd_i(ps2_rd_o),
+        .we_i(ps2_we_o),
+        .ack_o(ps2_ack_i),
+        .interrupt(devices_interrupt[`PS2_INT])
     );
 
     uart uart(
