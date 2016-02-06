@@ -45,7 +45,6 @@ module data_cache(
 
     wire        data_uncached   = (data_addr_i & UNCACHED_MASK) == UNCACHED_MASK;
 
-    // reg [LINE_BITS-1:0] caches  [0:LINE_COUNT-1];
     reg [31:0]          ents    [0:LINE_COUNT-1];
     reg [TAG_BITS-1:0]  tags    [0:LINE_COUNT-1];
     reg                 valids  [0:LINE_COUNT-1];
