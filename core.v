@@ -193,8 +193,15 @@ module core_dec(
     wire [31:0]                 dec_inst;
     wire [NR_INST-1:0]          dec_decoded;
 
+    reg  load_in_exec;
+    wire use_after_load = load_in_exec && (
+                            inst_data_i[25:21] == dec_dst_in_exec ||
+                            inst_data_i[20:16] == dec_dst_in_exec
+                        );
+    wire bubble         = use_after_load;
+
     assign inst_addr_o  = the_pc;
-    assign dec_inst     = inst_valid_i ? inst_data_i : NOP;
+    assign dec_inst     = (inst_valid_i && ~bubble) ? inst_data_i : NOP;
     assign dec_decoded  = decode(dec_inst);
 
     task dec_init;
@@ -229,6 +236,7 @@ module core_dec(
 
         dec_dst_in_exec     <= 6'b10_0000;
         dec_dst_in_mem      <= 6'b10_0000;
+        load_in_exec        <= 1'b0;
         the_pc              <= 32'hFFFF_F001;
     end
     endtask
@@ -254,7 +262,7 @@ module core_dec(
             the_pc  <= dec_pc_i;
         end
         else if (core_run) begin
-            if (inst_valid_i)
+            if (inst_valid_i && ~bubble)
                 case (1)
                     (|dec_decoded[I_JAL:I_J]):                  the_pc <= jump_addr;
                     (|dec_decoded[I_BGEZ:I_BEQ]):               the_pc <= branch_addr;
@@ -430,6 +438,7 @@ module core_dec(
                                      dec_decoded[I_JALR] ||
                                      dec_decoded[I_MFC0]);
             dec_dst_in_mem  <= dec_dst_in_exec;
+            load_in_exec    <= |dec_decoded[I_LL:I_LB];
         end
     end
 endmodule
