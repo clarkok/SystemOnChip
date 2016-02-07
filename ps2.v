@@ -31,11 +31,14 @@ module ps2(
             data    <= 0;
         end
         else begin
-            if (counter >= 1 && counter <= 8) begin
-                data    <= {ps2_data, data[7:1]};
+            if (state == 10) begin
+                state   <= 0;
             end
-            else if (counter == 10) begin
-                counter <= 0;
+            else begin
+                state   <= state + 1;
+                if (state >= 1 && state <= 8) begin
+                    data    <= {ps2_data, data[7:1]};
+                end
             end
         end
     end
