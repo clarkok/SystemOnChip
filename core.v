@@ -17,6 +17,7 @@ module core_dec(
     input  [INST_ADDR_WIDTH-1:0]    dec_pc_i,
 
     output reg                          dec_exception_o,
+    output reg                          dec_interrupt_o,
     output reg  [31:0]                  dec_cause_o,
     output reg  [INST_ADDR_WIDTH-1:0]   dec_pc_o,
     output reg  [4:0]                   dec_rs_o,
@@ -207,6 +208,7 @@ module core_dec(
     task dec_init;
     begin
         dec_exception_o     <= 0;
+        dec_interrupt_o     <= 0;
         dec_cause_o         <= 0;
         dec_pc_o            <= 0;
         dec_rs_o            <= 0;
@@ -270,7 +272,8 @@ module core_dec(
                       dec_decoded[I_ERET]):                     the_pc <= the_pc;
                     default:                                    the_pc <= the_pc + 4;
                 endcase
-            dec_exception_o     <= hw_interrupt | undefined_inst | privilege_inst | privilege_addr | syscall | break;
+            dec_exception_o     <= undefined_inst | privilege_inst | privilege_addr | syscall | break;
+            dec_interrupt_o     <= hw_interrupt;
             case (1)
                 (hw_interrupt):     dec_cause_o <= hw_cause;
                 (undefined_inst):   dec_cause_o <= `UNDEFINED_INST;
@@ -278,6 +281,7 @@ module core_dec(
                 (privilege_addr):   dec_cause_o <= `PRIVILEGE_ADDR;
                 (syscall):          dec_cause_o <= `SYSCALL;
                 (break):            dec_cause_o <= `BREAK;
+                default:            dec_cause_o <= 0;
             endcase
             dec_pc_o            <=  the_pc;
 
@@ -452,6 +456,7 @@ module core_exe(
     input           exec_pipeline_flush_i,
 
     input                           dec_exception_o,
+    input                           dec_interrupt_o,
     input  [31:0]                   dec_cause_o,
     input  [INST_ADDR_WIDTH-1:0]    dec_pc_o,
     input  [4:0]                    dec_rs_o,
@@ -480,6 +485,7 @@ module core_exe(
     input                           dec_sc_valid_o,
 
     output reg                          exec_exception_o,
+    output reg                          exce_interrupt_o,
     output reg  [31:0]                  exec_cause_o,
     output reg  [INST_ADDR_WIDTH-1:0]   exec_pc_o,
     output reg  [4:0]                   exec_rt_o,
@@ -518,6 +524,7 @@ module core_exe(
     task exec_init;
     begin
         exec_exception_o    <= 0;
+        exec_interrupt_o    <= 0;
         exec_cause_o        <= 0;
         exec_pc_o           <= 0;
         exec_rt_o           <= 0;
@@ -594,7 +601,8 @@ module core_exe(
         if (rst || exec_pipeline_flush_i) exec_init();
         else if (core_run) begin
             exec_exception_o        <= dec_exception_o | exec_overflow_err;
-            exec_cause_o            <= dec_exception_o ? dec_cause_o :
+            exce_interrupt_o        <= dec_interrupt_o;
+            exec_cause_o            <= (dec_interrupt_o || dec_exception_o) ? dec_cause_o :
                                        exec_overflow_err ? `OVERFLOW : 0;
             exec_pc_o               <= dec_pc_o;
             exec_rt_o               <= dec_rt_o;
@@ -651,6 +659,7 @@ module core_mem(
     input [31:0]                cp0_epc,
 
     input                       exec_exception_o,
+    input                       exec_interrupt_o,
     input [31:0]                exec_cause_o,
     input [INST_ADDR_WIDTH-1:0] exec_pc_o,
     input [4:0]                 exec_rt_o,
@@ -733,13 +742,15 @@ module core_mem(
                 3'h4:   mem_result_o    <= exec_sc_valid_o;
             endcase
             mem_lohi_o              <= exec_lohi_o;
-            mem_pipeline_flush_o    <= exec_exception_o ||
+            mem_pipeline_flush_o    <= exec_interrupt_o ||
+                                       exec_exception_o ||
                                        hw_page_fault ||
                                        exec_eret_o ||
                                       (exec_pc_we_o == 2'b0) ||                             // JR
                                       (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0);   // predict missed
             case (1)
                 (exec_exception_o ||
+                 exec_interrupt_o ||
                  hw_page_fault):        mem_pc_data_o   <= {cp0_ehb[INST_ADDR_WIDTH-1:2], 2'b01};
                 (exec_eret_o):          mem_pc_data_o   <=  cp0_epc;
                 (exec_pc_we_o == 2'b0): mem_pc_data_o   <= {exec_result_o[INST_ADDR_WIDTH-1:2], exec_pc_o[1:0]};

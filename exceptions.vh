@@ -1,9 +1,10 @@
 `define HW_RESET        5'd0
 `define MMU_PAGE_FAULT  5'd1
-`define PS2_INT         5'd2
-`define VGA_INT         5'd3
+`define VGA_INT         5'd2
+`define FLASH_INT       5'd3
 `define UART_INT        5'd4
 `define TIMER_INT       5'd5
+`define PS2_INT         5'd6
 
 `define UNALIGNED_INST  5'd8
 `define UNALIGNED_DATA  5'd9
