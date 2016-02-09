@@ -737,7 +737,7 @@ module core_mem(
             case (exec_reg_we_sel_o)
                 3'h0:   mem_result_o    <= exec_result_o;
                 3'h1:   mem_result_o    <= mem_bus_data;
-                3'h2:   mem_result_o    <= exec_pc_o + 4;
+                3'h2:   mem_result_o    <= {exec_pc_o[INST_ADDR_WIDTH-1:2], 2'b00} + 4;
                 3'h3:   mem_result_o    <= cp0_data_i;
                 3'h4:   mem_result_o    <= exec_sc_valid_o;
             endcase
