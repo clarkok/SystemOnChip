@@ -485,7 +485,7 @@ module core_exe(
     input                           dec_sc_valid_o,
 
     output reg                          exec_exception_o,
-    output reg                          exce_interrupt_o,
+    output reg                          exec_interrupt_o,
     output reg  [31:0]                  exec_cause_o,
     output reg  [INST_ADDR_WIDTH-1:0]   exec_pc_o,
     output reg  [4:0]                   exec_rt_o,
@@ -601,7 +601,7 @@ module core_exe(
         if (rst || exec_pipeline_flush_i) exec_init();
         else if (core_run) begin
             exec_exception_o        <= dec_exception_o | exec_overflow_err;
-            exce_interrupt_o        <= dec_interrupt_o;
+            exec_interrupt_o        <= dec_interrupt_o;
             exec_cause_o            <= (dec_interrupt_o || dec_exception_o) ? dec_cause_o :
                                        exec_overflow_err ? `OVERFLOW : 0;
             exec_pc_o               <= dec_pc_o;
