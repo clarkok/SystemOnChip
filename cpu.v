@@ -82,7 +82,7 @@ module cpu(
     wire [31:0] cp0_ptb;
     wire        cp0_ptb_we;
     wire        cp0_hw_page_fault;
-    wire        cp0_hw_page_fault_addr;
+    wire [31:0] cp0_hw_page_fault_addr;
 
     cp0 cp0(
         .clk(clk),

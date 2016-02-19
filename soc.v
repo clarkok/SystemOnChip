@@ -75,8 +75,8 @@ module soc(
     wire            bus_rd_o;
     wire            bus_ack_i;
 
-    wire [ 31:0]    bios_addr_o;
-    wire [ 31:0]    bios_data_i;
+    wire [ 31:0]    bios_inst_addr_o;
+    wire [ 31:0]    bios_inst_data_i;
 
     wire [ 31:0]    devices_interrupt;
 
@@ -96,16 +96,11 @@ module soc(
         .bus_we_o(bus_we_o),
         .bus_rd_o(bus_rd_o),
         .bus_ack_i(bus_ack_i),
-        .bios_addr_o(bios_addr_o),
-        .bios_data_i(bios_data_i),
+        .bios_addr_o(bios_inst_addr_o),
+        .bios_data_i(bios_inst_data_i),
         .bios_rd_o(),
         .bios_ack_i(1'b1),
         .devices_interrupt(devices_interrupt)
-    );
-
-    bios_rom bios_rom(
-        .a(bios_addr_o[11:2]),
-        .spo(bios_data_i)
     );
 
     ddr3_dev ddr3_dev(
@@ -146,6 +141,22 @@ module soc(
     wire        gpu_we_o;
     wire        gpu_ack_i;
 
+    wire [31:0] bios_addr_o;
+    wire [31:0] bios_data_i;
+    wire [31:0] bios_data_o;
+    wire [ 1:0] bios_sel_o;
+    wire        bios_rd_o;
+    wire        bios_we_o;
+    wire        bios_ack_i;
+
+    wire [31:0] uart_addr_o;
+    wire [31:0] uart_data_i;
+    wire [31:0] uart_data_o;
+    wire [ 1:0] uart_sel_o;
+    wire        uart_rd_o;
+    wire        uart_we_o;
+    wire        uart_ack_i;
+
     wire [31:0] ps2_addr_o;
     wire [31:0] ps2_data_i;
     wire [31:0] ps2_data_o;
@@ -166,13 +177,13 @@ module soc(
         .clk(clk_sys),
         .rst(rst),
 
-        .m_addr_i(bus_addr_i),
-        .m_data_o(bus_data_o),
-        .m_data_i(bus_data_i),
-        .m_sel_i(bus_sel_i),
-        .m_rd_i(bus_rd_i),
-        .m_we_i(bus_we_i),
-        .m_ack_o(bus_ack_o),
+        .m_addr_i(bus_addr_o),
+        .m_data_o(bus_data_i),
+        .m_data_i(bus_data_o),
+        .m_sel_i(bus_sel_o),
+        .m_rd_i(bus_rd_o),
+        .m_we_i(bus_we_o),
+        .m_ack_o(bus_ack_i),
 
         .gpu_addr_o(gpu_addr_o),
         .gpu_data_i(gpu_data_i),
@@ -181,6 +192,14 @@ module soc(
         .gpu_rd_o(gpu_rd_o),
         .gpu_we_o(gpu_we_o),
         .gpu_ack_i(gpu_ack_i),
+
+        .bios_addr_o(bios_addr_o),
+        .bios_data_i(bios_data_i),
+        .bios_data_o(bios_data_o),
+        .bios_sel_o(bios_sel_o),
+        .bios_rd_o(bios_rd_o),
+        .bios_we_o(bios_we_o),
+        .bios_ack_i(bios_ack_i),
 
         .uart_addr_o(uart_addr_o),
         .uart_data_i(uart_data_i),
@@ -205,6 +224,22 @@ module soc(
         .timer_rd_o(timer_rd_o),
         .timer_we_o(timer_we_o),
         .timer_ack_i(timer_ack_i)
+    );
+
+    bios_dev bios_dev(
+        .clk(clk_sys),
+        .rst(rst),
+
+        .addr_i(bios_addr_o),
+        .data_o(bios_data_i),
+        .data_i(bios_data_o),
+        .sel_i(bios_sel_o),
+        .rd_i(bios_sel_o),
+        .we_i(bios_sel_o),
+        .ack_o(bios_ack_i),
+
+        .inst_addr_i(bios_inst_addr_o),
+        .inst_data_o(bios_inst_data_i)
     );
 
     gpu gpu(
@@ -236,6 +271,7 @@ module soc(
     timer timer(
         .clk(clk_sys),
         .rst(rst),
+
         .addr_i(timer_addr_o),
         .data_o(timer_data_i),
         .data_i(timer_data_o),
@@ -243,14 +279,17 @@ module soc(
         .rd_i(timer_sel_o),
         .we_i(timer_sel_o),
         .ack_o(timer_ack_i),
+
         .interrupt(devices_interrupt[`TIMER_INT])
     );
 
     ps2 ps2(
         .clk(clk_sys),
         .rst(rst),
+
         .ps2_clk(ps2_clk),
         .ps2_data(ps2_data),
+
         .addr_i(ps2_addr_o),
         .data_o(ps2_data_i),
         .data_i(ps2_data_o),
@@ -258,21 +297,26 @@ module soc(
         .rd_i(ps2_rd_o),
         .we_i(ps2_we_o),
         .ack_o(ps2_ack_i),
+
         .interrupt(devices_interrupt[`PS2_INT])
     );
 
-    uart uart(
+    uart_dev uart_dev(
         .clk(clk_sys),
         .rst(rst),
 
         .uart_rxd(uart_rxd),
         .uart_txd(uart_txd),
 
-        .data_in(data_in),
-        .data_send(data_send),
-        .data_sent(data_sent),
-        .data_out(data_out),
-        .data_received(data_received)
+        .addr_i(uart_addr_o),
+        .data_o(uart_data_i),
+        .data_i(uart_data_o),
+        .sel_i(uart_sel_o),
+        .rd_i(uart_rd_o),
+        .we_i(uart_we_o),
+        .ack_o(uart_ack_i),
+
+        .interrupt(devices_interrupt[`UART_INT])
     );
 
     dsp dsp(

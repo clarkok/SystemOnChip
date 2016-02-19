@@ -61,6 +61,9 @@ module inst_cache(
     assign inst_valid_o     = inst_uncached ? uncached_ack_i  : valids[addr_hash] && (tags[addr_hash] == addr_tag);
     assign hw_page_fault_o  = hw_page_fault_i;
 
+    assign uncached_addr_o  = inst_addr_i;
+    assign uncached_rd_o    = inst_uncached;
+
     always @* begin
         case (addr_off[OFF_BITS-1:2])
             3'h0:   inst_data_r = cached_line[ 31:  0];
