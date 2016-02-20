@@ -80,6 +80,8 @@ module soc(
 
     wire [ 31:0]    devices_interrupt;
 
+    wire [ 31:0]    disp_value;
+
     cpu cpu(
         .clk(clk_sys),
         .rst(rst),
@@ -100,7 +102,8 @@ module soc(
         .bios_data_i(bios_inst_data_i),
         .bios_rd_o(),
         .bios_ack_i(1'b1),
-        .devices_interrupt(devices_interrupt)
+        .devices_interrupt(devices_interrupt),
+        .the_pc(disp_value)
     );
 
     ddr3_dev ddr3_dev(
@@ -337,9 +340,9 @@ module soc(
         .rst(rst),
 
         .en({8{1'b1}}),
-        .data(counter),
+        .data(disp_value),
         .dot(sram_dq[39:32]),
-        .led(led),
+        .led(devices_interrupt[15:0]),
 
         .led_clk(led_clk),
         .led_en(led_pen),

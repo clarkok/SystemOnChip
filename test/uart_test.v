@@ -28,37 +28,37 @@ module uart_test;
     task send;
     input [7:0] data;
     begin
-        #480;
+        #2170;
         uart_rxd = 0;
 
-        #480;
+        #2170;
         uart_rxd = data[0];
 
-        #480;
+        #2170;
         uart_rxd = data[1];
 
-        #480;
+        #2170;
         uart_rxd = data[2];
 
-        #480;
+        #2170;
         uart_rxd = data[3];
 
-        #480;
+        #2170;
         uart_rxd = data[4];
 
-        #480;
+        #2170;
         uart_rxd = data[5];
 
-        #480;
+        #2170;
         uart_rxd = data[6];
 
-        #480;
+        #2170;
         uart_rxd = data[7];
 
-        #480;
+        #2170;
         uart_rxd = 1;
 
-        #480;
+        #2170;
     end
     endtask
 

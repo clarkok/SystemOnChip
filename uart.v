@@ -16,12 +16,10 @@ module uart(
 
     parameter BAUD_RATE = 460800;
     parameter CLK_FREQ  = 100_000_000;   // 100MHz
-    parameter OVER_SAMP = 32;
 
-    localparam CLK_DIV          = CLK_FREQ / (BAUD_RATE * OVER_SAMP);
+    localparam CLK_DIV          = CLK_FREQ / BAUD_RATE;
     localparam CLK_DIV_WIDTH    = `GET_WIDTH(CLK_DIV);
     localparam HALF_CLK_DIV     = CLK_DIV / 2;
-    localparam OVER_SAMP_WIDTH  = `GET_WIDTH(OVER_SAMP);
 
     //
     // tx_state:
@@ -45,7 +43,7 @@ module uart(
     reg  [7:0]              rx_buf;
     reg  [CLK_DIV_WIDTH:0]  rx_count;
 
-    reg  [OVER_SAMP_WIDTH:0]    sample_counter;
+    reg  [CLK_DIV_WIDTH:0]  sample_counter;
 
     wire rx_sampled         = (sample_counter >= HALF_CLK_DIV);
 
@@ -146,7 +144,10 @@ module uart(
             end
 
             // rx logic
-            if (rx_count) rx_count  <= rx_count - 1;
+            if (rx_count) begin
+                rx_count        <= rx_count - 1;
+                sample_counter  <= sample_counter + uart_rxd;
+            end
             else begin
                 sample_counter  <= 0;
                 case (rx_state) 

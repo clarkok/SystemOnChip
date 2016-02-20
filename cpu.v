@@ -22,7 +22,10 @@ module cpu(
     output          bios_rd_o,
     input           bios_ack_i,
 
-    input  [31:0]   devices_interrupt
+    input  [31:0]   devices_interrupt,
+
+    // debug
+    output [31:0]   the_pc
     );
 
     wire [31:0] inst_addr_o;
@@ -76,7 +79,8 @@ module cpu(
         .cp0_data_o(cp0_data_o),
         .cp0_we_o(cp0_we_o),
         .cp0_ehb(cp0_ehb),
-        .cp0_epc(cp0_epc)
+        .cp0_epc(cp0_epc),
+        .the_pc(the_pc)
     );
 
     wire [31:0] cp0_ptb;

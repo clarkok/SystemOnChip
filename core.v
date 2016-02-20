@@ -44,7 +44,9 @@ module core_dec(
     output reg  [1:0]                   dec_mem_sel_o,
     output reg                          dec_cp0_we_o,
     output reg                          dec_eret_o,
-    output reg                          dec_sc_valid_o
+    output reg                          dec_sc_valid_o,
+
+    output      [31:0]                  the_pc_o
     );
 
     parameter INST_ADDR_WIDTH = 32;
@@ -445,6 +447,8 @@ module core_dec(
             load_in_exec    <= |dec_decoded[I_LL:I_LB];
         end
     end
+
+    assign the_pc_o = the_pc;
 endmodule
 
 module core_exe(
@@ -855,7 +859,10 @@ module core(
     output                          cp0_we_o,
 
     input  [INST_ADDR_WIDTH-1:0]    cp0_ehb,
-    input  [INST_ADDR_WIDTH-1:0]    cp0_epc
+    input  [INST_ADDR_WIDTH-1:0]    cp0_epc,
+
+    // debug
+    output [31:0]                   the_pc
     );
 
     parameter INST_ADDR_WIDTH = 32;
@@ -931,7 +938,8 @@ module core(
         .dec_mem_sel_o(dec_mem_sel_o),
         .dec_cp0_we_o(dec_cp0_we_o),
         .dec_eret_o(dec_eret_o),
-        .dec_sc_valid_o(dec_sc_valid_o)
+        .dec_sc_valid_o(dec_sc_valid_o),
+        .the_pc_o(the_pc)
     );
 
     wire [31:0]                 exec_mem_result_i;
