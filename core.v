@@ -27,11 +27,12 @@ module core_dec(
     output reg  [4:0]                   dec_shamt_o,
     output reg  [1:0]                   dec_pc_we_o,        // 0: always flush, 1: conditional flush, 2: Non
     output reg  [1:0]                   dec_pc_we_sel_o,    // 0: branch, 1: mem_result, 2: syscall, 3: eret
+    output reg                          dec_branch_rev_o,
     output reg                          dec_reg_we_o,
     output reg  [2:0]                   dec_reg_we_sel_o,   // 0: alu_out, 1: bus_data, 2: pc + 4, 3: c0, 4: sc
     output reg  [2:0]                   dec_reg_we_dst_o,   // 0: rd, 1: rt, 2: $ra, 3: hi, 4: lo, 5:lohi
     output reg  [3:0]                   dec_alu_op_o,       //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
-                                                            //  add sub and slt or  xor nor sll srl sra sltueq  ne  lui mul mulu
+                                                            //  add sub and slt or  xor nor sll srl sra sltueq      lui mul mulu
     output reg  [2:0]                   dec_alu_a_sel_o,    //  0: rs, 1: rt, 2: exec_result, 3: mem_result, 4: hi, 5: lo, 6: 0, 7: imm
     output reg  [2:0]                   dec_alu_b_sel_o,    //  0: rt, 1: imm, 2: shamt, 3: exec_result, 4: mem_result, 5: 0, 6: rs
     output reg                          dec_load_unsigned_o,
@@ -220,6 +221,7 @@ module core_dec(
         dec_shamt_o         <= 0;
         dec_pc_we_o         <= 2;
         dec_pc_we_sel_o     <= 0;
+        dec_branch_rev_o    <= 0;
         dec_reg_we_o        <= 0;
         dec_reg_we_sel_o    <= 0;
         dec_reg_we_dst_o    <= 0;
@@ -301,6 +303,7 @@ module core_dec(
                 (|dec_decoded[I_BGEZ:I_BEQ]):               dec_pc_we_sel_o <= 0;
                 (|dec_decoded[I_JALR:I_JR]):                dec_pc_we_sel_o <= 1;
             endcase
+            dec_branch_rev_o    <=  dec_decoded[I_BNE] || dec_decoded[I_BGEZ];
             dec_reg_we_o        <=  dec_decoded[I_LL:I_LB] || 
                                     dec_decoded[I_SC] || 
                                     dec_decoded[I_MTLO:I_ADDI] ||
@@ -378,7 +381,7 @@ module core_dec(
                 (dec_decoded[I_MULTU]):             dec_alu_op_o <= 15;
                 (|dec_decoded[I_MTLO:I_MFHI]):      dec_alu_op_o <= 0;
                 (dec_decoded[I_BEQ]):               dec_alu_op_o <= 11;
-                (dec_decoded[I_BNE]):               dec_alu_op_o <= 12;
+                (dec_decoded[I_BNE]):               dec_alu_op_o <= 11;
                 (dec_decoded[I_BLTZ]):              dec_alu_op_o <= 3;
                 (dec_decoded[I_BGEZ]):              dec_alu_op_o <= 3;
                 (|dec_decoded[I_MTC0:I_MFC0]):      dec_alu_op_o <= 0;
@@ -470,6 +473,7 @@ module core_exe(
     input  [4:0]                    dec_shamt_o,
     input  [1:0]                    dec_pc_we_o,
     input  [1:0]                    dec_pc_we_sel_o,
+    input                           dec_branch_rev_o,
     input                           dec_reg_we_o,
     input  [2:0]                    dec_reg_we_sel_o,
     input  [2:0]                    dec_reg_we_dst_o,
@@ -510,6 +514,7 @@ module core_exe(
     output reg                          exec_cp0_we_o,
     output reg                          exec_eret_o,
     output reg                          exec_sc_valid_o,
+    output reg                          exec_predict_missed_o,
 
     input  [63:0]                   lohi,
     output [4:0]                    reg_addr_a,
@@ -527,28 +532,29 @@ module core_exe(
 
     task exec_init;
     begin
-        exec_exception_o    <= 0;
-        exec_interrupt_o    <= 0;
-        exec_cause_o        <= 0;
-        exec_pc_o           <= 0;
-        exec_rt_o           <= 0;
-        exec_rd_o           <= 0;
-        exec_pc_we_o        <= 2;
-        exec_pc_we_sel_o    <= 0;
-        exec_reg_we_o       <= 0;
-        exec_reg_we_sel_o   <= 0;
-        exec_reg_we_dst_o   <= 0;
-        exec_load_unsigned_o <= 0;
-        exec_mem_rd_o       <= 0;
-        exec_mem_we_o       <= 0;
-        exec_mem_fc_o       <= 0;
-        exec_mem_sel_o      <= 0;
-        exec_result_o       <= 0;
-        exec_lohi_o         <= 0;
-        exec_data_o         <= 0;
-        exec_cp0_we_o       <= 0;
-        exec_eret_o         <= 0;
-        exec_sc_valid_o     <= 0;
+        exec_exception_o        <= 0;
+        exec_interrupt_o        <= 0;
+        exec_cause_o            <= 0;
+        exec_pc_o               <= 0;
+        exec_rt_o               <= 0;
+        exec_rd_o               <= 0;
+        exec_pc_we_o            <= 2;
+        exec_pc_we_sel_o        <= 0;
+        exec_reg_we_o           <= 0;
+        exec_reg_we_sel_o       <= 0;
+        exec_reg_we_dst_o       <= 0;
+        exec_load_unsigned_o    <= 0;
+        exec_mem_rd_o           <= 0;
+        exec_mem_we_o           <= 0;
+        exec_mem_fc_o           <= 0;
+        exec_mem_sel_o          <= 0;
+        exec_result_o           <= 0;
+        exec_lohi_o             <= 0;
+        exec_data_o             <= 0;
+        exec_cp0_we_o           <= 0;
+        exec_eret_o             <= 0;
+        exec_sc_valid_o         <= 0;
+        exec_predict_missed_o   <= 0;
     end
     endtask
 
@@ -590,14 +596,34 @@ module core_exe(
         endcase
     end
 
+    always @* begin
+        case (dec_alu_op_o)
+            4'h0:       exec_alu_out    = exec_alu_a + exec_alu_b;
+            4'h1:       exec_alu_out    = exec_alu_a - exec_alu_b;
+            4'h2:       exec_alu_out    = exec_alu_a & exec_alu_b;
+            4'h3:       exec_alu_out    = $signed(exec_alu_a) < $signed(exec_alu_b);
+            4'h4:       exec_alu_out    = exec_alu_a | exec_alu_b;
+            4'h5:       exec_alu_out    = exec_alu_a ^ exec_alu_b;
+            4'h6:       exec_alu_out    = ~(exec_alu_a | exec_alu_b);
+            4'h7:       exec_alu_out    = exec_alu_a << exec_alu_b[4:0];
+            4'h8:       exec_alu_out    = exec_alu_a >> exec_alu_b[4:0];
+            4'h9:       exec_alu_out    = $signed(exec_alu_a) >>> exec_alu_b[4:0];
+            4'ha:       exec_alu_out    = exec_alu_a < exec_alu_b;
+            4'hb:       exec_alu_out    = exec_alu_a == exec_alu_b;
+            4'hd:       exec_alu_out    = {exec_alu_a[15:0], 16'b0};
+            default:    exec_alu_out    = 0;
+        endcase
+    end
+
     wire [32:0] exec_add_res    = (dec_alu_op_o == 4'h0) ? (exec_alu_a + exec_alu_b)    :
                                   (dec_alu_op_o == 4'h1) ? (exec_alu_a - exec_alu_b)    :
                                                            33'b0;
     wire exec_overflow      = (exec_add_res[32] ^ dec_alu_op_o[0]);
     wire exec_overflow_err  = exec_overflow & dec_overflow_o;
+    wire exec_predict_missed= (exec_alu_out == 0) ^ dec_branch_rev_o;
     wire exec_no_exception  = ~( exec_exception_o ||
                                 (exec_pc_we_o == 2'b0) ||                               // JR
-                                (exec_pc_we_o == 2'b1 && exec_result_o == 0) ||         // predict missed
+                                (exec_pc_we_o == 2'b1 && exec_predict_missed) ||
                                 (exec_eret_o)
                                 );
 
@@ -621,23 +647,7 @@ module core_exe(
             exec_mem_we_o           <=(dec_mem_we_o || (dec_mem_sc_o && dec_sc_valid_o)) && exec_no_exception;
             exec_mem_fc_o           <= dec_mem_fc_o && exec_no_exception;
             exec_mem_sel_o          <= dec_mem_sel_o;
-            case (dec_alu_op_o)
-                4'h0:       exec_result_o   <= exec_alu_a + exec_alu_b;
-                4'h1:       exec_result_o   <= exec_alu_a - exec_alu_b;
-                4'h2:       exec_result_o   <= exec_alu_a & exec_alu_b;
-                4'h3:       exec_result_o   <= $signed(exec_alu_a) < $signed(exec_alu_b);
-                4'h4:       exec_result_o   <= exec_alu_a | exec_alu_b;
-                4'h5:       exec_result_o   <= exec_alu_a ^ exec_alu_b;
-                4'h6:       exec_result_o   <= ~(exec_alu_a | exec_alu_b);
-                4'h7:       exec_result_o   <= exec_alu_a << exec_alu_b[4:0];
-                4'h8:       exec_result_o   <= exec_alu_a >> exec_alu_b[4:0];
-                4'h9:       exec_result_o   <= $signed(exec_alu_a) >>> exec_alu_b[4:0];
-                4'ha:       exec_result_o   <= exec_alu_a < exec_alu_b;
-                4'hb:       exec_result_o   <= exec_alu_a == exec_alu_b;
-                4'hc:       exec_result_o   <= exec_alu_a != exec_alu_b;
-                4'hd:       exec_result_o   <= {exec_alu_a[15:0], 16'b0};
-                default:    exec_result_o   <= 0;
-            endcase
+            exec_result_o           <= exec_alu_out;
             exec_lohi_o             <= exec_lohi_out;
             case (dec_data_sel_o)
                 2'h0:   exec_data_o <= exec_rt;
@@ -647,6 +657,7 @@ module core_exe(
             exec_cp0_we_o           <= dec_cp0_we_o;
             exec_eret_o             <= dec_eret_o;
             exec_sc_valid_o         <= dec_sc_valid_o;
+            exec_predict_missed_o   <= exec_predict_missed;
         end
     end
 endmodule
@@ -684,6 +695,7 @@ module core_mem(
     input                       exec_cp0_we_o,
     input                       exec_eret_o,
     input                       exec_sc_valid_o,
+    input                       exec_predict_missed_o,
 
     output reg  [4:0]                   mem_rt_o,
     output reg  [4:0]                   mem_rd_o,
@@ -751,7 +763,7 @@ module core_mem(
                                        hw_page_fault ||
                                        exec_eret_o ||
                                       (exec_pc_we_o == 2'b0) ||                             // JR
-                                      (exec_pc_we_o == 2'b1 && exec_result_o[31:0] == 0);   // predict missed
+                                      (exec_pc_we_o == 2'b1 && exec_predict_missed_o);
             case (1)
                 (exec_exception_o ||
                  exec_interrupt_o ||
@@ -883,6 +895,7 @@ module core(
     wire [4:0]                  dec_shamt_o;
     wire [1:0]                  dec_pc_we_o;
     wire [1:0]                  dec_pc_we_sel_o;
+    wire                        dec_branch_rev_o;
     wire                        dec_reg_we_o;
     wire [2:0]                  dec_reg_we_sel_o;
     wire [2:0]                  dec_reg_we_dst_o;
@@ -922,6 +935,7 @@ module core(
         .dec_shamt_o(dec_shamt_o),
         .dec_pc_we_o(dec_pc_we_o),
         .dec_pc_we_sel_o(dec_pc_we_sel_o),
+        .dec_branch_rev_o(dec_branch_rev_o),
         .dec_reg_we_o(dec_reg_we_o),
         .dec_reg_we_sel_o(dec_reg_we_sel_o),
         .dec_reg_we_dst_o(dec_reg_we_dst_o),
@@ -964,6 +978,7 @@ module core(
     wire                        exec_cp0_we_o;
     wire                        exec_eret_o;
     wire                        exec_sc_valid_o;
+    wire                        exec_predict_missed_o;
     wire [63:0]                 lohi;
     wire [4:0]                  reg_addr_a;
     wire [DATA_DATA_WIDTH-1:0]  reg_data_a;
@@ -986,6 +1001,7 @@ module core(
         .dec_shamt_o(dec_shamt_o),
         .dec_pc_we_o(dec_pc_we_o),
         .dec_pc_we_sel_o(dec_pc_we_sel_o),
+        .dec_branch_rev_o(dec_branch_rev_o),
         .dec_reg_we_o(dec_reg_we_o),
         .dec_reg_we_sel_o(dec_reg_we_sel_o),
         .dec_reg_we_dst_o(dec_reg_we_dst_o),
@@ -1024,6 +1040,7 @@ module core(
         .exec_cp0_we_o(exec_cp0_we_o),
         .exec_eret_o(exec_eret_o),
         .exec_sc_valid_o(exec_sc_valid_o),
+        .exec_predict_missed_o(exec_predict_missed_o),
         .lohi(lohi),
         .reg_addr_a(reg_addr_a),
         .reg_data_a(reg_data_a),
@@ -1075,6 +1092,7 @@ module core(
         .exec_cp0_we_o(exec_cp0_we_o),
         .exec_eret_o(exec_eret_o),
         .exec_sc_valid_o(exec_sc_valid_o),
+        .exec_predict_missed_o(exec_predict_missed_o),
         .mem_rt_o(mem_rt_o),
         .mem_rd_o(mem_rd_o),
         .mem_reg_we_o(mem_reg_we_o),

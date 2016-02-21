@@ -4,8 +4,8 @@ module soc_test;
     reg   [15:0] sw;
     reg   ps2_clk;
     reg   ps2_data;
-    reg   uart_rxd;
 
+    wire uart_rxd;
     wire [47:0] sram_dq;
     wire [ 3:0] ddr3_dqs_n;
     wire [ 3:0] ddr3_dqs_p;
@@ -105,9 +105,36 @@ module soc_test;
         .dq(ddr3_dq)
     );
 
+    reg  [7:0]  uart_data_i;
+    reg         uart_data_send;
+    wire        uart_data_sent;
+    wire [7:0]  uart_data_o;
+    wire        uart_data_received;
+
+    uart uart_receiver(
+        .clk(clk),
+        .rst(rst),
+        .uart_rxd(uart_txd),
+        .uart_txd(uart_rxd),
+        .data_in(uart_data_i),
+        .data_send(uart_data_send),
+        .data_sent(uart_data_sent),
+        .data_out(uart_data_o),
+        .data_received(uart_data_received)
+    );
+
+    always @(posedge clk) begin
+        if (uart_data_received) begin
+            $display("%c", uart_data_o);
+        end
+    end
+
     initial begin
         clk = 0;
         rstn = 1;
+
+        uart_data_i = 0;
+        uart_data_send = 0;
     end
 
     initial forever #5 clk = ~clk;
