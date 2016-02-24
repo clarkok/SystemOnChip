@@ -151,7 +151,7 @@ module mmu(
                         end
                         else begin
                             addr_o  <= v_addr_i;
-                            data_o  <= v_data_o;
+                            data_o  <= v_data_i;
                             rd_o    <= v_rd_i;
                             we_o    <= v_we_i;
                         end
