@@ -196,17 +196,24 @@ module core_dec(
 
     wire [31:0]                 dec_inst;
     wire [NR_INST-1:0]          dec_decoded;
+    wire [NR_INST-1:0]          dec_peak;
+
+    reg  [1:0]                  predicting;
 
     reg  load_in_exec;
+
     wire use_after_load = load_in_exec && (
                             inst_data_i[25:21] == dec_dst_in_exec ||
                             inst_data_i[20:16] == dec_dst_in_exec
                         );
-    wire bubble         = use_after_load;
+    wire mem_in_predict = predicting && (dec_peak[I_SC:I_LB] || dec_peak[I_MTC0:I_MFC0]);
+
+    wire bubble         = use_after_load || mem_in_predict;
 
     assign inst_addr_o  = the_pc;
     assign dec_inst     = (inst_valid_i && ~bubble) ? inst_data_i : NOP;
     assign dec_decoded  = decode(dec_inst);
+    assign dec_peak     = decode(inst_data_i);
 
     task dec_init;
     begin
@@ -242,6 +249,7 @@ module core_dec(
 
         dec_dst_in_exec     <= 6'b10_0000;
         dec_dst_in_mem      <= 6'b10_0000;
+        predicting          <= 2'b0;
         load_in_exec        <= 1'b0;
         the_pc              <= 32'hFFFF_F001;
     end
@@ -447,6 +455,7 @@ module core_dec(
                                      dec_decoded[I_JALR] ||
                                      dec_decoded[I_MFC0]);
             dec_dst_in_mem  <= dec_dst_in_exec;
+            predicting      <= {predicting[0], |dec_decoded[I_BGEZ:I_BEQ]};
             load_in_exec    <= |dec_decoded[I_LL:I_LB];
         end
     end
