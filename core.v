@@ -263,7 +263,7 @@ module core_dec(
 
     always @(posedge clk) begin
         if (rst) dec_init();
-        else if (dec_pipeline_flush_i) begin
+        else if (core_run && dec_pipeline_flush_i) begin
             dec_init();
             the_pc  <= dec_pc_i;
         end
@@ -628,7 +628,7 @@ module core_exe(
                                 );
 
     always @(posedge clk) begin
-        if (rst || exec_pipeline_flush_i) exec_init();
+        if (rst || (core_run && exec_pipeline_flush_i)) exec_init();
         else if (core_run) begin
             exec_exception_o        <= dec_exception_o | exec_overflow_err;
             exec_interrupt_o        <= dec_interrupt_o;
@@ -744,7 +744,7 @@ module core_mem(
     end
 
     always @(posedge clk) begin
-        if (rst || mem_pipeline_flush_o) mem_init();
+        if (rst || (core_run && mem_pipeline_flush_o)) mem_init();
         else if (core_run) begin
             mem_rt_o                <= exec_rt_o;
             mem_rd_o                <= exec_rd_o;
