@@ -37,6 +37,14 @@ module soc(
     input  ps2_clk,
     input  ps2_data,
 
+    output [25:0]   bpi_a,
+    inout  [31:0]   bpi_q,
+    output [ 1:0]   bpi_cen,
+    output          bpi_oen,
+    output          bpi_wen,
+    output          bpi_rstn,
+    input  [ 1:0]   bpi_rynby,
+
     inout  [31:0] ddr3_dq,
     inout  [ 3:0] ddr3_dqs_n,
     inout  [ 3:0] ddr3_dqs_p,
@@ -152,6 +160,22 @@ module soc(
     wire        bios_we_o;
     wire        bios_ack_i;
 
+    wire [31:0] flash_addr_o;
+    wire [31:0] flash_data_i;
+    wire [31:0] flash_data_o;
+    wire [ 1:0] flash_sel_o;
+    wire        flash_rd_o;
+    wire        flash_we_o;
+    wire        flash_ack_i;
+
+    wire [31:0] timer_addr_o;
+    wire [31:0] timer_data_i;
+    wire [31:0] timer_data_o;
+    wire [ 1:0] timer_sel_o;
+    wire        timer_rd_o;
+    wire        timer_we_o;
+    wire        timer_ack_i;
+
     wire [31:0] uart_addr_o;
     wire [31:0] uart_data_i;
     wire [31:0] uart_data_o;
@@ -168,13 +192,21 @@ module soc(
     wire        ps2_we_o;
     wire        ps2_ack_i;
 
-    wire [31:0] timer_addr_o;
-    wire [31:0] timer_data_i;
-    wire [31:0] timer_data_o;
-    wire [ 1:0] timer_sel_o;
-    wire        timer_rd_o;
-    wire        timer_we_o;
-    wire        timer_ack_i;
+    wire [31:0] sw_addr_o;
+    wire [31:0] sw_data_i;
+    wire [31:0] sw_data_o;
+    wire [ 1:0] sw_sel_o;
+    wire        sw_rd_o;
+    wire        sw_we_o;
+    wire        sw_ack_i;
+
+    wire [31:0] dt_addr_o;
+    wire [31:0] dt_data_i;
+    wire [31:0] dt_data_o;
+    wire [ 1:0] dt_sel_o;
+    wire        dt_rd_o;
+    wire        dt_we_o;
+    wire        dt_ack_i;
 
     bus bus(
         .clk(clk_sys),
@@ -204,6 +236,22 @@ module soc(
         .bios_we_o(bios_we_o),
         .bios_ack_i(bios_ack_i),
 
+        .flash_addr_o(flash_addr_o),
+        .flash_data_i(flash_data_i),
+        .flash_data_o(flash_data_o),
+        .flash_sel_o(flash_sel_o),
+        .flash_rd_o(flash_rd_o),
+        .flash_we_o(flash_we_o),
+        .flash_ack_i(flash_ack_i),
+
+        .timer_addr_o(timer_addr_o),
+        .timer_data_i(timer_data_i),
+        .timer_data_o(timer_data_o),
+        .timer_sel_o(timer_sel_o),
+        .timer_rd_o(timer_rd_o),
+        .timer_we_o(timer_we_o),
+        .timer_ack_i(timer_ack_i),
+
         .uart_addr_o(uart_addr_o),
         .uart_data_i(uart_data_i),
         .uart_data_o(uart_data_o),
@@ -220,13 +268,21 @@ module soc(
         .ps2_we_o(ps2_we_o),
         .ps2_ack_i(ps2_ack_i),
 
-        .timer_addr_o(timer_addr_o),
-        .timer_data_i(timer_data_i),
-        .timer_data_o(timer_data_o),
-        .timer_sel_o(timer_sel_o),
-        .timer_rd_o(timer_rd_o),
-        .timer_we_o(timer_we_o),
-        .timer_ack_i(timer_ack_i)
+        .sw_addr_o(sw_addr_o),
+        .sw_data_i(sw_data_i),
+        .sw_data_o(sw_data_o),
+        .sw_sel_o(sw_sel_o),
+        .sw_rd_o(sw_rd_o),
+        .sw_we_o(sw_we_o),
+        .sw_ack_i(sw_ack_i),
+
+        .dt_addr_o(dt_addr_o),
+        .dt_data_i(dt_data_i),
+        .dt_data_o(dt_data_o),
+        .dt_sel_o(dt_sel_o),
+        .dt_rd_o(dt_rd_o),
+        .dt_we_o(dt_we_o),
+        .dt_ack_i(dt_ack_i)
     );
 
     bios_dev bios_dev(
@@ -320,6 +376,59 @@ module soc(
         .ack_o(uart_ack_i),
 
         .interrupt(devices_interrupt[`UART_INT])
+    );
+
+    flash_dev flash_dev(
+        .clk(clk_sys),
+        .rst(rst),
+
+        .bpi_a(bpi_a),
+        .bpi_q(bpi_q),
+        .bpi_cen(bpi_cen),
+        .bpi_oen(bpi_oen),
+        .bpi_wen(bpi_wen),
+        .bpi_rstn(bpi_rstn),
+        .bpi_rynby(bpi_rynby),
+
+        .addr_i(flash_addr_o),
+        .data_o(flash_data_i),
+        .data_i(flash_data_o),
+        .sel_i(flash_sel_o),
+        .rd_i(flash_rd_o),
+        .we_i(flash_we_o),
+        .ack_o(flash_ack_i),
+
+        .interrupt(devices_interrupt[`FLASH_INT])
+    );
+
+    switch switch(
+        .clk(clk_sys),
+        .rst(rst),
+
+        .sw(sw),
+
+        .addr_i(sw_addr_o),
+        .data_o(sw_data_i),
+        .data_i(sw_data_o),
+        .sel_i(sw_sel_o),
+        .rd_i(sw_rd_o),
+        .we_i(sw_we_o),
+        .ack_o(sw_ack_i),
+
+        .interrupt()
+    );
+
+    datetime datetime(
+        .clk(clk_sys),
+        .rst(rst),
+
+        .addr_i(dt_addr_o),
+        .data_o(dt_data_i),
+        .data_i(dt_data_o),
+        .sel_i(dt_sel_o),
+        .rd_i(dt_rd_o),
+        .we_i(dt_we_o),
+        .ack_o(dt_ack_i)
     );
 
     dsp dsp(

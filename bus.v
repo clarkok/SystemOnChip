@@ -56,7 +56,23 @@ module bus(
     output [ 1:0]   ps2_sel_o,
     output          ps2_rd_o,
     output          ps2_we_o,
-    input           ps2_ack_i
+    input           ps2_ack_i,
+
+    output [31:0]   dt_addr_o,
+    input  [31:0]   dt_data_i,
+    output [31:0]   dt_data_o,
+    output [ 1:0]   dt_sel_o,
+    output          dt_rd_o,
+    output          dt_we_o,
+    input           dt_ack_i,
+
+    output [31:0]   sw_addr_o,
+    input  [31:0]   sw_data_i,
+    output [31:0]   sw_data_o,
+    output [ 1:0]   sw_sel_o,
+    output          sw_rd_o,
+    output          sw_we_o,
+    input           sw_ack_i
     );
 
     /*
@@ -70,6 +86,9 @@ module bus(
         0xFFFF_FE08     0xFFFF_FE0C     UART Rx
         0xFFFF_FE0C     0xFFFF_FE10     UART Tx
         0xFFFF_FE10     0xFFFF_FE14     PS2
+        0xFFFF_FE14     0xFFFF_FE18     Unused
+        0xFFFF_FE18     0xFFFF_FE1C     SW
+        0xFFFF_FE1C     0xFFFF_FE20     Datetime
     */
 
     parameter   GPU_ADDR_MASK   = 32'hFFC0_0000;
@@ -81,6 +100,8 @@ module bus(
     parameter   URX_ADDR_MASK   = 32'hFFFF_FE08;
     parameter   UTX_ADDR_MASK   = 32'hFFFF_FE0C;
     parameter   PS2_ADDR_MASK   = 32'hFFFF_FE10;
+    parameter   SW_ADDR_MASK    = 32'hFFFF_FE18;
+    parameter   DT_ADDR_MASK    = 32'hFFFF_FE1C;
 
     wire gpu_stb    = ((m_addr_i & GPU_ADDR_MASK) == GPU_ADDR_MASK) && (~m_addr_i[12]);
     wire bios_stb   = ((m_addr_i & BIOS_ADDR_MASK) == BIOS_ADDR_MASK) && (~m_addr_i[11]);
@@ -96,6 +117,8 @@ module bus(
     wire uart_stb   = uart_rx_stb || uart_tx_stb;
 
     wire ps2_stb    = (m_addr_i == PS2_ADDR_MASK);
+    wire sw_stb     = (m_addr_i == SW_ADDR_MASK);
+    wire dt_stb     = (m_addr_i == DT_ADDR_MASK);
 
     assign  gpu_addr_o      = m_addr_i;
     assign  bios_addr_o     = m_addr_i;
@@ -103,6 +126,8 @@ module bus(
     assign  timer_addr_o    = m_addr_i;
     assign  uart_addr_o     = m_addr_i;
     assign  ps2_addr_o      = m_addr_i;
+    assign  sw_addr_o       = m_addr_i;
+    assign  dt_addr_o       = m_addr_i;
 
     assign  gpu_data_o      = m_data_i;
     assign  bios_data_o     = m_data_i;
@@ -110,6 +135,8 @@ module bus(
     assign  timer_data_o    = m_data_i;
     assign  uart_data_o     = m_data_i;
     assign  ps2_data_o      = m_data_i;
+    assign  sw_data_o       = m_data_i;
+    assign  dt_data_o       = m_data_i;
 
     assign  gpu_sel_o       = m_sel_i;
     assign  bios_sel_o      = m_sel_i;
@@ -117,6 +144,8 @@ module bus(
     assign  timer_sel_o     = m_sel_i;
     assign  uart_sel_o      = m_sel_i;
     assign  ps2_sel_o       = m_sel_i;
+    assign  sw_sel_o        = m_sel_i;
+    assign  dt_sel_o        = m_sel_i;
 
     assign  gpu_rd_o    = m_rd_i    && gpu_stb;
     assign  bios_rd_o   = m_rd_i    && bios_stb;
@@ -124,6 +153,8 @@ module bus(
     assign  timer_rd_o  = m_rd_i    && timer_stb;
     assign  uart_rd_o   = m_rd_i    && uart_stb;
     assign  ps2_rd_o    = m_rd_i    && ps2_stb;
+    assign  sw_rd_o     = m_rd_i    && sw_stb;
+    assign  dt_rd_o     = m_rd_i    && dt_stb;
 
     assign  gpu_we_o    = m_we_i    && gpu_stb;
     assign  bios_we_o   = m_we_i    && bios_stb;
@@ -131,6 +162,8 @@ module bus(
     assign  timer_we_o  = m_we_i    && timer_stb;
     assign  uart_we_o   = m_we_i    && uart_stb;
     assign  ps2_we_o    = m_we_i    && ps2_stb;
+    assign  sw_we_o     = m_we_i    && sw_stb;
+    assign  dt_we_o     = m_we_i    && dt_stb;
 
     assign  m_data_o    = gpu_stb   ?   gpu_data_i      :
                           bios_stb  ?   bios_data_i     :
@@ -138,6 +171,8 @@ module bus(
                           timer_stb ?   timer_data_i    :
                           uart_stb  ?   uart_data_i     :
                           ps2_stb   ?   ps2_data_i      :
+                          sw_stb    ?   sw_data_i       :
+                          dt_stb    ?   dt_data_i       :
                                         32'b0;
     assign  m_ack_o     = gpu_stb   ?   gpu_ack_i       :
                           bios_stb  ?   bios_ack_i      :
@@ -145,6 +180,8 @@ module bus(
                           timer_stb ?   timer_ack_i     :
                           uart_stb  ?   uart_ack_i      :
                           ps2_stb   ?   ps2_ack_i       :
+                          sw_stb    ?   sw_ack_i        :
+                          dt_stb    ?   dt_ack_i        :
                                         1'b0;
 
 endmodule

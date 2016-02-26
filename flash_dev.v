@@ -2,6 +2,14 @@ module flash_dev(
     input  clk,
     input  rst,
 
+    output [25:0]   bpi_a,
+    inout  [31:0]   bpi_q,
+    output [ 1:0]   bpi_cen,
+    output          bpi_oen,
+    output          bpi_wen,
+    output          bpi_rstn,
+    input  [ 1:0]   bpi_rynby,
+
     input  [31:0]   addr_i,
     output [31:0]   data_o,
     input  [31:0]   data_i,
@@ -10,15 +18,7 @@ module flash_dev(
     input           we_i,
     output          ack_o,
 
-    output          interrupt,
-
-    output [25:0]   bpi_a,
-    inout  [31:0]   bpi_q,
-    output [ 1:0]   bpi_cen,
-    output          bpi_oen,
-    output          bpi_wen,
-    output          bpi_rstn,
-    input  [ 1:0]   bpi_rynby
+    output          interrupt
     );
 
     parameter   FLASH_CTRL_ADDR = 32'hFFFF_FE00;
